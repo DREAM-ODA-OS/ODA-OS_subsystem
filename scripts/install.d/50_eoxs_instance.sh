@@ -150,7 +150,7 @@ END
 
 # set the log-file 
 sudo -u "$ODAOSUSER" ex "$SETTINGS" <<END
-g/^LOGGING/,/^}/s;^\([	 ]*'filename'[	 ]*:\).*;\1 '${EOXSURL}',;
+g/^LOGGING/,/^}/s;^\([	 ]*'filename'[	 ]*:\).*;\1 '${EOXSLOG}',;
 wq
 END
 
