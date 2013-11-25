@@ -2,7 +2,7 @@
 #-------------------------------------------------------------------------------
 #
 # Project: DREAM - Task 5 - ODA-OS 
-# Purpose: ODA-OS installation script 
+# Purpose: reset hostname in the ODA-OS configuration
 # Authors: Martin Paces <martin.paces@eox.at>
 #
 #-------------------------------------------------------------------------------
@@ -26,55 +26,31 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 #-------------------------------------------------------------------------------
+export EXENAME=`basename $0`
 
 #source common part 
-. `dirname $0`/lib_common.sh  
+. `dirname $0`/lib_common.sh
 
 #-------------------------------------------------------------------------------
-# check whether the user and group exists 
-# if not create them 
 
-_mkdir()
-{ # <owner>[:<group>] <permissions> <dirname> <label>
-    if [ ! -d "$3" ] 
-    then 
-        echo "Creating $4: $3"
-        mkdir -p "$3"
-    fi 
-    chown -v "$1" "$3"
-    chmod -v "$2" "$3"
-} 
+if [ "$#" -lt "1" ] 
+then 
+    echo "ERROR: $EXENAME: Missing the required host name!" >&2 
+    echo "USAGE: $EXENAME <hostname> [<instance name> [<instance root>]]" >&2 
+    exit 1 
+fi 
 
-set -x 
-id -g "$ODAOSGROUP" 
-id -g "$ODAOSGROUP" >/dev/null 2>&1 || \
-{ 
-    echo "Creatting system group: $ODAOSGROUP"
-    groupadd -r "$ODAOSGROUP"    
-}
-
-
-id -u "$ODAOSUSER"
-id -u "$ODAOSUSER" >/dev/null 2>&1 || \
-{ 
-    echo "Creatting system user: $ODAOSUSER"
-    useradd -r -m -g "$ODAOSGROUP" -d "$ODAOSROOT" -c "ODA-OS system user" "$ODAOSUSER"
-} 
-set +x 
-
-# just in case the ODA-OS directories do not exists create them
-# and set the right permissions 
-
-_mkdir "$ODAOSUSER:$ODAOSGROUP" 0755 "$ODAOSROOT" "subsytem's root directory"
-_mkdir "$ODAOSUSER:$ODAOSGROUP" 0775 "$ODAOSLOGDIR" "subsytem's logging directory"
-_mkdir "$ODAOSUSER:$ODAOSGROUP" 0775 "$ODAOSDATADIR" "subsytem's long-term data storage directory"
-_mkdir "$ODAOSUSER:$ODAOSGROUP" 0775 "$ODAOSTMPDIR" "subsytem's short-term data stoarage directory"
+echo "INFO: Setting the service hostname to: $1"
 
 #-------------------------------------------------------------------------------
-# execute specific installation scripts 
+# set the service url 
 
-for SCRIPT in "`dirname $0`/install.d/"*.sh 
-do
-    echo "Executing installation script: $SCRIPT" 
-    sh -e $SCRIPT 
-done
+HOSTNAME="$1"
+INSTANCE="${2:-eoxs00}"
+INSTROOT="${3:-$ODAOSROOT}"
+EOXSCONF="${INSTROOT}/${INSTANCE}/${INSTANCE}/conf/eoxserver.conf"
+
+sudo -u "$ODAOSUSER" ex "$EOXSCONF" <<END
+/^[	 ]*http_service_url[	 ]*=/s;\(^[	 ]*http_service_url[	 ]*=\).*;\1http://${HOSTNAME}/${INSTANCE}/ows;
+wq
+END
