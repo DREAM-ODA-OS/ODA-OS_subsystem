@@ -2,6 +2,13 @@
 #
 # install PostgreSQL and PostGIS installation
 #
+#======================================================================
+
+. `dirname $0`/../lib_logging.sh  
+
+info "Installing PosgreSQL RDBM ... "
+
+#======================================================================
 
 # STEP 1: INSTALL RPMS
 

@@ -2,6 +2,13 @@
 #
 # install Apache HTTP server 
 #
+#======================================================================
+
+. `dirname $0`/../lib_logging.sh  
+
+info "Installing Apache HTTP server ... "
+
+#======================================================================
 
 SOCKET_PREFIX="run/wsgi"
 

@@ -3,6 +3,10 @@
 # disable SELinux 
 #
 
+. `dirname $0`/../lib_logging.sh  
+
+info "Disabling SELinux ..."
+
 # change to permissive mode in the current session 
 [ `getenforce` != "Disabled" ] && setenforce "Permissive"
 

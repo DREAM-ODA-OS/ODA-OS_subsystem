@@ -2,7 +2,7 @@
 #-------------------------------------------------------------------------------
 #
 # Project: DREAM - Task 5 - ODA-OS 
-# Purpose: ODA-OS installation script - common shared defaults 
+# Purpose: ODA-OS installation script - logging utilities
 # Authors: Martin Paces <martin.paces@eox.at>
 #
 #-------------------------------------------------------------------------------
@@ -27,28 +27,20 @@
 # THE SOFTWARE.
 #-------------------------------------------------------------------------------
 
-# public hostname (or IP number) under which the ODA-OS shall be accessable 
-# NOTE: Critical parameter! Be sure you set to proper value.
-export ODAOSHOSTNAME=${ODAOSHOSTNAME:-192.168.56.13}
+EXENAME=`basename $0`
+error()
+{
+    echo "ERROR: $EXENAME: $1 " >&2
+    exit 1
+}
 
-# root directory of the ODA-OS subsystem - by default set to '/srv/odaos'
-export ODAOSROOT=${ODAOSROOT:-/srv/odaos}
+info()
+{
+    echo "INFO: $EXENAME: $1 " 
+}
 
-# directory where the log files shall be places - by default set to '/var/log/odaos'
-export ODAOSLOGDIR=${ODAOSLOGDIR:-/var/log/odaos}
-
-# directory of the long-term data storage - by default set to '/srv/eodata'
-export ODAOSDATADIR=${ODAOSDATADIR:-/srv/eodata}
-
-# directory of the short-term data storage - by default set to '/srv/tmp'
-# NOTE: the purpose of this directory is not to replace the /tmp but 
-#       rather to be used as a subsytem's temporary workspace
-export ODAOSTMPDIR=${ODAOSTMPDIR:-/srv/tmp}
-
-# names of the ODA-OS user and group - by default set to 'odaos:apache'
-export ODAOSGROUP=${ODAOSGROUP:-apache}
-export ODAOSUSER=${ODAOSUSER:-odaos}
-
-# location of the ngEO downaload manager home directory
-export ODAOS_DM_HOME=${ODAOS_DM_HOME:-$ODAOSROOT/ngeo-dm}
+warn()
+{
+    echo "WARNING: $EXENAME: $1 " 
+}
 

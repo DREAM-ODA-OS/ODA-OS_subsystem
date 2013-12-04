@@ -3,6 +3,10 @@
 # enable extra RPM repositories 
 #
 
+. `dirname $0`/../lib_logging.sh  
+
+info "Installing common RPM repositories ..."
+
 # EPEL: http://fedoraproject.org/wiki/EPEL
 rpm -q --quiet epel-release || rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
 

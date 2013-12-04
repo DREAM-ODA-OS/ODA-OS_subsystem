@@ -2,14 +2,13 @@
 #
 # setup EOxServer instance 
 #
-#-------------------------------------------------------------------------------
-EXENAME=`basename $0`
-error()
-{
-    echo "ERROR: $EXENAME: $1 "
-    exit 1
-}
-#-------------------------------------------------------------------------------
+#======================================================================
+
+. `dirname $0`/../lib_logging.sh  
+
+info "Configuring EOxServer ... "
+
+#======================================================================
 # NOTE: In ODA-OS, it is not expected to have mutiple instances of the EOxServer
 
 [ -z "$ODAOSHOSTNAME" ] && error "Missing the required ODAOSHOSTNAME variable!"
@@ -17,8 +16,6 @@ error()
 [ -z "$ODAOSUSER" ] && error "Missing the required ODAOSUSER variable!"
 [ -z "$ODAOSLOGDIR" ] && error "Missing the required ODAOSLOGDIR variable!"
 export ODAOSLOGDIR=${ODAOSLOGDIR:-/var/log/odaos}
-
-set -x 
 
 HOSTNAME="$ODAOSHOSTNAME"
 INSTANCE="eoxs00"
@@ -47,14 +44,14 @@ EOXSURL="http://${HOSTNAME}/${INSTANCE}/ows"
 #-------------------------------------------------------------------------------
 # create instance 
 
-echo "Creating EOxServer instance '${INSTANCE}' in '$INSTROOT/$INSTANCE' ..."
+info "Creating EOxServer instance '${INSTANCE}' in '$INSTROOT/$INSTANCE' ..."
 sudo -u "$ODAOSUSER" mkdir -p "$INSTROOT/$INSTANCE"
 sudo -u "$ODAOSUSER" eoxserver-admin.py create_instance "$INSTANCE" "$INSTROOT/$INSTANCE" 
 
 #-------------------------------------------------------------------------------
 # create Postgres DB 
 
-echo "Creating EOxServer instance's Postgres database '$DBNAME' ..."
+info "Creating EOxServer instance's Postgres database '$DBNAME' ..."
 
 sudo -u postgres psql -q -c "CREATE USER $DBUSER WITH ENCRYPTED PASSWORD '$DBPASSWD' NOSUPERUSER NOCREATEDB NOCREATEROLE ;"
 sudo -u postgres psql -q -c "CREATE DATABASE $DBNAME WITH OWNER $DBUSER TEMPLATE template_postgis ENCODING 'UTF-8' ;"
@@ -89,7 +86,7 @@ END
 #-------------------------------------------------------------------------------
 # Integration with the Apache web server  
 
-echo "Mapping EOxServer instance '${INSTANCE}' to URL path '${INSTANCE}' ..."
+info "Mapping EOxServer instance '${INSTANCE}' to URL path '${INSTANCE}' ..."
 
 # locate proper configuration file (see also apache configuration)
 
@@ -162,7 +159,7 @@ chmod -v 0664 ${EOXSLOG}
 #-------------------------------------------------------------------------------
 # Django syncdb (without interactive prompts) 
 
-echo "Initializing EOxServer instance '${INSTANCE}' ..."
+info "Initializing EOxServer instance '${INSTANCE}' ..."
 
 # collect static files 
 sudo -u "$ODAOSUSER" python "$MNGCMD" collectstatic -l --noinput

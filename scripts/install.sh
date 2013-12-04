@@ -27,8 +27,13 @@
 # THE SOFTWARE.
 #-------------------------------------------------------------------------------
 
-#source common part 
+#source common parts
 . `dirname $0`/lib_common.sh  
+. `dirname $0`/lib_logging.sh  
+
+#export location of the contrib directory 
+
+export CONTRIB="$(cd "$(dirname "$0")/../contrib"; pwd )"
 
 #-------------------------------------------------------------------------------
 # check whether the user and group exists 
@@ -38,18 +43,18 @@ _mkdir()
 { # <owner>[:<group>] <permissions> <dirname> <label>
     if [ ! -d "$3" ] 
     then 
-        echo "Creating $4: $3"
+        info "Creating $4: $3"
         mkdir -p "$3"
     fi 
     chown -v "$1" "$3"
     chmod -v "$2" "$3"
 } 
 
-set -x 
+
 id -g "$ODAOSGROUP" 
 id -g "$ODAOSGROUP" >/dev/null 2>&1 || \
 { 
-    echo "Creatting system group: $ODAOSGROUP"
+    info "Creatting system group: $ODAOSGROUP"
     groupadd -r "$ODAOSGROUP"    
 }
 
@@ -57,10 +62,9 @@ id -g "$ODAOSGROUP" >/dev/null 2>&1 || \
 id -u "$ODAOSUSER"
 id -u "$ODAOSUSER" >/dev/null 2>&1 || \
 { 
-    echo "Creatting system user: $ODAOSUSER"
+    info "Creatting system user: $ODAOSUSER"
     useradd -r -m -g "$ODAOSGROUP" -d "$ODAOSROOT" -c "ODA-OS system user" "$ODAOSUSER"
 } 
-set +x 
 
 # just in case the ODA-OS directories do not exists create them
 # and set the right permissions 
@@ -73,8 +77,12 @@ _mkdir "$ODAOSUSER:$ODAOSGROUP" 0775 "$ODAOSTMPDIR" "subsytem's short-term data 
 #-------------------------------------------------------------------------------
 # execute specific installation scripts 
 
+#for SCRIPT in "`dirname $0`/install.d/"*ngeo_dm*.sh
 for SCRIPT in "`dirname $0`/install.d/"*.sh 
 do
-    echo "Executing installation script: $SCRIPT" 
+    info "Executing installation script: $SCRIPT" 
     sh -e $SCRIPT 
+    [ 0 -ne "$?" ] && warn "Installation script ended with an error: $SCRIPT"
 done
+
+info "Installation has been completed." 

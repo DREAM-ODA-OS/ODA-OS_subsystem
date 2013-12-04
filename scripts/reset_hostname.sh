@@ -26,10 +26,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 #-------------------------------------------------------------------------------
-export EXENAME=`basename $0`
 
-#source common part 
+#source common parts 
 . `dirname $0`/lib_common.sh
+. `dirname $0`/lib_logging.sh  
 
 #-------------------------------------------------------------------------------
 
@@ -40,7 +40,7 @@ then
     exit 1 
 fi 
 
-echo "INFO: Setting the service hostname to: $1"
+info "Setting the service hostname to: $1"
 
 #-------------------------------------------------------------------------------
 # set the service url 
