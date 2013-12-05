@@ -118,13 +118,4 @@ mv -f "$DM_TMPDIR/ngEO-download-manager" "$ODAOS_DM_HOME"
 # fix permisions 
 chown -R "$ODAOSUSER:$ODAOSGROUP" "$ODAOS_DM_HOME"
 
-# create writeable directory to hold the HSQLDB 
-mv -f "$DM_TMPDIR/ngEO-download-manager" "$ODAOS_DM_HOME"
-
-
-
-#chmod 0755 "$ODAOS_DM_HOME"
-#find "$ODAOS_DM_HOME" -type d -exec chmod 0755 {} \;  
-#find "$ODAOS_DM_HOME" -type f -exec chmod 0644 {} \;  
-
 # TODO: get rid of the embedded JRE 
