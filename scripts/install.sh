@@ -50,16 +50,13 @@ _mkdir()
     chmod -v "$2" "$3"
 } 
 
-
-id -g "$ODAOSGROUP" 
 id -g "$ODAOSGROUP" >/dev/null 2>&1 || \
 { 
     info "Creatting system group: $ODAOSGROUP"
-    groupadd -r "$ODAOSGROUP"    
+    groupadd -r "$ODAOSGROUP"
 }
 
 
-id -u "$ODAOSUSER"
 id -u "$ODAOSUSER" >/dev/null 2>&1 || \
 { 
     info "Creatting system user: $ODAOSUSER"
@@ -69,8 +66,8 @@ id -u "$ODAOSUSER" >/dev/null 2>&1 || \
 # just in case the ODA-OS directories do not exists create them
 # and set the right permissions 
 
-_mkdir "$ODAOSUSER:$ODAOSGROUP" 0755 "$ODAOSROOT" "subsytem's root directory"
-_mkdir "$ODAOSUSER:$ODAOSGROUP" 0775 "$ODAOSLOGDIR" "subsytem's logging directory"
+_mkdir "$ODAOSUSER:$ODAOSGROUP" 0755 "$ODAOSROOT" "subsytem's root directory" 
+_mkdir "$ODAOSUSER:$ODAOSGROUP" 0775 "$ODAOSLOGDIR" "subsytem's logging directory" 
 _mkdir "$ODAOSUSER:$ODAOSGROUP" 0775 "$ODAOSDATADIR" "subsytem's long-term data storage directory"
 _mkdir "$ODAOSUSER:$ODAOSGROUP" 0775 "$ODAOSTMPDIR" "subsytem's short-term data stoarage directory"
 
@@ -81,7 +78,7 @@ _mkdir "$ODAOSUSER:$ODAOSGROUP" 0775 "$ODAOSTMPDIR" "subsytem's short-term data 
 for SCRIPT in "`dirname $0`/install.d/"*.sh 
 do
     info "Executing installation script: $SCRIPT" 
-    sh -e $SCRIPT 
+    sh -e $SCRIPT
     [ 0 -ne "$?" ] && warn "Installation script ended with an error: $SCRIPT"
 done
 

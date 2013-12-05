@@ -28,19 +28,33 @@
 #-------------------------------------------------------------------------------
 
 EXENAME=`basename $0`
+
+# setup color output 
+#if tty -s 
+RED="\\033[31m"
+GRE="\\033[32m"
+YEL="\\033[33m"
+BLU="\\033[34m"
+RES="\\033[m"
+
+tstamp()
+{ 
+    date --rfc-3339=seconds
+} 
+
 error()
 {
-    echo "ERROR: $EXENAME: $1 " >&2
+    echo -e "`tstamp` ${RED}ERROR: $EXENAME: $1 ${RES}" 
     exit 1
 }
 
 info()
 {
-    echo "INFO: $EXENAME: $1 " 
+    echo -e "`tstamp` ${YEL}INFO: $EXENAME: $1 ${RES}" 
 }
 
 warn()
 {
-    echo "WARNING: $EXENAME: $1 " 
+    echo -e "`tstamp` ${RED}WARNING: $EXENAME: $1 ${RES}" 
 }
 
