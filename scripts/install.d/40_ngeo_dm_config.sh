@@ -339,11 +339,11 @@ chmod -v 0775 "$DM_DBDIR"
 
 # we enable access to port 80 from anywhere
 # and make the iptables chages permanent 
-if [ -z "`iptables -nL | grep '^ACCEPT *tcp *-- *0\.0\.0\.0/0 *0\.0\.0\.0/0 *state *NEW *tcp *dpt:8082'`" ] 
-then 
-    iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 8082 -j ACCEPT
-    service iptables save
-fi
+#if [ -z "`iptables -nL | grep '^ACCEPT *tcp *-- *0\.0\.0\.0/0 *0\.0\.0\.0/0 *state *NEW *tcp *dpt:8082'`" ] 
+#then 
+#    iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 8082 -j ACCEPT
+#    service iptables save
+#fi
 
 #======================================================================
 # make the donwload manager enabled permanently and start the service 
