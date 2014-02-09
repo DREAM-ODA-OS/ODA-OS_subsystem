@@ -74,8 +74,16 @@ _mkdir "$ODAOSUSER:$ODAOSGROUP" 0775 "$ODAOSTMPDIR" "subsytem's short-term data 
 #-------------------------------------------------------------------------------
 # execute specific installation scripts 
 
-#for SCRIPT in "`dirname $0`/install.d/"*ngeo_dm*.sh
-for SCRIPT in "`dirname $0`/install.d/"*.sh 
+if [ $# -eq 1 ] 
+then 
+    # execute selected scripts only 
+    SCRIPTS=$*
+else 
+    # execute all scripts 
+    SCRIPTS="`dirname $0`/install.d/"*.sh
+fi 
+
+for SCRIPT in $SCRIPTS
 do
     info "Executing installation script: $SCRIPT" 
     sh -e $SCRIPT
