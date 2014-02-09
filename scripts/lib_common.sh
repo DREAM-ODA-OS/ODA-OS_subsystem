@@ -52,3 +52,5 @@ export ODAOSUSER=${ODAOSUSER:-odaos}
 # location of the ngEO downaload manager home directory
 export ODAOS_DM_HOME=${ODAOS_DM_HOME:-$ODAOSROOT/ngeo-dm}
 
+# location of the Ingestion Engine home directory
+export ODAOS_IE_HOME=${ODAOS_IE_HOME:-$ODAOSROOT/ingeng}
