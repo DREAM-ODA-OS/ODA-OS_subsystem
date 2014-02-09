@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh 
 #
 # install ODA-OS ingestion engine 
 #
@@ -17,7 +17,8 @@ IE_TMPDIR='/tmp/ieng'
 [ -z "$ODAOSUSER" ] && error "Missing the required ODAOSUSER variable!"
 [ -z "$ODAOSGROUP" ] && error "Missing the required ODAOSGROUP variable!"
 
-if [ -d "$ODAOS_IE_HOME" ] 
+#if [ -d "$ODAOS_IE_HOME" ] 
+if /bin/false
 then 
     info "Ingestion Engine seems to be already installed."
     info "Ingestion Engine installation is terminated."
@@ -53,6 +54,8 @@ get_filename()
 
 #======================================================================
 # trying to locate the download manager tarball in DM directory 
+
+set -x 
 
 IE_TARBALL="`find "$CONTRIB" -name 'IngestionEngine*' | grep -e '\.tgz$' -e '\.tar\.gz$' | sort -r | head -n 1`" 
 
@@ -96,7 +99,7 @@ mkdir -p "$IE_TMPDIR"
 tar -xzf "$IE_TARBALL" --directory="$IE_TMPDIR"
 
 # move to destination 
-IE_ROOT="`find "$IE_TMPDIR" -name 'IngestionEngine*' -mindepth 1 -maxdepth 1 -type d | head -n 1`"
+IE_ROOT="`find "$IE_TMPDIR" -mindepth 1 -maxdepth 1 -name 'IngestionEngine*' -type d | head -n 1`"
 mv -f "$IE_ROOT" "$ODAOS_IE_HOME"
 
 # fix permisions 
