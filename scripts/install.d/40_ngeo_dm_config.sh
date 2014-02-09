@@ -3,7 +3,6 @@
 # configure ngEO downaload manager 
 #
 #======================================================================
-set -x 
 
 . `dirname $0`/../lib_logging.sh  
 
@@ -275,14 +274,43 @@ DM_DOWNLOAD_DIR="$ODAOSTMPDIR/ngeo-dm"
 
 info "Setting the default donwload location to $DM_DOWNLOAD_DIR"
 
-DM_CONFIG="$ODAOS_DM_HOME/conf/userModifiableSettingsPersistentStore.properties"
+DM_CONFIG0="$ODAOS_DM_HOME/conf/userModifiableSettingsPersistentStore.properties"
+DM_CONFIG1="$ODAOS_DM_HOME/conf/user-modifiable-settings.properties"
+
+[ -f "$DM_CONFIG0" ] && DM_CONFIG="$DM_CONFIG0"
+[ -f "$DM_CONFIG1" ] && DM_CONFIG="$DM_CONFIG1"
+
+[ -z "$DM_CONFIG" ] && error "Cannot find the configuration file! FILE=$DM_CONFIG1"
 
 # make the necessary changes
 sudo -u "$ODAOSUSER" ex "$DM_CONFIG" <<END
 1,\$s:\\r::ge
+1,\$s:^[ 	]*\\(DM_FRIENDLY_NAME\\)[ 	]*=.*\$:\1=T5IngestionEngineDM:
 1,\$s:^[ 	]*\\(BASE_DOWNLOAD_FOLDER_ABSOLUTE\\)[ 	]*=.*\$:\1=$DM_DOWNLOAD_DIR:
 wq
 END
+# Possible Options: 
+#SSO_USERNAME=
+#SSO_PASSWORD=
+#DM_FRIENDLY_NAME=
+#BASE_DOWNLOAD_FOLDER_ABSOLUTE=
+#WEB_INTERFACE_PORT_NO=8082
+#NO_OF_PARALLEL_PRODUCT_DOWNLOAD_THREADS=5
+#WEB_PROXY_HOST=
+#WEB_PROXY_PORT=
+#WEB_PROXY_USERNAME=
+#WEB_PROXY_PASSWORD=
+#PRODUCT_DOWNLOAD_COMPLETE_COMMAND=
+#WEB_INTERFACE_USERNAME=
+#WEB_INTERFACE_PASSWORD=
+#WEB_INTERFACE_REMOTE_ACCESS_ENABLED=
+#EMAIL_RECIPIENTS=
+#EMAIL_SEND_NOTIFICATION_LEVEL=ERROR
+#EMAIL_SMTP_SERVER=
+#EMAIL_SMTP_PORT=
+#EMAIL_SMTP_USERNAME=
+#EMAIL_SMTP_PASSWORD=
+#EMAIL_SMTP_SECURITY_TYPE=NONE
 
 #======================================================================
 # make sure the directory exists and has the proper permissions
