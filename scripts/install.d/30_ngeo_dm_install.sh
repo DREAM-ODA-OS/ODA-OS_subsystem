@@ -43,7 +43,7 @@ trap on_exit EXIT
 #======================================================================
 # trying to locate the download manager tarball in DM directory 
 
-DM_TARBALL="`find "$CONTRIB" -name 'download-manager*-linux_x64.tar.gz' | sort | tail -n 1`" 
+DM_TARBALL="`find "$CONTRIB" -name 'download-manager*-linux_x64.tar.gz' | sort -r | head -n 1`" 
 
 if [ -z "$DM_TARBALL" ] 
 then 
@@ -93,7 +93,7 @@ then
 
 else # found - using local copy  
 
-    info "Using the existing local copy of the donwload manager."
+    info "Using the existing local copy of the download manager."
 
 fi 
 
@@ -117,5 +117,7 @@ mv -f "$DM_TMPDIR/ngEO-download-manager" "$ODAOS_DM_HOME"
 
 # fix permisions 
 chown -R "$ODAOSUSER:$ODAOSGROUP" "$ODAOS_DM_HOME"
+
+info "ngEO Download Manager installed."
 
 # TODO: get rid of the embedded JRE 
