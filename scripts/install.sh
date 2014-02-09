@@ -74,7 +74,7 @@ _mkdir "$ODAOSUSER:$ODAOSGROUP" 0775 "$ODAOSTMPDIR" "subsytem's short-term data 
 #-------------------------------------------------------------------------------
 # execute specific installation scripts 
 
-if [ $# -eq 1 ] 
+if [ $# -ge 1 ] 
 then 
     # execute selected scripts only 
     SCRIPTS=$*
