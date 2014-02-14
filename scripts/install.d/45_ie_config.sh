@@ -67,8 +67,8 @@ SETTINGS="${INSTROOT}/${INSTANCE}/settings.py"
 
 info "Initializing EOxServer instance '${INSTANCE}' ..."
 
-# collect static files 
-sudo -u "$ODAOSUSER" python "$MNGCMD" collectstatic -l --noinput
+# collect static files (do not use the -l option!)
+sudo -u "$ODAOSUSER" python "$MNGCMD" collectstatic --noinput
 
 # setup new database 
 sudo -u "$ODAOSUSER" python "$MNGCMD" syncdb --noinput 

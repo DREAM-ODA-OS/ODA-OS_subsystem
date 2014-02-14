@@ -55,8 +55,6 @@ get_filename()
 #======================================================================
 # trying to locate the download manager tarball in DM directory 
 
-set -x 
-
 IE_TARBALL="`find "$CONTRIB" -name 'IngestionEngine*' | grep -e '\.tgz$' -e '\.tar\.gz$' | sort -r | head -n 1`" 
 
 if [ -z "$IE_TARBALL" ] 
