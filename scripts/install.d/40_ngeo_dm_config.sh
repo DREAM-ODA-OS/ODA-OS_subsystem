@@ -33,7 +33,7 @@ END
 #======================================================================
 # java wrapper  
 
-DM_CONSOLE_LOG="/dev/null"
+#DM_CONSOLE_LOG="/dev/null"
 DM_CONSOLE_LOG="$ODAOSLOGDIR/ngeo-dm_console.log"
 
 DM_START="$ODAOS_DM_HOME/start-dm.sh"
@@ -229,7 +229,7 @@ dm_reset()
             return 1 
         fi
     else
-        echo $"WARNING: \${ngeo_dm_db} seems to reset alredy." 
+        echo $"WARNING: \${ngeo_dm_db} seems to be reset alredy." 
         echo FAILED 
         return 2
     fi
@@ -351,4 +351,3 @@ chmod -v 0775 "$DM_DBDIR"
 info "Enabling the download manager's service ..."
 chkconfig ngeo-dm on 
 service ngeo-dm restart
-
