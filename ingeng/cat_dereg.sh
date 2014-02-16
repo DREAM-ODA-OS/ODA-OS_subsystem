@@ -11,5 +11,9 @@
 
 echo "Default Local Catalogue de-registration script started."
 
+echo "---"
+echo " WARNING: Catalogue meta-data ingestion not yet implemented!"
+echo "---"
+
 echo "Default Local Cat de-registration script finishing with status 0."
 exit 0

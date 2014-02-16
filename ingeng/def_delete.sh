@@ -51,5 +51,9 @@ then
     fi
 fi
 
+echo "---"
+echo " WARNING: Product removal action not yet implemented!"
+echo "---"
+
 echo $script_name "finishing with status 0."
 exit 0

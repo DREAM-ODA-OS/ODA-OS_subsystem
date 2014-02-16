@@ -34,5 +34,9 @@ echo arg: $1
 echo "arg1 contains:"
 cat $1
 
+echo "---"
+echo " WARNING: Catalogue meta-data removal not yet implemented!"
+echo "---"
+
 echo "Default Local Cat registration script finishing with status 0."
 exit 0

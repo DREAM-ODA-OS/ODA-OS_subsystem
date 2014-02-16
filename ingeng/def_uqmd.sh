@@ -18,6 +18,10 @@
 echo "Update MetaData script started on" $(date)
 echo args: $*
 
+echo "---"
+echo " WARNING: Meta-data update not yet implemented!"
+echo "---"
+
 if [[ $# < 3 ]]
 then
     echo "Not enough args, exiting with status 5."
@@ -42,6 +46,10 @@ then
     echo echo "exiting with status 3"
     exit 3
 fi
+
+echo "---"
+echo " WARNING: Update Quality Metadata not yet implemented!"
+echo "---"
 
 echo "test uqmd finishing with status 0."
 exit 0

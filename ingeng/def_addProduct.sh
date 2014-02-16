@@ -98,5 +98,9 @@ if [[ ! -f $data ]] ; then
     exit 4
 fi
 
+echo "---"
+echo " WARNING: AddProduct action not yet implemented!"
+echo "---"
+
 echo "test uqmd finishing with status 0."
 exit 0

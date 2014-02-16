@@ -59,5 +59,9 @@ then
     fi
 fi
 
+echo "---"
+echo " WARNING: Ingestion action not yet implemented!"
+echo "---"
+
 echo "Default Ingestion script finishing with status " $ex_status
 exit $ex_status
