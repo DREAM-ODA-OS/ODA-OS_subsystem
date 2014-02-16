@@ -34,6 +34,7 @@
 #export location of the contrib directory 
 
 export CONTRIB="$(cd "$(dirname "$0")/../contrib"; pwd )"
+export INGENG="$(cd "$(dirname "$0")/../ingeng"; pwd )"
 
 #-------------------------------------------------------------------------------
 # check whether the user and group exists 
