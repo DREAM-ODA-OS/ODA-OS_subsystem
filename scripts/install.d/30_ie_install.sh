@@ -30,7 +30,7 @@ fi
 
 on_exit() 
 { 
-    [ ! -d "$EI_TMPDIR" ] || rm -fR "$EI_TMPDIR"
+    [ ! -d "$IE_TMPDIR" ] || rm -fR "$IE_TMPDIR"
 } 
 
 trap on_exit EXIT 
