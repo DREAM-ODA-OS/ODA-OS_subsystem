@@ -10,6 +10,7 @@ info "Installing the Ingestion Engine action scripts ... "
 
 #======================================================================
 
+[ -z "$ODAOS_IEAS_HOME" ] && error "Missing the required ODAOS_IEAS_HOME variable!"
 [ -z "$ODAOSROOT" ] && error "Missing the required ODAOSROOT variable!"
 [ -z "$CONTRIB" ] && error "Missing the required CONTRIB variable!"
 [ -z "$INGENG" ] && error "Missing the required INGENG variable!"
@@ -19,24 +20,22 @@ info "Installing the Ingestion Engine action scripts ... "
 USE_SYMLINKS=FALSE
 #USE_SYMLINKS=TRUE
 
-IEAS_HOME="$ODAOSROOT/ie_scripts"
-
 #======================================================================
 
 # clean-up previous mess 
-[ -d "$IEAS_HOME" -o -h "$IEAS_HOME" ] && rm -fR "$IEAS_HOME"
+[ -d "$ODAOS_IEAS_HOME" -o -h "$ODAOS_IEAS_HOME" ] && rm -fR "$ODAOS_IEAS_HOME"
 
 if [ "TRUE" == "$USE_SYMLINKS" ]
 then 
     # symbolic link
-    ln -fs "$INGENG" "$IEAS_HOME"
+    ln -fs "$INGENG" "$ODAOS_IEAS_HOME"
 
 else 
     # copied files 
-    cp -fvR "$INGENG" "$IEAS_HOME"
+    cp -fvR "$INGENG" "$ODAOS_IEAS_HOME"
 
     # set owner  
-    chown -R "$ODAOSUSER:$ODAOSGROUP" "$IEAS_HOME"
+    chown -R "$ODAOSUSER:$ODAOSGROUP" "$ODAOS_IEAS_HOME"
 fi
 
 #======================================================================

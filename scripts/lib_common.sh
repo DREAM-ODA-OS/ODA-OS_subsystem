@@ -54,3 +54,6 @@ export ODAOS_DM_HOME=${ODAOS_DM_HOME:-$ODAOSROOT/ngeo-dm}
 
 # location of the Ingestion Engine home directory
 export ODAOS_IE_HOME=${ODAOS_IE_HOME:-$ODAOSROOT/ingeng}
+
+# location of the Ingestion Engine actions scripts home directory
+export ODAOS_IEAS_HOME=${ODAOS_IEAS_HOME:-$ODAOSROOT/ie_scripts}

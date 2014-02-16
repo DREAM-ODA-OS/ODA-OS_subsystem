@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh 
 #
 # configure ODA-OS ingestion engine 
 #
@@ -11,6 +11,7 @@ info "Configuring Ingestion Engine ... "
 #======================================================================
 # NOTE: In ODA-OS, it is not expected to have mutiple instances of the EOxServer
 
+[ -z "$ODAOS_IEAS_HOME" ] && error "Missing the required ODAOS_IEAS_HOME variable!"
 [ -z "$ODAOS_DM_HOME" ] && error "Missing the required ODAOS_DM_HOME variable!"
 [ -z "$ODAOS_IE_HOME" ] && error "Missing the required ODAOS_IE_HOME variable!"
 #[ -z "$ODAOSHOSTNAME" ] && error "Missing the required ODAOSHOSTNAME variable!"
@@ -54,11 +55,11 @@ wq
 END
 
 # settings.py 
-sudo -u "$ODAOSUSER" ex "$SETTINGS" <<END
+sudo -u "$ODAOSUSER" ex -V "$SETTINGS" <<END
 1,\$s:^\(LOGGING_DIR[	 ]*=[	 ]*\).*$:\1"$ODAOSLOGDIR":
+1,\$s:^\(IE_SCRIPTS_DIR[	 ]*=[	 ]*\).*$:\1"$ODAOS_IEAS_HOME":
 wq
 END
-SETTINGS="${INSTROOT}/${INSTANCE}/settings.py"
 
 #-------------------------------------------------------------------------------
 # Django syncdb (without interactive prompts) 
