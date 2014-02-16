@@ -45,6 +45,15 @@ EOXSURL="http://${HOSTNAME}/${INSTANCE}/ows"
 # create instance 
 
 info "Creating EOxServer instance '${INSTANCE}' in '$INSTROOT/$INSTANCE' ..."
+
+if [ -d "$INSTROOT/$INSTANCE" ]
+then 
+
+    info " The instance seems to already exist. All files will be removed!"
+    rm -fvR "$INSTROOT/$INSTANCE"
+fi
+
+
 sudo -u "$ODAOSUSER" mkdir -p "$INSTROOT/$INSTANCE"
 sudo -u "$ODAOSUSER" eoxserver-admin.py create_instance "$INSTANCE" "$INSTROOT/$INSTANCE" 
 
@@ -53,13 +62,27 @@ sudo -u "$ODAOSUSER" eoxserver-admin.py create_instance "$INSTANCE" "$INSTROOT/$
 
 info "Creating EOxServer instance's Postgres database '$DBNAME' ..."
 
+# deleting any previously existing database and user 
+sudo -u postgres psql -q -c "DROP DATABASE $DBNAME ;" 2>/dev/null \
+  && warn " The alredy existing database '$DBNAME' was removed." || /bin/true 
+
+# deleting any previously existing user 
+TMP=`sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='$DBUSER' ;"`
+if [ 1 == "$TMP" ]
+then 
+    sudo -u postgres psql -q -c "DROP USER $DBUSER ;"
+    warn " The alredy existing database user '$DBUSER' was removed"
+fi
+
+# create new users 
 sudo -u postgres psql -q -c "CREATE USER $DBUSER WITH ENCRYPTED PASSWORD '$DBPASSWD' NOSUPERUSER NOCREATEDB NOCREATEROLE ;"
 sudo -u postgres psql -q -c "CREATE DATABASE $DBNAME WITH OWNER $DBUSER TEMPLATE template_postgis ENCODING 'UTF-8' ;"
 
 # prepend to the beginning of the acess list 
-sudo -u postgres ex "$PG_HBA" <<END 
+{ sudo -u postgres ex "$PG_HBA" || /bin/true ; } <<END 
+g/# EOxServer instance:.*\/$INSTANCE/d
+g/^[	 ]*local[	 ]*$DBNAME/d
 /#[	 ]*TYPE[	 ]*DATABASE[	 ]*USER[	 ]*CIDR-ADDRESS[	 ]*METHOD/a
-
 # EOxServer instance: $INSTROOT/$INSTANCE
 local	$DBNAME	$DBUSER	md5
 local	$DBNAME	all	reject
@@ -73,15 +96,16 @@ service postgresql restart
 # setup Django DB backend 
 
 sudo -u "$ODAOSUSER" ex "$SETTINGS" <<END
-1,\$s/\('ENGINE'[	 ]*:[	 ]*'\).*\('[	 ]*,\)/\1$DBENGINE\2/
-1,\$s/\('NAME'[	 ]*:[	 ]*'\).*\('[	 ]*,\)/\1$DBNAME\2/
-1,\$s/\('USER'[	 ]*:[	 ]*'\).*\('[	 ]*,\)/\1$DBUSER\2/
-1,\$s/\('PASSWORD'[	 ]*:[	 ]*'\).*\('[	 ]*,\)/\1$DBPASSWD\2/
-1,\$s/\('HOST'[	 ]*:[	 ]*'\).*\('[	 ]*,\)/#\1$DBHOST\2/
-1,\$s/\('PORT'[	 ]*:[	 ]*'\).*\('[	 ]*,\)/#\1$DBPORT\2/
-1,\$s:\(STATIC_URL[	 ]*=[	 ]*'\).*\('.*\):\1$INSTSTAT_URL/\2:
+1,\$s/\('ENGINE'[	 ]*:[	 ]*\).*\(,\)/\1'$DBENGINE'\2/
+1,\$s/\('NAME'[	 ]*:[	 ]*\).*\(,\)/\1'$DBNAME'\2/
+1,\$s/\('USER'[	 ]*:[	 ]*\).*\(,\)/\1'$DBUSER'\2/
+1,\$s/\('PASSWORD'[	 ]*:[	 ]*\).*\(,\)/\1'$DBPASSWD'\2/
+1,\$s/\('HOST'[	 ]*:[	 ]*\).*\(,\)/#\1'$DBHOST'\2/
+1,\$s/\('PORT'[	 ]*:[	 ]*\).*\(,\)/#\1'$DBPORT'\2/
+1,\$s:\(STATIC_URL[	 ]*=[	 ]*\).*:\1'$INSTSTAT_URL/':
 wq
 END
+#ALLOWED_HOSTS = []
 
 #-------------------------------------------------------------------------------
 # Integration with the Apache web server  
@@ -106,8 +130,11 @@ done
 
 # insert the configuration to the virtual host 
 
-ex "$CONF" <<END
-/^[ 	]*<VirtualHost[ 	]*\*:80>/a
+#/^[ 	]*<VirtualHost[ 	]*\*:80>/a
+{ ex "$CONF" || /bin/true ; } <<END
+/EOXS00_BEGIN/,/EOXS00_END/de
+/^[ 	]*<\/VirtualHost>/i
+    # EOXS00_BEGIN - EOxServer instance - Do not edit or remove this line! 
 
     # EOxServer instance configured by the automatic installation script
 
@@ -130,6 +157,8 @@ ex "$CONF" <<END
             Order Allow,Deny
             Allow from all
     </Directory>
+
+    # EOXS00_END - EOxServer instance - Do not edit or remove this line! 
 .
 wq
 END
@@ -138,18 +167,19 @@ END
 # EOxServer configuration 
 
 # set the service url and log-file 
+#/^[	 ]*logging_filename[	 ]*=/s;\(^[	 ]*logging_filename[	 ]*=\).*;\1${EOXSLOG};
 sudo -u "$ODAOSUSER" ex "$EOXSCONF" <<END
 /^[	 ]*http_service_url[	 ]*=/s;\(^[	 ]*http_service_url[	 ]*=\).*;\1${EOXSURL};
-/^[	 ]*logging_filename[	 ]*=/s;\(^[	 ]*logging_filename[	 ]*=\).*;\1${EOXSLOG};
 g/^#.*supported_crs/,/^$/ s/^#//
 wq
 END
 
 # set the log-file 
 sudo -u "$ODAOSUSER" ex "$SETTINGS" <<END
-g/^LOGGING/,/^}/s;^\([	 ]*'filename'[	 ]*:\).*;\1 '${EOXSLOG}',;
+g/^LOGGING[	 ]*=/,/^}/s;^\([	 ]*'filename'[	 ]*:\).*;\1 '${EOXSLOG}',;
 wq
 END
+#wq
 
 # touch the logfifile and set the right permissions 
 touch ${EOXSLOG}
