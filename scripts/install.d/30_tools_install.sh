@@ -10,7 +10,6 @@ info "Installing EOX Tools ... "
 
 #======================================================================
 
-
 [ -z "$ODAOSROOT" ] && error "Missing the required ODAOSROOT variable!"
 [ -z "$CONTRIB" ] && error "Missing the required CONTRIB variable!"
 [ -z "$ODAOSUSER" ] && error "Missing the required ODAOSUSER variable!"
@@ -75,6 +74,8 @@ mv -f "$TOOLS_ROOT" "$TOOLS_HOME"
 
 # fix permisions 
 chown -R "$ODAOSUSER:$ODAOSGROUP" "$TOOLS_HOME"
+
+#======================================================================
 
 info "EOX Tools installed."
 
