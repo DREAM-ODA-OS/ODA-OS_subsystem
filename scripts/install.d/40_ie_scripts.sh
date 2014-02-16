@@ -28,7 +28,7 @@ USE_SYMLINKS=FALSE
 if [ "TRUE" == "$USE_SYMLINKS" ]
 then 
     # symbolic link
-    ln -fs "$INGENG" "$ODAOS_IEAS_HOME"
+    sudo -u "$ODAOSUSER" ln -fs "$INGENG" "$ODAOS_IEAS_HOME"
 
 else 
     # copied files 
