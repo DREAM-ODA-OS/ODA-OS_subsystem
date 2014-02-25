@@ -16,4 +16,29 @@ rpm -q --quiet elgis-release || rpm -Uvh http://elgis.argeo.org/repos/6/elgis-re
 # EOX - EOX RPM repository 
 rpm -q --quiet eox-release || rpm -Uvh http://yum.packages.eox.at/el/eox-release-6-2.noarch.rpm
 
+info "Enabling EOX testing repository for explicitly listed packages ..."
 
+ex /etc/yum.repos.d/eox-testing.repo <<END
+1,\$s/^[ 	]*enabled[ 	]*=.*\$/enabled = 1/
+1,\$g/^[ 	]*includepkgs[ 	]*=.*\$/d
+1,\$g/^[ 	]*excludepkgs[ 	]*=.*\$/d
+/\[eox-testing\]
+/^[ 	]*gpgkey[ 	]*=.*\$
+a
+includepkgs =
+.
+/\[eox-testing-source\]
+/^[ 	]*gpgkey[ 	]*=.*\$
+a
+includepkgs =
+.
+/\[eox-testing-noarch\]
+/^[ 	]*gpgkey[ 	]*=.*\$
+a
+includepkgs =
+.
+wq 
+END
+
+# reset yum cache
+yum clean all
