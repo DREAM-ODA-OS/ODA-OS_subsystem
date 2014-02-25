@@ -11,6 +11,7 @@ info "Configuring EOxServer ... "
 #======================================================================
 # NOTE: In ODA-OS, it is not expected to have mutiple instances of the EOxServer
 
+[ -z "$ODAOS_IEAS_HOME" ] && error "Missing the required ODAOS_IEAS_HOME variable!"
 [ -z "$ODAOSHOSTNAME" ] && error "Missing the required ODAOSHOSTNAME variable!"
 [ -z "$ODAOSROOT" ] && error "Missing the required ODAOSROOT variable!"
 [ -z "$ODAOSUSER" ] && error "Missing the required ODAOSUSER variable!"
@@ -196,6 +197,9 @@ sudo -u "$ODAOSUSER" python "$MNGCMD" collectstatic -l --noinput
 
 # setup new database 
 sudo -u "$ODAOSUSER" python "$MNGCMD" syncdb --noinput 
+
+# load range types
+sudo -u "$ODAOSUSER" python "$MNGCMD" eoxs_rangetype_load < "$ODAOS_IEAS_HOME/range_types.json" 
 
 #-------------------------------------------------------------------------------
 # restart apache to force the changes to take effect 
