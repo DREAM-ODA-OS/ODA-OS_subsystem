@@ -29,7 +29,7 @@
 
 # public hostname (or IP number) under which the ODA-OS shall be accessable 
 # NOTE: Critical parameter! Be sure you set to proper value.
-export ODAOSHOSTNAME=${ODAOSHOSTNAME:-192.168.56.13}
+export ODAOSHOSTNAME=${ODAOSHOSTNAME:-$HOSTNAME}
 
 # root directory of the ODA-OS subsystem - by default set to '/srv/odaos'
 export ODAOSROOT=${ODAOSROOT:-/srv/odaos}

@@ -319,6 +319,9 @@ mkdir -v -p "$DM_DOWNLOAD_DIR"
 chown -v "$ODAOSUSER:$ODAOSGROUP" "$DM_DOWNLOAD_DIR"
 chmod -v 0775 "$DM_DOWNLOAD_DIR"
 
+# clean the previous data 
+rm -fR "$DM_DOWNLOAD_DIR"/*
+
 #======================================================================
 # create the HSQLDB database directory with the proper permissions
 

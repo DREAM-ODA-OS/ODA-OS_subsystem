@@ -10,9 +10,19 @@ info "Installing Rasdaman ... "
 
 #======================================================================
 
-# enable eox-testing repository 
-ex /etc/yum.repos.d/eox-testing.repo <<END
-1,\$s/^[ 	]*enabled[ 	]*=.*\$/enabled=1/
+#TODO: testing repo conflicts 
+
+info "Enabling Rasdaman packages from the EOX testing repository... "
+ex /etc/yum.repos.d/eox-testing.repo -V <<END
+/\[eox-testing\]
+/^[ 	]*includepkgs[ 	]*=.*\$/
+s/^\([ 	]*includepkgs[ 	]*=.*\)\$/\1 rasdaman*/
+/\[eox-testing-source\]
+/^[ 	]*includepkgs[ 	]*=.*\$/
+s/^\([ 	]*includepkgs[ 	]*=.*\)\$/\1 rasdaman*/
+/\[eox-testing-noarch\]
+/^[ 	]*includepkgs[ 	]*=.*\$/
+s/^\([ 	]*includepkgs[ 	]*=.*\)\$/\1 rasdaman*/
 wq 
 END
 
@@ -21,3 +31,4 @@ yum clean all
 
 # install RPMs 
 yum --assumeyes install rasdaman rasdaman-petascope
+

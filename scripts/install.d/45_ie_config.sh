@@ -26,8 +26,6 @@ INSTANCE="ingestion"
 INSTROOT="$ODAOS_IE_HOME"
 #
 SETTINGS="${INSTROOT}/${INSTANCE}/settings.py"
-#INSTSTAT_URL="/${INSTANCE}_static" # DO NOT USE THE TRAILING SLASH!!!
-#INSTSTAT_DIR="${INSTROOT}/${INSTANCE}/${INSTANCE}/static"
 #WSGI="${INSTROOT}/${INSTANCE}/${INSTANCE}/wsgi.py"
 INGESTION_CONFIG="${INSTROOT}/ingestion_config.json"
 MNGCMD="${INSTROOT}/manage.py"
@@ -290,3 +288,60 @@ chkconfig --add ingeng
 info "Enabling the download manager's service ..."
 chkconfig ingeng on 
 service ingeng restart
+
+#======================================================================
+# Integration with the Apache web server  
+
+info "Setting Ingestion Engine instance '${INSTANCE}' behind the Apache reverse proxy ..."
+
+# locate proper configuration file (see also apache configuration)
+
+CONFS="/etc/httpd/conf/httpd.conf /etc/httpd/conf.d/*.conf"
+CONF=
+
+for F in $CONFS 
+do
+    if [ 0 -lt `grep -c '^[ 	]*<VirtualHost[ 	]*\*:80>' $F` ] 
+    then 
+        CONF=$F
+        break 
+    fi
+done
+
+[ -z "CONFS" ] && error "Cannot find the Apache VirtualHost configuration file."
+
+# insert the configuration to the virtual host 
+
+# delete any previous configuration
+# and write new one 
+{ ex "$CONF" || /bin/true ; } <<END
+/IE00_BEGIN/,/IE00_END/de
+/^[ 	]*<\/VirtualHost>/i
+    # IE00_BEGIN - Ingestion Engine instance - Do not edit or remove this line! 
+
+    # reverse proxy to the Ingestion Engine daemon 
+
+    ProxyPass        /ingestion http://127.0.0.1:8000/ingestion
+    ProxyPassReverse /ingestion http://127.0.0.1:8000/ingestion
+
+    ProxyPass        /ingest http://127.0.0.1:8000/ingest
+    ProxyPassReverse /ingest http://127.0.0.1:8000/ingest
+
+    ProxyPass        /scenario http://127.0.0.1:8000/scenario
+    ProxyPassReverse /scenario http://127.0.0.1:8000/scenario
+
+    ProxyPass        /account http://127.0.0.1:8000/account
+    ProxyPassReverse /account http://127.0.0.1:8000/account
+
+    ProxyPass        $INSTSTAT_URL http://127.0.0.1:8000$INSTSTAT_URL
+    ProxyPassReverse $INSTSTAT_URL http://127.0.0.1:8000$INSTSTAT_URL
+
+    # IE00_END - Ingestion Engine instance - Do not edit or remove this line! 
+.
+wq
+END
+
+#-------------------------------------------------------------------------------
+# restart apache to force the changes to take effect 
+
+service httpd restart
