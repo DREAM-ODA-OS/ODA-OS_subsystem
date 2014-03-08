@@ -49,7 +49,7 @@ sudo -u "$ODAOSUSER" ex "$DM_DAEMON" <<END
 # if DM_PORT is set use it defines the port value (defaults to 8082)
 DM_PORT=\${DM_PORT:-8082}
 
-# if DM_CONSOLE_LOG is set it defines log file where the console 
+# if DM_CONSOLE_LOG is set it defines a log file where the console 
 # output is caught (defaults to '/dev/null') 
 DM_CONSOLE_LOG="\${DM_CONSOLE_LOG:-/dev/null}" 
 
@@ -76,7 +76,7 @@ sleep 2
 [ -z "\$PID" ] && exit 1 
 ps p "\$PID" >/dev/null 2>&1 || exit 1 
 
-# DM_PIDFILE optionally contains file-name where the daemons PID shall be written.
+# DM_PIDFILE optionally contains a file-name where the daemons PID shall be written.
 if [ -n "\$DM_PIDFILE" ]
 then
     echo "\$PID" > "\$DM_PIDFILE"
