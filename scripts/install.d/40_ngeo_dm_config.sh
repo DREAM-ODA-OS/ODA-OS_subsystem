@@ -46,10 +46,14 @@ sudo -u "$ODAOSUSER" cp -fv "$DM_START" "$DM_DAEMON"
 # make the necessary changes
 sudo -u "$ODAOSUSER" ex "$DM_DAEMON" <<END
 2a
-# if enviromental variable DM_PORT set use it to set the port value or default to 8082
+# if DM_PORT is set use it defines the port value (defaults to 8082)
 DM_PORT=\${DM_PORT:-8082}
 
-# if enviromental variable DM_USER set use it to set the owner of the daemon process 
+# if DM_CONSOLE_LOG is set it defines log file where the console 
+# output is caught (defaults to '/dev/null') 
+DM_CONSOLE_LOG="\${DM_CONSOLE_LOG:-/dev/null}" 
+
+# if DM_USER is set use it defines the owner of the daemon process 
 
 if [ -z "\$DM_USER" ]
 then 
@@ -60,11 +64,11 @@ fi
 
 # clear the session log if necessary
 
-[ "/dev/null" != "$DM_CONSOLE_LOG" ] && rm -f "$DM_CONSOLE_LOG"
+[ "/dev/null" != "\$DM_CONSOLE_LOG" ] && rm -f "\$DM_CONSOLE_LOG"
 .
 /[ 	\/]java[ 	].*download-manager-webapp-jetty-console\.war/s/8082/"\$DM_PORT"/ge
 .s/"/\\\\"/ge
-.s:^.*$:PID=\$( \$EXEC -c "ulimit -S -c 0 ; cd \\\\"\$DM_HOME\\\\" ; nohup & <\&- >'$DM_CONSOLE_LOG' 2>\&1 \& echo \\\\\$!" ):e
+.s:^.*$:PID=\$( \$EXEC -c "ulimit -S -c 0 ; cd \\\\"\$DM_HOME\\\\" ; nohup & <\&- >\\\\"\$DM_CONSOLE_LOG\\\\" 2>\&1 \& echo \\\\\$!" ):e
 .a
 
 # check whether the daemon is still alive 
@@ -127,6 +131,7 @@ ngeo_dm="$DM_DAEMON"
 ngeo_dm_db="$ODAOS_DM_HOME/hsqldb"
 pidfile="$DM_PIDFILE"
 lockfile="$DM_LOCK"
+console_log="$DM_CONSOLE_LOG"
 timeout="5"
 
 
@@ -170,6 +175,7 @@ dm_start()
     # parameters of the daemon's statup script
     export DM_PIDFILE="\$pidfile"
     export DM_USER="\$user"
+    export DM_CONSOLE_LOG="\$console_log"
 
     # check status and write message if something's wrong 
     MSG=\$( dm_status )
