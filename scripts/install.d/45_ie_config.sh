@@ -333,8 +333,8 @@ done
     ProxyPass        /account http://127.0.0.1:8000/account
     ProxyPassReverse /account http://127.0.0.1:8000/account
 
-    ProxyPass        $INSTSTAT_URL http://127.0.0.1:8000$INSTSTAT_URL
-    ProxyPassReverse $INSTSTAT_URL http://127.0.0.1:8000$INSTSTAT_URL
+    ProxyPass        /static http://127.0.0.1:8000/static
+    ProxyPassReverse /static http://127.0.0.1:8000/static
 
     # IE00_END - Ingestion Engine instance - Do not edit or remove this line! 
 .

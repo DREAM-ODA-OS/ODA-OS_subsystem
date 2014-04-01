@@ -148,6 +148,8 @@ done
             AllowOverride None
             Order Allow,Deny
             Allow from all
+            Header set Access-Control-Allow-Headers Content-Type
+            Header set Access-Control-Allow-Methods "POST, GET"
     </Directory>
 
     # static content 
@@ -175,17 +177,34 @@ g/^#.*supported_crs/,/^$/ s/^#//
 wq
 END
 
+# set the allowed hosts 
+sudo -u "$ODAOSUSER" ex "$SETTINGS" <<END
+1,\$s/\(^ALLOWED_HOSTS[	 ]*=[	 ]*\).*/\1['$HOSTNAME']/
+wq
+END
+
 # set the log-file 
 sudo -u "$ODAOSUSER" ex "$SETTINGS" <<END
 g/^LOGGING[	 ]*=/,/^}/s;^\([	 ]*'filename'[	 ]*:\).*;\1 '${EOXSLOG}',;
+/^COMPONENTS[	 ]*=[	 ]*(/
+/^COMPONENTS[	 ]*=[	 ]*(/,/^[	 ]*)/g/'eoxserver\.services\.ows\.wps\.\*\*/d
+/^COMPONENTS[	 ]*=[	 ]*(/
+/'eoxserver\.services\.ows\.wms\.\*\*/a
+    'eoxserver.services.ows.wps.**',
+.
 wq
 END
 #wq
 
+# TODO: loading of the WPS service hadler and loading of the 
+#       specific services
+    #'eoxserver.services.ows.wps.**',
+
 # touch the logfifile and set the right permissions 
-touch ${EOXSLOG}
-chown -v "$ODAOSUSER:$ODAOSGROUP" ${EOXSLOG}
-chmod -v 0664 ${EOXSLOG}  
+[ -f "$EOXSLOG" ] && rm -fv "$EOXSLOG"
+touch "$EOXSLOG"
+chown -v "$ODAOSUSER:$ODAOSGROUP" "$EOXSLOG"
+chmod -v 0664 "$EOXSLOG"
 
 #-------------------------------------------------------------------------------
 # Django syncdb (without interactive prompts) 
