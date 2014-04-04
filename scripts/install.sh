@@ -31,6 +31,12 @@
 . `dirname $0`/lib_common.sh  
 . `dirname $0`/lib_logging.sh  
 
+info "#"
+info "#  --= DREAM - Online Data Access - Open Source =-- "
+info "#"
+info "#   version: $ODAOSVERSION"
+info "# "
+
 #export location of the contrib directory 
 
 export CONTRIB="$(cd "$(dirname "$0")/../contrib"; pwd )"
