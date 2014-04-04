@@ -21,21 +21,24 @@ info "Enabling EOX testing repository for explicitly listed packages ..."
 ex /etc/yum.repos.d/eox-testing.repo <<END
 1,\$s/^[ 	]*enabled[ 	]*=.*\$/enabled = 1/
 1,\$g/^[ 	]*includepkgs[ 	]*=.*\$/d
-1,\$g/^[ 	]*excludepkgs[ 	]*=.*\$/d
+1,\$g/^[ 	]*exclude[ 	]*=.*\$/d
 /\[eox-testing\]
 /^[ 	]*gpgkey[ 	]*=.*\$
 a
-includepkgs =
+includepkgs=
+exclude=
 .
 /\[eox-testing-source\]
 /^[ 	]*gpgkey[ 	]*=.*\$
 a
-includepkgs =
+includepkgs=
+exclude=
 .
 /\[eox-testing-noarch\]
 /^[ 	]*gpgkey[ 	]*=.*\$
 a
-includepkgs =
+includepkgs=
+exclude=
 .
 wq 
 END

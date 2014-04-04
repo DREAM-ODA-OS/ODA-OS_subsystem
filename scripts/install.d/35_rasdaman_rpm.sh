@@ -13,7 +13,7 @@ info "Installing Rasdaman ... "
 #TODO: testing repo conflicts 
 
 info "Enabling Rasdaman packages from the EOX testing repository... "
-ex /etc/yum.repos.d/eox-testing.repo -V <<END
+ex /etc/yum.repos.d/eox-testing.repo <<END
 /\[eox-testing\]
 /^[ 	]*includepkgs[ 	]*=.*\$/
 s/^\([ 	]*includepkgs[ 	]*=.*\)\$/\1 rasdaman*/

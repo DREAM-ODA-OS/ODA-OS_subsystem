@@ -41,9 +41,7 @@ trap on_exit EXIT
 get_release_url()
 { 
     URL_BASE="https://github.com"
-
-    PATH="`curl "$URL_BASE/DREAM-ODA-OS/IngestionEngine/releases" | sed -ne 's/.*href="\(.*\.tar\.gz\)" .*/\1/p' | head -n 1`"
-
+    PATH="`curl -S "$URL_BASE/DREAM-ODA-OS/IngestionEngine/releases" | sed -ne 's/.*href="\(.*\.tar\.gz\)" .*/\1/p' | head -n 1`"
     echo -n "$URL_BASE$PATH"
 } 
 
@@ -53,7 +51,7 @@ get_filename()
 } 
 
 #======================================================================
-# trying to locate the download manager tarball in DM directory 
+# trying to locate the ingestion engine tarball 
 
 IE_TARBALL="`find "$CONTRIB" -name 'IngestionEngine*' | grep -e '\.tgz$' -e '\.tar\.gz$' | sort -r | head -n 1`" 
 
@@ -61,10 +59,12 @@ if [ -z "$IE_TARBALL" ]
 then 
     
     # automatic download of the latest release 
+    #URL="`get_release_url`"
 
-    URL="`get_release_url`"
+    #fixed version download
+    URL="https://github.com/DREAM-ODA-OS/IngestionEngine/archive/v0.6.0.tar.gz"
 
-    info "Downaloding latest release from: $URL"
+    info "Downloading from: $URL"
 
     IE_TARBALL="$CONTRIB/`get_filename "$URL"`"
 
@@ -86,7 +86,7 @@ info "$IE_TARBALL"
 #======================================================================
 # unpack the download manager 
 
-# clean-up previous mess 
+# clean-up the previous installation if needed 
 [ -d "$ODAOS_IE_HOME" ] && rm -fR "$ODAOS_IE_HOME"
 [ -d "$IE_TMPDIR" ] && rm -fR "$IE_TMPDIR"
 

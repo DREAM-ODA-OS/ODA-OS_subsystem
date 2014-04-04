@@ -19,7 +19,7 @@ DM_TMPDIR='/tmp/ngeo-dm'
 
 if [ -d "$ODAOS_DM_HOME" ] 
 then 
-    info "ngEO Download Manager seems to be already installed."
+    info "ngEO Download Manager seems to be already installed in: $ODAOS_DM_HOME"
     info "ngEO Download Manager installation is terminated."
     exit 0 
 fi 
@@ -68,19 +68,27 @@ then
 
     # NOTE: assuming the server supports NLST command and lists directories
 
-    BASEURL="ftp://ftp.spacebel.be/Inbox/ASU/MAGELLIUM/DMTU-Releases"
+    BASEURL="ftp://ftp.spacebel.be/Inbox/ASU/MAGELLIUM/DM-Releases"
 
-    # select the latest DM version available 
-    info "Listing: $BASEURL/"
-    DM_VERSION=`curl -n -l "$BASEURL/" | grep '^[0-9]*\.[0-9]*\.[0-9]*' | sort | tail -n 1`
+    # fixed version download - comment out to get the latest version
+    DM_VERSION=0.6.0
+    DM_ARCHIVE="download-manager-$DM_VERSION-linux_x64.tar.gz"
 
-    [ -z "$DM_VERSION" ] && { echo "ERROR: Failed to locate the DM download directory!" >&2 ; exit 1 ; } 
+    if [ -z "$DM_ARCHIVE" ] 
+    then 
+        # select the latest DM version available 
 
-    # select binary tarball to be used 
-    info "Listing: $BASEURL/$DM_VERSION/"
-    DM_ARCHIVE=`curl -n -l "$BASEURL/$DM_VERSION/" | grep -m 1 '^download-manager.*-linux_x64\.tar\.gz$'`
+        info "Listing: $BASEURL/"
+        DM_VERSION=`curl -n -l "$BASEURL/" | grep '^[0-9]*\.[0-9]*\.[0-9]*' | sort | tail -n 1`
 
-    [ -z "$DM_ARCHIVE" ] && { echo "ERROR: Failed to locate the DM package!" >&2 ; exit 1 ; } 
+        [ -z "$DM_VERSION" ] && { echo "ERROR: Failed to locate the DM download directory!" >&2 ; exit 1 ; } 
+
+        # select binary tarball to be used 
+        info "Listing: $BASEURL/$DM_VERSION/"
+        DM_ARCHIVE=`curl -n -l "$BASEURL/$DM_VERSION/" | grep -m 1 '^download-manager.*-linux_x64\.tar\.gz$'`
+
+        [ -z "$DM_ARCHIVE" ] && { echo "ERROR: Failed to locate the DM package!" >&2 ; exit 1 ; } 
+    fi  
 
     # download the DM tarball 
 
