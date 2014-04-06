@@ -36,21 +36,47 @@
 if [ "$#" -lt "1" ] 
 then 
     echo "ERROR: $EXENAME: Missing the required host name!" >&2 
-    echo "USAGE: $EXENAME <hostname> [<instance name> [<instance root>]]" >&2 
+    echo "USAGE: $EXENAME <hostname>" >&2 
     exit 1 
 fi 
 
 info "Setting the service hostname to: $1"
 
-#-------------------------------------------------------------------------------
-# set the service url 
-
 HOSTNAME="$1"
-INSTANCE="${2:-eoxs00}"
-INSTROOT="${3:-$ODAOSROOT}"
+
+#-------------------------------------------------------------------------------
+# EOxServer set the service url 
+
+INSTANCE="eoxs"
+INSTROOT="$ODAOSROOT"
 EOXSCONF="${INSTROOT}/${INSTANCE}/${INSTANCE}/conf/eoxserver.conf"
+EOXSTNGS="${INSTROOT}/${INSTANCE}/${INSTANCE}/settings.py"
 
 sudo -u "$ODAOSUSER" ex "$EOXSCONF" <<END
 /^[	 ]*http_service_url[	 ]*=/s;\(^[	 ]*http_service_url[	 ]*=\).*;\1http://${HOSTNAME}/${INSTANCE}/ows;
+wq
+END
+
+# set the allowed hosts
+sudo -u "$ODAOSUSER" ex "$EOXSTNGS" <<END
+1,\$s/\(^ALLOWED_HOSTS[	 ]*=[	 ]*\).*/\1['$HOSTNAME']/
+wq
+END
+
+#-------------------------------------------------------------------------------
+# ODA Client 
+
+CONFIG_JSON="${ODAOS_ODAC_HOME}/config.json"
+IE_BASE_URL="http://${HOSTNAME}/ingest/ManageScenario/"
+LAYERS_URL="data.json" # set to proper layer definition
+
+# config.json
+sudo -u "$ODAOSUSER" ex "$CONFIG_JSON" <<END
+/^[ 	]*"ingestionEngineT5"[ 	]*:
+/^[ 	]*"baseUrl"[ 	]*:
+s#\("baseUrl"[	 ]*:[	 ]*"\).*\("[	 ]*,\)#\1$IE_BASE_URL\2#
+/^[ 	]*"mapConfig"[ 	]*:
+/^[ 	]*"dataconfigurl"[ 	]*:
+s#\("dataconfigurl"[	 ]*:[	 ]*"\).*\("[	 ]*,\)#\1$LAYERS_URL\2#
 wq
 END
