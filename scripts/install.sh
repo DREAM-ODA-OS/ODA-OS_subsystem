@@ -27,74 +27,79 @@
 # THE SOFTWARE.
 #-------------------------------------------------------------------------------
 
+INSTALL_LOG="install.log"
+
 #source common parts
 . `dirname $0`/lib_common.sh  
 . `dirname $0`/lib_logging.sh  
 
-info "#"
-info "#  --= DREAM - Online Data Access - Open Source =-- "
-info "#"
-info "#   version: $ODAOSVERSION"
-info "# "
-
-#export location of the contrib directory 
-
-export CONTRIB="$(cd "$(dirname "$0")/../contrib"; pwd )"
-export INGENG="$(cd "$(dirname "$0")/../ingeng"; pwd )"
-
-#-------------------------------------------------------------------------------
-# check whether the user and group exists 
-# if not create them 
-
-_mkdir()
-{ # <owner>[:<group>] <permissions> <dirname> <label>
-    if [ ! -d "$3" ] 
+{ 
+    info "#"
+    info "#  --= DREAM - Online Data Access - Open Source =-- "
+    info "#"
+    info "#   version: $ODAOSVERSION"
+    info "# "
+    
+    #export location of the contrib directory 
+    
+    export CONTRIB="$(cd "$(dirname "$0")/../contrib"; pwd )"
+    export INGENG="$(cd "$(dirname "$0")/../ingeng"; pwd )"
+    
+    #-------------------------------------------------------------------------------
+    # check whether the user and group exists 
+    # if not create them 
+    
+    _mkdir()
+    { # <owner>[:<group>] <permissions> <dirname> <label>
+        if [ ! -d "$3" ] 
+        then 
+            info "Creating $4: $3"
+            mkdir -p "$3"
+        fi 
+        chown -v "$1" "$3"
+        chmod -v "$2" "$3"
+    } 
+    
+    id -g "$ODAOSGROUP" >/dev/null 2>&1 || \
+    { 
+        info "Creatting system group: $ODAOSGROUP"
+        groupadd -r "$ODAOSGROUP"
+    }
+    
+    
+    id -u "$ODAOSUSER" >/dev/null 2>&1 || \
+    { 
+        info "Creatting system user: $ODAOSUSER"
+        useradd -r -m -g "$ODAOSGROUP" -d "$ODAOSROOT" -c "ODA-OS system user" "$ODAOSUSER"
+    } 
+    
+    # just in case the ODA-OS directories do not exists create them
+    # and set the right permissions 
+    
+    _mkdir "$ODAOSUSER:$ODAOSGROUP" 0755 "$ODAOSROOT" "subsytem's root directory" 
+    _mkdir "$ODAOSUSER:$ODAOSGROUP" 0775 "$ODAOSLOGDIR" "subsytem's logging directory" 
+    _mkdir "$ODAOSUSER:$ODAOSGROUP" 0775 "$ODAOSDATADIR" "subsytem's long-term data storage directory"
+    _mkdir "$ODAOSUSER:$ODAOSGROUP" 0775 "$ODAOSTMPDIR" "subsytem's short-term data stoarage directory"
+    
+    #-------------------------------------------------------------------------------
+    # execute specific installation scripts 
+    
+    if [ $# -ge 1 ] 
     then 
-        info "Creating $4: $3"
-        mkdir -p "$3"
+        # execute selected scripts only 
+        SCRIPTS=$*
+    else 
+        # execute all scripts 
+        SCRIPTS="`dirname $0`/install.d/"*.sh
     fi 
-    chown -v "$1" "$3"
-    chmod -v "$2" "$3"
-} 
+    
+    for SCRIPT in $SCRIPTS
+    do
+        info "Executing installation script: $SCRIPT" 
+        sh -e $SCRIPT
+        [ 0 -ne "$?" ] && warn "Installation script ended with an error: $SCRIPT"
+    done
+    
+    info "Installation has been completed."
 
-id -g "$ODAOSGROUP" >/dev/null 2>&1 || \
-{ 
-    info "Creatting system group: $ODAOSGROUP"
-    groupadd -r "$ODAOSGROUP"
-}
-
-
-id -u "$ODAOSUSER" >/dev/null 2>&1 || \
-{ 
-    info "Creatting system user: $ODAOSUSER"
-    useradd -r -m -g "$ODAOSGROUP" -d "$ODAOSROOT" -c "ODA-OS system user" "$ODAOSUSER"
-} 
-
-# just in case the ODA-OS directories do not exists create them
-# and set the right permissions 
-
-_mkdir "$ODAOSUSER:$ODAOSGROUP" 0755 "$ODAOSROOT" "subsytem's root directory" 
-_mkdir "$ODAOSUSER:$ODAOSGROUP" 0775 "$ODAOSLOGDIR" "subsytem's logging directory" 
-_mkdir "$ODAOSUSER:$ODAOSGROUP" 0775 "$ODAOSDATADIR" "subsytem's long-term data storage directory"
-_mkdir "$ODAOSUSER:$ODAOSGROUP" 0775 "$ODAOSTMPDIR" "subsytem's short-term data stoarage directory"
-
-#-------------------------------------------------------------------------------
-# execute specific installation scripts 
-
-if [ $# -ge 1 ] 
-then 
-    # execute selected scripts only 
-    SCRIPTS=$*
-else 
-    # execute all scripts 
-    SCRIPTS="`dirname $0`/install.d/"*.sh
-fi 
-
-for SCRIPT in $SCRIPTS
-do
-    info "Executing installation script: $SCRIPT" 
-    sh -e $SCRIPT
-    [ 0 -ne "$?" ] && warn "Installation script ended with an error: $SCRIPT"
-done
-
-info "Installation has been completed." 
+} 2>&1 | tee -a "$INSTALL_LOG"
