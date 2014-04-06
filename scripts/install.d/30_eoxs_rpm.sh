@@ -67,5 +67,11 @@ fi
 info "$EOXS_RPM"
 
 #======================================================================
-yum --assumeyes install "$EOXS_RPM"
-yum --assumeyes install proj-epsg fcgi gd libXpm libxml2-python mapserver mapserver-python
+#    yum --assumeyes install proj-epsg fcgi gd libXpm libxml2-python mapserver mapserver-python
+if [ -z "`rpm -qa | grep EOxServer`" ] 
+then 
+    yum --assumeyes install "$EOXS_RPM"
+else 
+    yum --assumeyes update "$EOXS_RPM"
+fi
+

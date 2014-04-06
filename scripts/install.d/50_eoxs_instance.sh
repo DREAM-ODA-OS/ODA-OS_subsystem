@@ -19,7 +19,7 @@ info "Configuring EOxServer ... "
 export ODAOSLOGDIR=${ODAOSLOGDIR:-/var/log/odaos}
 
 HOSTNAME="$ODAOSHOSTNAME"
-INSTANCE="eoxs00"
+INSTANCE="eoxs"
 INSTROOT="$ODAOSROOT"
 
 SETTINGS="${INSTROOT}/${INSTANCE}/${INSTANCE}/settings.py"
@@ -183,9 +183,64 @@ sudo -u "$ODAOSUSER" ex "$SETTINGS" <<END
 wq
 END
 
-# set the log-file 
+# set-up logging 
 sudo -u "$ODAOSUSER" ex "$SETTINGS" <<END
-g/^LOGGING[	 ]*=/,/^}/s;^\([	 ]*'filename'[	 ]*:\).*;\1 '${EOXSLOG}',;
+g/^DEBUG[	 ]*=/s/\(^DEBUG[	 ]*=[	 ]*\).*/\1False/
+g/^LOGGING[	 ]*=/,/^}/d
+a
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
+    'formatters': {
+        'simple': {
+            'format': '%(levelname)s: %(message)s'
+        },
+        'verbose': {
+            'format': '[%(asctime)s][%(module)s] %(levelname)s: %(message)s'
+        }
+    },
+    'handlers': {
+        'eoxserver_file': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'maxBytes' : 2500000,
+            'backupCount' : 9,
+            'filename': '${EOXSLOG}',
+            'formatter': 'verbose' if DEBUG else 'simple',
+            'filters': [],
+        },
+        'stderr_stream': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+            'filters': [],
+        },
+    },
+    'loggers': {
+        'eoxserver': {
+            'handlers': ['eoxserver_file'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
+        '': {
+            'handlers': ['stderr_stream'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+    }
+}
+.
+wq
+END
+#wq
+
+# enable WPS component 
+sudo -u "$ODAOSUSER" ex "$SETTINGS" <<END
 /^COMPONENTS[	 ]*=[	 ]*(/
 /^COMPONENTS[	 ]*=[	 ]*(/,/^[	 ]*)/g/'eoxserver\.services\.ows\.wps\.\*\*/d
 /^COMPONENTS[	 ]*=[	 ]*(/
@@ -194,11 +249,6 @@ g/^LOGGING[	 ]*=/,/^}/s;^\([	 ]*'filename'[	 ]*:\).*;\1 '${EOXSLOG}',;
 .
 wq
 END
-#wq
-
-# TODO: loading of the WPS service hadler and loading of the 
-#       specific services
-    #'eoxserver.services.ows.wps.**',
 
 # touch the logfifile and set the right permissions 
 [ -f "$EOXSLOG" ] && rm -fv "$EOXSLOG"

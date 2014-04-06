@@ -126,6 +126,6 @@ mv -f "$DM_TMPDIR/ngEO-download-manager" "$ODAOS_DM_HOME"
 # fix permisions 
 chown -R "$ODAOSUSER:$ODAOSGROUP" "$ODAOS_DM_HOME"
 
-info "ngEO Download Manager installed."
+info "ngEO Download Manager installed to: $ODAOS_DM_HOME"
 
 # TODO: get rid of the embedded JRE 

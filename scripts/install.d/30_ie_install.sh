@@ -103,4 +103,4 @@ mv -f "$IE_ROOT" "$ODAOS_IE_HOME"
 # fix permisions 
 chown -R "$ODAOSUSER:$ODAOSGROUP" "$ODAOS_IE_HOME"
 
-info "Ingestion Engine installed."
+info "Ingestion Engine installed to: $ODAOS_IE_HOME"

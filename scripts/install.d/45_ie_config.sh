@@ -9,7 +9,7 @@
 info "Configuring Ingestion Engine ... "
 
 #======================================================================
-# NOTE: In ODA-OS, it is not expected to have mutiple instances of the EOxServer
+# NOTE: In ODA-OS, it is not expected to have mutiple instances of the Ingestion Engine 
 
 [ -z "$ODAOS_IEAS_HOME" ] && error "Missing the required ODAOS_IEAS_HOME variable!"
 [ -z "$ODAOS_DM_HOME" ] && error "Missing the required ODAOS_DM_HOME variable!"
@@ -43,21 +43,33 @@ MNGCMD="${INSTROOT}/manage.py"
 #EOXSCONF="${INSTROOT}/${INSTANCE}/${INSTANCE}/conf/eoxserver.conf"
 #EOXSURL="http://${HOSTNAME}/${INSTANCE}/ows"
 
+IE_LOG="${ODAOSLOGDIR}/ingestion_engine.log"
+
 #-------------------------------------------------------------------------------
 # configuration 
 
-# ingestion_config.json 
+# ingestion_config.json - download manager
 sudo -u "$ODAOSUSER" ex "$INGESTION_CONFIG" <<END
 1,\$s:\("DownloadManagerDir"[	 ]*\:[	 ]*"\).*\("[	 ]*,\):\1$ODAOS_DM_HOME\2:
 wq
 END
 
-# settings.py 
-sudo -u "$ODAOSUSER" ex -V "$SETTINGS" <<END
-1,\$s:^\(LOGGING_DIR[	 ]*=[	 ]*\).*$:\1"$ODAOSLOGDIR":
+# settings.py - scripts' directory 
+sudo -u "$ODAOSUSER" ex "$SETTINGS" <<END
+1,\$g/Following line is set by the ODA-OS installation script/d
+1,\$s:^\(LOGGING_FILE[	 ]*=[	 ]*\).*$:\1"$IE_LOG":
+/^\(LOGGING_FILE[	 ]*=[	 ]*\).*$/i
+# Following line is set by the ODA-OS installation script. Do not edit!
+.
 1,\$s:^\(IE_SCRIPTS_DIR[	 ]*=[	 ]*\).*$:\1"$ODAOS_IEAS_HOME":
 wq
 END
+
+# touch the logfifile and set the right permissions 
+[ -f "$IE_LOG" ] && rm -fv "$IE_LOG"
+touch "$IE_LOG"
+chown -v "$ODAOSUSER:$ODAOSGROUP" "$IE_LOG"
+chmod -v 0664 "$IE_LOG"
 
 #-------------------------------------------------------------------------------
 # Django syncdb (without interactive prompts) 

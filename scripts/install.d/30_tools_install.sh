@@ -106,5 +106,5 @@ chown -R "$ODAOSUSER:$ODAOSGROUP" "$TOOLS_HOME"
 
 #======================================================================
 
-info "EOX Tools installed."
+info "EOX Tools installed to: $TOOLS_HOME"
 
