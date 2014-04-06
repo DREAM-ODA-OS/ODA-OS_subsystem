@@ -60,3 +60,6 @@ export ODAOS_IE_HOME=${ODAOS_IE_HOME:-$ODAOSROOT/ingeng}
 
 # location of the Ingestion Engine actions scripts home directory
 export ODAOS_IEAS_HOME=${ODAOS_IEAS_HOME:-$ODAOSROOT/ie_scripts}
+
+# location of the ODA Client home directory 
+export ODAOS_ODAC_HOME=${ODAOS_ODAC_HOME:-$ODAOSROOT/oda_client}
