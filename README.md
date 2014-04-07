@@ -41,7 +41,7 @@ ngEO-DM | Spacebel FTP [1] | Required. Downloaded automatically when a valid `.n
 local catalogue | *n/a* | Optional. Not yet integrated. 
 [1] `ftp://ftp.spacebel.be/Inbox/ASU/MAGELLIUM/DM-Releases/`
 
-### 1. Get the Installation Scripts
+### Step 1 - Get the Installation Scripts
 
 The installer (i.e., content of this repository) can be obtained
 either as on of the [tagged releases](https://github.com/DREAM-ODA-OS/ODA-OS_subsytem/releases)
@@ -51,6 +51,21 @@ or by clonning of the repository:
 $ git clone https://github.com/DREAM-ODA-OS/ODA-OS_subsytem.git
 ```
 
-### 1. Prepare SW packages
+### Step 2 - Prepare the installed SW packages
 
-Put the SW packages which i) cannot be downloaded automatically or ii) need to be installed from a newer version not yet available on-line to the `contrib/` directory of the (unpacked or cloned) installer.
+Put the SW packages which i) cannot be downloaded automatically or ii) need to be installed from a newer version not yet available on-line to the `ODA-OS_subsytem/contrib/` directory of the (unpacked or cloned) installer.
+
+### Step 3 - Run the Installation
+
+Execute the installation script with the root's permission:
+
+```
+$ sudo ODA-OS_subsytem/scripts/install.sh
+```
+
+
+
+
+
+
+
