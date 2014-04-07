@@ -157,11 +157,22 @@ The ODA-OS is structure in the following subdirectories:
 
 #### User Identities 
 
-The installed SW components and their configuration is owned by `odaos` system user
-(no password assigned) any modification of the configuration requires 
-`odaos` user identity. 
+The installed SW components and their configuration is owned by `odaos`
+admnistrator, a system user with no password assigned. Any modification
+of the configuration requires `odaos` user identity. 
 
-The actual service are operated having 
+The actual service are operated having `apache` system user's identity
+and all the files created or modified by the services are either owned
+directly by the `apache` user or they belong to `apache` user group 
+with write permission granted.
+
+The SW installed from the RPM packages is owned by the `root` and they 
+are not supposed to be modified.
+
+*More details TBD*
+
+
+
 
 
 
