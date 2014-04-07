@@ -42,6 +42,7 @@ EOXSCONF="${INSTROOT}/${INSTANCE}/${INSTANCE}/conf/eoxserver.conf"
 EOXSURL="http://${HOSTNAME}/${INSTANCE}/ows"
 
 
+set -x 
 #-------------------------------------------------------------------------------
 # create instance 
 
@@ -198,7 +199,7 @@ LOGGING = {
     },
     'formatters': {
         'simple': {
-            'format': '%(levelname)s: %(message)s'
+            'format': '[%(module)s] %(levelname)s: %(message)s'
         },
         'verbose': {
             'format': '[%(asctime)s][%(module)s] %(levelname)s: %(message)s'
@@ -211,7 +212,7 @@ LOGGING = {
             'maxBytes' : 2500000,
             'backupCount' : 9,
             'filename': '${EOXSLOG}',
-            'formatter': 'verbose' if DEBUG else 'simple',
+            'formatter': 'verbose',
             'filters': [],
         },
         'stderr_stream': {
