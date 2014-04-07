@@ -6,9 +6,9 @@ DREAM Tasks 5 ODA-OS sub-system core.
 
 The repository contains following directories:
 
->  `scripts/` - installation scripts 
->  `contrib/` - location of the installed SW packages 
->  `ingeng/`  - ingestion engine actions scripts  
+-  `scripts/` - installation scripts 
+-  `contrib/` - location of the installed SW packages 
+-  `ingeng/`  - ingestion engine actions scripts  
 
 NOTE: The repository does not cover the autonomous Cloud-free Coverage
 Assembly.
@@ -37,7 +37,7 @@ manually.
 
 *SW Component* | *On-line Source* | *Comment*
 --- | --- | --- 
-ngEO-DM | [Spacebel FTP](ftp://dream-reader@ftp.spacebel.be/Inbox/ASU/MAGELLIUM/DM-Releases/) | Downloaded automatically when a valid `.netrc` found in the `contrib/` directory.
+ngEO-DM | [Spacebel FTP](ftp://ftp.spacebel.be/Inbox/ASU/MAGELLIUM/DM-Releases/) | Downloaded automatically when a valid `.netrc` found in the `contrib/` directory.
 local catalogue | *n/a* | Optional. Not yet integrated. 
 
 # 1. Get the Installation Scripts
