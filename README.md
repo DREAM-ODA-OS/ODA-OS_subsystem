@@ -128,11 +128,41 @@ http://<host-name>/eoxs
 
 ### ODA-OS Core Administration
 
+This section provides brief introduction to the administration ODA-OS Core 
+and to the detail of the configuration. The text focuses on the scecific 
+aspects of the ODA-Core installation and it does not intend to replace
+the documentation of the idividual components.
 
-#### User names
+#### System Service
+
+The ODA-OS utilizes following system service (administred via the `chkconfig`
+and `service` command [2])
+
+-  `ngeo-dm` - The ngEO Download Manager (local deamon, not exposed to the external world)
+-  `ingeng`  - The Ingestion Engine (autonomous daemon accesible via Apache reverse proxy)  
+-  `httpd`   - The Apche web server - the web interface. 
+-  `postgresql` - The PostgreSQL database. 
+
+*More service*
+
+[2] https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Deployment_Guide/ch-Services_and_Daemons.html
 
 
 #### Directories and File Locations 
+
+The ODA-OS is structure in the following subdirectories:
+-  `/srv/eodata/` - data storage (anticipated to be mounted from a separate storage volume). 
+-  `/srv/odaos/` - location of the installed SW and its configuration.
+-  `/var/log/odaos` - location of the logfiles of the SW components. 
+
+#### User Identities 
+
+The installed SW components and their configuration is owned by `odaos` system user
+(no password assigned) any modification of the configuration requires 
+`odaos` user identity. 
+
+The actual service are operated having 
+
 
 
 
