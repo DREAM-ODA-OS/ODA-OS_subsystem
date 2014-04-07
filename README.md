@@ -37,10 +37,20 @@ manually.
 
 *SW Component* | *On-line Source* | *Comment*
 --- | --- | --- 
-ngEO-DM | `ftp://ftp.spacebel.be/Inbox/ASU/MAGELLIUM/DM-Releases/` | Downloaded automatically when a valid `.netrc` found in the `contrib/` directory.
+ngEO-DM | Spacebel FTP [1] | Required. Downloaded automatically when a valid `.netrc` found in the `contrib/` directory.
 local catalogue | *n/a* | Optional. Not yet integrated. 
+[1] `ftp://ftp.spacebel.be/Inbox/ASU/MAGELLIUM/DM-Releases/`
 
-# 1. Get the Installation Scripts
+### 1. Get the Installation Scripts
 
+The installer (i.e., content of this repository) can be obtained
+either as on of the [tagged releases](https://github.com/DREAM-ODA-OS/ODA-OS_subsytem/releases)
+or by clonning of the repository:
 
+```
+$ git clone https://github.com/DREAM-ODA-OS/ODA-OS_subsytem.git
+```
 
+### 1. Prepare SW packages
+
+Put the SW packages which i) cannot be downloaded automatically or ii) need to be installed from a newer version not yet available on-line to the `contrib/` directory of the (unpacked or cloned) installer.
