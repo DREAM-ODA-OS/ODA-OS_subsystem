@@ -52,7 +52,9 @@ $ git clone https://github.com/DREAM-ODA-OS/ODA-OS_subsytem.git
 
 #### Step 2 - Prepare the installed SW packages
 
-Put the SW packages which i) cannot be downloaded automatically or ii) need to be installed from a newer version not yet available on-line to the `ODA-OS_subsytem/contrib/` directory of the (unpacked or cloned) installer.
+Put the SW packages which i) cannot be downloaded automatically or ii) need to
+be installed from a newer version not yet available on-line to the
+`ODA-OS_subsytem/contrib/` directory of the (unpacked or cloned) installer.
 
 #### Step 3 - Run the Installation
 
@@ -95,13 +97,12 @@ This allows installation and/or update of selected SW packages only.
 
 #### Step 4 - Hostname Configuration
 
-Some of the services provided by the ODA-OS subsytem require 
-configuration of the correct host-name under which the service
-will be available. The host-name need not to be always the same 
-as the one announced by the operating system during the 
-installation. In case, the service host-name (i.e., fully qualified
-domain-name or IP adress assigned to the computer) has to be corrected
-the following command shall be executed:
+Some of the services provided by the ODA-OS subsytem require configuration of
+the correct host-name under which the service will be available. The host-name
+need not to be always the same as the one announced by the operating system
+during the installation. In case, the service host-name (i.e., fully qualified
+domain-name or IP adress assigned to the computer) has to be corrected the
+following command shall be executed:
 
 ```
 $ sudo ODA-OS_subsytem/scripts/reset_hostname.sh <host-name>
@@ -109,9 +110,9 @@ $ sudo ODA-OS_subsytem/scripts/reset_hostname.sh <host-name>
 
 ### ODA-OS Core Quick Start 
 
-When the installation has been finished successfully, 
-the ODA-OS core shoudl be fully functional. The ODA-Client
-(including the Ingestion Admin. Client) is available at:
+When the installation has been finished successfully, the ODA-OS core shoudl be
+fully functional. The ODA-Client (including the Ingestion Admin. Client) is
+available at:
 
 ```
 http://<host-name>/oda
@@ -128,10 +129,10 @@ http://<host-name>/eoxs
 
 ### ODA-OS Core Administration
 
-This section provides brief introduction to the administration ODA-OS Core 
-and to the detail of the configuration. The text focuses on the scecific 
-aspects of the ODA-Core installation and it does not intend to replace
-the documentation of the idividual components.
+This section provides brief introduction to the administration ODA-OS Core and
+to the detail of the configuration. The text focuses on the scecific aspects of
+the ODA-Core installation and it does not intend to replace the documentation
+of the idividual components.
 
 #### System Service
 
@@ -143,7 +144,7 @@ and `service` command [2])
 -  `httpd`   - The Apche web server - the web interface. 
 -  `postgresql` - The PostgreSQL database. 
 
-*More service*
+*Additional services may still be added.*
 
 [2] https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Deployment_Guide/ch-Services_and_Daemons.html
 
@@ -158,24 +159,16 @@ The ODA-OS is structure in the following subdirectories:
 #### User Identities 
 
 The installed SW components and their configuration is owned by `odaos`
-admnistrator, a system user with no password assigned. Any modification
-of the configuration requires `odaos` user identity. 
+admnistrator, a system user with no password assigned. Any modification of the
+configuration requires `odaos` user identity. 
 
-The actual service are operated having `apache` system user's identity
-and all the files created or modified by the services are either owned
-directly by the `apache` user or they belong to `apache` user group 
-with write permission granted.
+The actual service are operated having `apache` system user's identity and all
+the files created or modified by the services are either owned directly by the
+`apache` user or they belong to `apache` user group with write permission
+granted.
 
-The SW installed from the RPM packages is owned by the `root` and they 
-are not supposed to be modified.
+The SW installed from the RPM packages is owned by the `root` and they are not
+supposed to be modified.
 
 *More details TBD*
-
-
-
-
-
-
-
-
 
