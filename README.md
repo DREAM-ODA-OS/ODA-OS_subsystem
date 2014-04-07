@@ -37,7 +37,7 @@ manually.
 
 *SW Component* | *On-line Source* | *Comment*
 --- | --- | --- 
-ngEO-DM | [Spacebel FTP](ftp://ftp.spacebel.be/Inbox/ASU/MAGELLIUM/DM-Releases/) | Downloaded automatically when a valid `.netrc` found in the `contrib/` directory.
+ngEO-DM | `ftp://ftp.spacebel.be/Inbox/ASU/MAGELLIUM/DM-Releases/` | Downloaded automatically when a valid `.netrc` found in the `contrib/` directory.
 local catalogue | *n/a* | Optional. Not yet integrated. 
 
 # 1. Get the Installation Scripts
