@@ -41,8 +41,6 @@ EOXSLOG="${ODAOSLOGDIR}/eoxserver.log"
 EOXSCONF="${INSTROOT}/${INSTANCE}/${INSTANCE}/conf/eoxserver.conf"
 EOXSURL="http://${HOSTNAME}/${INSTANCE}/ows"
 
-
-set -x 
 #-------------------------------------------------------------------------------
 # create instance 
 
