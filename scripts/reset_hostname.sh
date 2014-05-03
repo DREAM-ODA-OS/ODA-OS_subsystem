@@ -68,18 +68,15 @@ END
 
 CONFIG_JSON="${ODAOS_ODAC_HOME}/config.json"
 IE_BASE_URL="http://${HOSTNAME}/ingest/ManageScenario/"
-LAYERS_URL="data.json" # set to proper layer definition
+LAYERS_URL="http://${HOSTNAME}/eoxs/eoxc"
 
-# config.json
-sudo -u "$ODAOSUSER" ex "$CONFIG_JSON" <<END
-/^[ 	]*"ingestionEngineT5"[ 	]*:
-/^[ 	]*"baseUrl"[ 	]*:
-s#\("baseUrl"[	 ]*:[	 ]*"\).*\("[	 ]*,\)#\1$IE_BASE_URL\2#
-/^[ 	]*"mapConfig"[ 	]*:
-/^[ 	]*"dataconfigurl"[ 	]*:
-s#\("dataconfigurl"[	 ]*:[	 ]*"\).*\("[	 ]*,\)#\1$LAYERS_URL\2#
-wq
-END
+# define JQ filters 
+_F1=".ingestionEngineT5.baseUrl=\"$IE_BASE_URL\""
+_F2=".mapConfig.dataconfigurl=\"$LAYERS_URL\""
+
+sudo -u "$ODAOSUSER" cp "$CONFIG_JSON" "$CONFIG_JSON~" && \
+sudo -u "$ODAOSUSER" jq "$_F1|$_F2" >"$CONFIG_JSON" <"$CONFIG_JSON~" && \
+sudo -u "$ODAOSUSER" rm -f "$CONFIG_JSON~"
 
 #-------------------------------------------------------------------------------
 service httpd restart

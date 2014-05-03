@@ -21,21 +21,19 @@ ODAOS_ODAC_URL="/oda"
 HOSTNAME="$ODAOSHOSTNAME"
 CONFIG_JSON="${ODAOS_ODAC_HOME}/config.json"
 IE_BASE_URL="http://${HOSTNAME}/ingest/ManageScenario/"
-LAYERS_URL="data.json" # set to proper layer definition
+LAYERS_URL="http://${HOSTNAME}/eoxs/eoxc"
 
 #======================================================================
 # configuration
 
-# config.json
-sudo -u "$ODAOSUSER" ex "$CONFIG_JSON" <<END
-/^[ 	]*"ingestionEngineT5"[ 	]*:
-/^[ 	]*"baseUrl"[ 	]*:
-s#\("baseUrl"[	 ]*:[	 ]*"\).*\("[	 ]*,\)#\1$IE_BASE_URL\2#
-/^[ 	]*"mapConfig"[ 	]*:
-/^[ 	]*"dataconfigurl"[ 	]*:
-s#\("dataconfigurl"[	 ]*:[	 ]*"\).*\("[	 ]*,\)#\1$LAYERS_URL\2#
-wq
-END
+# define JQ filters 
+_F1=".ingestionEngineT5.baseUrl=\"$IE_BASE_URL\""
+_F2=".mapConfig.dataconfigurl=\"$LAYERS_URL\""
+_F3='del(.mapConfig.products)' 
+
+sudo -u "$ODAOSUSER" cp "$CONFIG_JSON" "$CONFIG_JSON~" && \
+sudo -u "$ODAOSUSER" jq "$_F1|$_F2|$_F3" >"$CONFIG_JSON" <"$CONFIG_JSON~" && \
+sudo -u "$ODAOSUSER" rm -f "$CONFIG_JSON~"
 
 #======================================================================
 # Integration with the Apache web server  
