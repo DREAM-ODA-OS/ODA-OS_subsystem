@@ -206,9 +206,7 @@ LOGGING = {
     'handlers': {
         'eoxserver_file': {
             'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'maxBytes' : 2500000,
-            'backupCount' : 9,
+            'class': 'logging.handlers.WatchedFileHandler',
             'filename': '${EOXSLOG}',
             'formatter': 'verbose',
             'filters': [],
@@ -221,14 +219,9 @@ LOGGING = {
         },
     },
     'loggers': {
-        'eoxserver': {
+        '': {
             'handlers': ['eoxserver_file'],
             'level': 'DEBUG' if DEBUG else 'INFO',
-            'propagate': False,
-        },
-        '': {
-            'handlers': ['stderr_stream'],
-            'level': 'WARNING',
             'propagate': False,
         },
     }
