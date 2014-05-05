@@ -40,6 +40,9 @@ export ODAOSROOT=${ODAOSROOT:-/srv/odaos}
 # directory where the log files shall be places - by default set to '/var/log/odaos'
 export ODAOSLOGDIR=${ODAOSLOGDIR:-/var/log/odaos}
 
+# directory where the PosgreSQL DB stores the files
+export ODAOS_PGDATA_DIR=${ODAOS_PGDATA_DIR:-/srv/pgdata} 
+
 # directory of the long-term data storage - by default set to '/srv/eodata'
 export ODAOSDATADIR=${ODAOSDATADIR:-/srv/eodata}
 

@@ -13,15 +13,27 @@ info "Installing PosgreSQL RDBM ... "
 # STEP 1: INSTALL RPMS
 
 yum --assumeyes install postgresql postgresql-server postgis python-psycopg2
-# there are missing dependencies ???
 
-# STEP 2: START THE SERVICE  
+
+# STEP 2: CONFIGURE THE STORAGE DIRECTORY 
+
+if [ -n "$ODAOS_PGDATA_DIR" ]
+else 
+    sudo ex "/etc/rc.d/init.d/postgresql" <<END
+g/^PGDATA=/s#\(^PGDATA=\).*#\1$ODAOS_PGDATA_DIR#
+g/^PGLOG=/s#\(^PGLOG=\).*#\1$ODAOS_PGDATA_DIR/pgstartup.log#
+wq
+END 
+
+fi 
+
+# STEP 3: INIT THE DB AND START THE SERVICE  
 
 service postgresql initdb
 chkconfig postgresql on
 service postgresql start
 
-# STEP3: SETUP POSTGIS DATABASE TEMPLATE 
+# STEP 4: SETUP POSTGIS DATABASE TEMPLATE 
 
 if [ -z "`sudo sudo -u postgres psql --list | grep template_postgis`" ] 
 then 
