@@ -184,7 +184,7 @@ END
 
 # set-up logging 
 sudo -u "$ODAOSUSER" ex "$SETTINGS" <<END
-g/^DEBUG[	 ]*=/s/\(^DEBUG[	 ]*=[	 ]*\).*/\1False/
+g/^DEBUG[	 ]*=/s#\(^DEBUG[	 ]*=[	 ]*\).*#\1False#
 g/^LOGGING[	 ]*=/,/^}/d
 a
 LOGGING = {
