@@ -18,12 +18,11 @@ ODAC_TMPDIR='/tmp/ieng'
 [ -z "$ODAOSGROUP" ] && error "Missing the required ODAOSGROUP variable!"
 
 #if [ -d "$ODAOS_ODAC_HOME" ] 
-if /bin/false
-then 
-    info "ODA Client seems to be already installed."
-    info "ODA Client installation is terminated."
-    exit 0 
-fi 
+#then 
+#    error "ODA Client seems to be already installed."
+#    error "ODA Client installation is terminated."
+#    exit 1 
+#fi 
 
 #======================================================================
 # setup automatic cleanup 

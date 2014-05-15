@@ -19,12 +19,11 @@ TOOLS_TMPDIR='/tmp/tools'
 TOOLS_HOME="$ODAOSROOT/tools"
 
 #if [ -d "$TOOLS_HOME" ] 
-if /bin/false
-then 
-    info "EOX Tools seem to be already installed."
-    info "EOX Tools' installation is terminated."
-    exit 0 
-fi 
+#then 
+#    error "EOX Tools seem to be already installed."
+#    error "EOX Tools' installation is terminated."
+#    exit 1 
+#fi 
 
 #======================================================================
 # setup automatic cleanup 

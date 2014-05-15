@@ -19,9 +19,9 @@ DM_TMPDIR='/tmp/ngeo-dm'
 
 if [ -d "$ODAOS_DM_HOME" ] 
 then 
-    info "ngEO Download Manager seems to be already installed in: $ODAOS_DM_HOME"
-    info "ngEO Download Manager installation is terminated."
-    exit 0 
+    error "ngEO Download Manager seems to be already installed in: $ODAOS_DM_HOME"
+    error "ngEO Download Manager installation is terminated."
+    exit 1 
 fi 
 
 #======================================================================
@@ -94,10 +94,10 @@ then
 
     DM_TARBALL="$CONTRIB/$DM_ARCHIVE"
 
-    info "Donwloading the ngEO Download Manager: ... "
+    info "Donwloading the ngEO Download Manager ... "
     info "$BASEURL/$DM_VERSION/$DM_ARCHIVE -> $DM_TARBALL"
     curl -n -s -S "$BASEURL/$DM_VERSION/$DM_ARCHIVE" -o "$DM_TARBALL"
-    info "Download manager downloaded."
+    info "Download completed."
 
 else # found - using local copy  
 
@@ -120,7 +120,7 @@ mkdir -p "$DM_TMPDIR"
 # unpack 
 tar -xzf "$DM_TARBALL" --directory="$DM_TMPDIR"
 
-# move to destination 
+# move to the destination 
 mv -f "$DM_TMPDIR/ngEO-download-manager" "$ODAOS_DM_HOME"
 
 # fix permisions 

@@ -18,12 +18,11 @@ IE_TMPDIR='/tmp/ieng'
 [ -z "$ODAOSGROUP" ] && error "Missing the required ODAOSGROUP variable!"
 
 #if [ -d "$ODAOS_IE_HOME" ] 
-if /bin/false
-then 
-    info "Ingestion Engine seems to be already installed."
-    info "Ingestion Engine installation is terminated."
-    exit 0 
-fi 
+#then 
+#    error "Ingestion Engine seems to be already installed."
+#    error "Ingestion Engine installation is terminated."
+#    exit 1 
+#fi 
 
 #======================================================================
 # setup automatic cleanup 
