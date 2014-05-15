@@ -79,4 +79,14 @@ sudo -u "$ODAOSUSER" jq "$_F1|$_F2" >"$CONFIG_JSON" <"$CONFIG_JSON~" && \
 sudo -u "$ODAOSUSER" rm -f "$CONFIG_JSON~"
 
 #-------------------------------------------------------------------------------
+
 service httpd restart
+
+#-------------------------------------------------------------------------------
+# Data Quality subsytem 
+
+if [ -f "$ODAOS_DQ_HOME/reset_hostname.sh" ] 
+then 
+    sudo -u "$ODAOS_DQ_HOME/reset_hostname.sh" "$HOSTNAME" 80 
+    service "tomcat7-dq" restart
+fi

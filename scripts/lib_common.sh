@@ -66,3 +66,6 @@ export ODAOS_IEAS_HOME=${ODAOS_IEAS_HOME:-$ODAOSROOT/ie_scripts}
 
 # location of the ODA Client home directory 
 export ODAOS_ODAC_HOME=${ODAOS_ODAC_HOME:-$ODAOSROOT/oda_client}
+
+# location of the DQ subsystem  
+export ODAOS_DQ_HOME=${ODAOS_DQ_HOME:-$ODAOSROOT/data_quality}
