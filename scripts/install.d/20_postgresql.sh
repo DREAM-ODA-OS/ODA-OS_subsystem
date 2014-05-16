@@ -14,17 +14,12 @@ info "Installing PosgreSQL RDBM ... "
 
 yum --assumeyes install postgresql postgresql-server postgis python-psycopg2
 
-
 # STEP 2: CONFIGURE THE STORAGE DIRECTORY 
 
 if [ -n "$ODAOS_PGDATA_DIR" ]
-else 
-    sudo ex "/etc/rc.d/init.d/postgresql" <<END
-g/^PGDATA=/s#\(^PGDATA=\).*#\1$ODAOS_PGDATA_DIR#
-g/^PGLOG=/s#\(^PGLOG=\).*#\1$ODAOS_PGDATA_DIR/pgstartup.log#
-wq
-END 
-
+then 
+    info "Setting the PostgreSQL data location to: $ODAOS_PGDATA_DIR"
+    echo "PGDATA=\"$ODAOS_PGDATA_DIR\"" > /etc/sysconfig/pgsql/postgresql
 fi 
 
 # STEP 3: INIT THE DB AND START THE SERVICE  
@@ -35,6 +30,7 @@ service postgresql start
 
 # STEP 4: SETUP POSTGIS DATABASE TEMPLATE 
 
+set -x 
 if [ -z "`sudo sudo -u postgres psql --list | grep template_postgis`" ] 
 then 
     sudo -u postgres createdb template_postgis
