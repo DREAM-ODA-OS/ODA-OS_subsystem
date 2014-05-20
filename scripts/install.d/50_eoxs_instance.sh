@@ -1,10 +1,10 @@
-#!/bin/sh 
+#!/bin/sh
 #
-# setup EOxServer instance 
+# setup EOxServer instance
 #
 #======================================================================
 
-. `dirname $0`/../lib_logging.sh  
+. `dirname $0`/../lib_logging.sh
 
 info "Configuring EOxServer ... "
 
@@ -31,55 +31,64 @@ MNGCMD="${INSTROOT}/${INSTANCE}/manage.py"
 DBENGINE="django.contrib.gis.db.backends.postgis"
 DBNAME="eoxs_${INSTANCE}"
 DBUSER="eoxs_admin_${INSTANCE}"
-DBPASSWD="${INSTANCE}_admin_eoxs"
+DBPASSWD="${INSTANCE}_admin_eoxs_`head -c 24 < /dev/urandom | base64 | tr '/' '_'`"
 DBHOST=""
 DBPORT=""
 
-PG_HBA="/var/lib/pgsql/data/pg_hba.conf"
+PG_HBA="${ODAOS_PGDATA_DIR:-/var/lib/pgsql/data}/pg_hba.conf"
 
 EOXSLOG="${ODAOSLOGDIR}/eoxserver.log"
 EOXSCONF="${INSTROOT}/${INSTANCE}/${INSTANCE}/conf/eoxserver.conf"
 EOXSURL="http://${HOSTNAME}/${INSTANCE}/ows"
 
 #-------------------------------------------------------------------------------
-# create instance 
+# create instance
 
 info "Creating EOxServer instance '${INSTANCE}' in '$INSTROOT/$INSTANCE' ..."
 
 if [ -d "$INSTROOT/$INSTANCE" ]
-then 
+then
 
     info " The instance seems to already exist. All files will be removed!"
     rm -fvR "$INSTROOT/$INSTANCE"
 fi
 
+# check availability of the EOxServer
+#HINT: Does python complain that the apparently installed EOxServer
+#      package is not available? First check that the 'eoxserver' tree is
+#      readable by anyone. (E.g. in case of read protected home directory when
+#      the development setup is used.)
+sudo -u "$ODAOSUSER" python -c 'import eoxserver' || {
+    error "EOxServer does not seem to be installed!"
+    exit 1
+}
 
 sudo -u "$ODAOSUSER" mkdir -p "$INSTROOT/$INSTANCE"
-sudo -u "$ODAOSUSER" eoxserver-admin.py create_instance "$INSTANCE" "$INSTROOT/$INSTANCE" 
+sudo -u "$ODAOSUSER" eoxserver-admin.py create_instance "$INSTANCE" "$INSTROOT/$INSTANCE"
 
 #-------------------------------------------------------------------------------
-# create Postgres DB 
+# create Postgres DB
 
 info "Creating EOxServer instance's Postgres database '$DBNAME' ..."
 
-# deleting any previously existing database and user 
+# deleting any previously existing database and user
 sudo -u postgres psql -q -c "DROP DATABASE $DBNAME ;" 2>/dev/null \
-  && warn " The alredy existing database '$DBNAME' was removed." || /bin/true 
+  && warn " The alredy existing database '$DBNAME' was removed." || /bin/true
 
-# deleting any previously existing user 
+# deleting any previously existing user
 TMP=`sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='$DBUSER' ;"`
 if [ 1 == "$TMP" ]
-then 
+then
     sudo -u postgres psql -q -c "DROP USER $DBUSER ;"
     warn " The alredy existing database user '$DBUSER' was removed"
 fi
 
-# create new users 
+# create new users
 sudo -u postgres psql -q -c "CREATE USER $DBUSER WITH ENCRYPTED PASSWORD '$DBPASSWD' NOSUPERUSER NOCREATEDB NOCREATEROLE ;"
 sudo -u postgres psql -q -c "CREATE DATABASE $DBNAME WITH OWNER $DBUSER TEMPLATE template_postgis ENCODING 'UTF-8' ;"
 
-# prepend to the beginning of the acess list 
-{ sudo -u postgres ex "$PG_HBA" || /bin/true ; } <<END 
+# prepend to the beginning of the acess list
+{ sudo -u postgres ex "$PG_HBA" || /bin/true ; } <<END
 g/# EOxServer instance:.*\/$INSTANCE/d
 g/^[	 ]*local[	 ]*$DBNAME/d
 /#[	 ]*TYPE[	 ]*DATABASE[	 ]*USER[	 ]*CIDR-ADDRESS[	 ]*METHOD/a
@@ -93,22 +102,22 @@ END
 service postgresql restart
 
 #-------------------------------------------------------------------------------
-# setup Django DB backend 
+# setup Django DB backend
 
 sudo -u "$ODAOSUSER" ex "$SETTINGS" <<END
-1,\$s/\('ENGINE'[	 ]*:[	 ]*\).*\(,\)/\1'$DBENGINE'\2/
-1,\$s/\('NAME'[	 ]*:[	 ]*\).*\(,\)/\1'$DBNAME'\2/
-1,\$s/\('USER'[	 ]*:[	 ]*\).*\(,\)/\1'$DBUSER'\2/
-1,\$s/\('PASSWORD'[	 ]*:[	 ]*\).*\(,\)/\1'$DBPASSWD'\2/
-1,\$s/\('HOST'[	 ]*:[	 ]*\).*\(,\)/#\1'$DBHOST'\2/
-1,\$s/\('PORT'[	 ]*:[	 ]*\).*\(,\)/#\1'$DBPORT'\2/
+1,\$s/\('ENGINE'[	 ]*:[	 ]*\).*\(,\)/\1'$DBENGINE',/
+1,\$s/\('NAME'[	 ]*:[	 ]*\).*\(,\)/\1'$DBNAME',/
+1,\$s/\('USER'[	 ]*:[	 ]*\).*\(,\)/\1'$DBUSER',/
+1,\$s/\('PASSWORD'[	 ]*:[	 ]*\).*\(,\)/\1'$DBPASSWD',/
+1,\$s/\('HOST'[	 ]*:[	 ]*\).*\(,\)/#\1'$DBHOST',/
+1,\$s/\('PORT'[	 ]*:[	 ]*\).*\(,\)/#\1'$DBPORT',/
 1,\$s:\(STATIC_URL[	 ]*=[	 ]*\).*:\1'$INSTSTAT_URL/':
 wq
 END
 #ALLOWED_HOSTS = []
 
 #-------------------------------------------------------------------------------
-# Integration with the Apache web server  
+# Integration with the Apache web server
 
 info "Mapping EOxServer instance '${INSTANCE}' to URL path '${INSTANCE}' ..."
 
@@ -117,28 +126,28 @@ info "Mapping EOxServer instance '${INSTANCE}' to URL path '${INSTANCE}' ..."
 CONFS="/etc/httpd/conf/httpd.conf /etc/httpd/conf.d/*.conf"
 CONF=
 
-for F in $CONFS 
+for F in $CONFS
 do
-    if [ 0 -lt `grep -c '^[ 	]*<VirtualHost[ 	]*\*:80>' $F` ] 
-    then 
+    if [ 0 -lt `grep -c '^[ 	]*<VirtualHost[ 	]*\*:80>' $F` ]
+    then
         CONF=$F
-        break 
+        break
     fi
 done
 
 [ -z "CONFS" ] && error "Cannot find the Apache VirtualHost configuration file."
 
-# insert the configuration to the virtual host 
+# insert the configuration to the virtual host
 
 #/^[ 	]*<VirtualHost[ 	]*\*:80>/a
 { ex "$CONF" || /bin/true ; } <<END
 /EOXS00_BEGIN/,/EOXS00_END/de
 /^[ 	]*<\/VirtualHost>/i
-    # EOXS00_BEGIN - EOxServer instance - Do not edit or remove this line! 
+    # EOXS00_BEGIN - EOxServer instance - Do not edit or remove this line!
 
     # EOxServer instance configured by the automatic installation script
 
-    # WSGI service endpoint 
+    # WSGI service endpoint
     Alias /$INSTANCE "${INSTROOT}/${INSTANCE}/${INSTANCE}/wsgi.py"
     <Directory "${INSTROOT}/${INSTANCE}/${INSTANCE}">
             Options +ExecCGI -MultiViews +FollowSymLinks
@@ -151,7 +160,7 @@ done
             Header set Access-Control-Allow-Methods "POST, GET"
     </Directory>
 
-    # static content 
+    # static content
     Alias $INSTSTAT_URL "$INSTSTAT_DIR"
     <Directory "$INSTSTAT_DIR">
             Options -MultiViews +FollowSymLinks
@@ -160,15 +169,15 @@ done
             Allow from all
     </Directory>
 
-    # EOXS00_END - EOxServer instance - Do not edit or remove this line! 
+    # EOXS00_END - EOxServer instance - Do not edit or remove this line!
 .
 wq
 END
 
 #-------------------------------------------------------------------------------
-# EOxServer configuration 
+# EOxServer configuration
 
-# set the service url and log-file 
+# set the service url and log-file
 #/^[	 ]*logging_filename[	 ]*=/s;\(^[	 ]*logging_filename[	 ]*=\).*;\1${EOXSLOG};
 sudo -u "$ODAOSUSER" ex "$EOXSCONF" <<END
 /^[	 ]*http_service_url[	 ]*=/s;\(^[	 ]*http_service_url[	 ]*=\).*;\1${EOXSURL};
@@ -176,13 +185,13 @@ g/^#.*supported_crs/,/^$/ s/^#//
 wq
 END
 
-# set the allowed hosts 
+# set the allowed hosts
 sudo -u "$ODAOSUSER" ex "$SETTINGS" <<END
 1,\$s/\(^ALLOWED_HOSTS[	 ]*=[	 ]*\).*/\1['$HOSTNAME']/
 wq
 END
 
-# set-up logging 
+# set-up logging
 sudo -u "$ODAOSUSER" ex "$SETTINGS" <<END
 g/^DEBUG[	 ]*=/s#\(^DEBUG[	 ]*=[	 ]*\).*#\1False#
 g/^LOGGING[	 ]*=/,/^}/d
@@ -231,7 +240,7 @@ wq
 END
 #wq
 
-# enable WPS component 
+# enable WPS component
 sudo -u "$ODAOSUSER" ex "$SETTINGS" <<END
 /^COMPONENTS[	 ]*=[	 ]*(/
 /^COMPONENTS[	 ]*=[	 ]*(/,/^[	 ]*)/g/'eoxserver\.services\.ows\.wps\.\*\*/d
@@ -242,27 +251,27 @@ sudo -u "$ODAOSUSER" ex "$SETTINGS" <<END
 wq
 END
 
-# touch the logfifile and set the right permissions 
+# touch the logfifile and set the right permissions
 [ -f "$EOXSLOG" ] && rm -fv "$EOXSLOG"
 touch "$EOXSLOG"
 chown -v "$ODAOSUSER:$ODAOSGROUP" "$EOXSLOG"
 chmod -v 0664 "$EOXSLOG"
 
 #-------------------------------------------------------------------------------
-# Django syncdb (without interactive prompts) 
+# Django syncdb (without interactive prompts)
 
 info "Initializing EOxServer instance '${INSTANCE}' ..."
 
-# collect static files 
+# collect static files
 sudo -u "$ODAOSUSER" python "$MNGCMD" collectstatic -l --noinput
 
-# setup new database 
-sudo -u "$ODAOSUSER" python "$MNGCMD" syncdb --noinput 
+# setup new database
+sudo -u "$ODAOSUSER" python "$MNGCMD" syncdb --noinput
 
 # load range types
-sudo -u "$ODAOSUSER" python "$MNGCMD" eoxs_rangetype_load < "$ODAOS_IEAS_HOME/range_types.json" 
+sudo -u "$ODAOSUSER" python "$MNGCMD" eoxs_rangetype_load < "$ODAOS_IEAS_HOME/range_types.json"
 
 #-------------------------------------------------------------------------------
-# restart apache to force the changes to take effect 
+# restart apache to force the changes to take effect
 
 service httpd restart
