@@ -28,7 +28,7 @@
 #-------------------------------------------------------------------------------
 
 # version 
-export ODAOSVERSION=0.1.0
+export ODAOSVERSION=0.2.0
 
 # public hostname (or IP number) under which the ODA-OS shall be accessable 
 # NOTE: Critical parameter! Be sure you set to proper value.
@@ -62,10 +62,10 @@ export ODAOS_DM_HOME=${ODAOS_DM_HOME:-$ODAOSROOT/ngeo-dm}
 export ODAOS_IE_HOME=${ODAOS_IE_HOME:-$ODAOSROOT/ingeng}
 
 # location of the Ingestion Engine actions scripts home directory
-export ODAOS_IEAS_HOME=${ODAOS_IEAS_HOME:-$ODAOSROOT/ie_scripts}
+export ODAOS_IEAS_HOME=${ODAOS_IEAS_HOME:-$ODAOSROOT/ie-scripts}
 
 # location of the ODA Client home directory 
-export ODAOS_ODAC_HOME=${ODAOS_ODAC_HOME:-$ODAOSROOT/oda_client}
+export ODAOS_ODAC_HOME=${ODAOS_ODAC_HOME:-$ODAOSROOT/oda-client}
 
 # location of the DQ subsystem  
-export ODAOS_DQ_HOME=${ODAOS_DQ_HOME:-$ODAOSROOT/data_quality}
+export ODAOS_DQ_HOME=${ODAOS_DQ_HOME:-$ODAOSROOT/data-quality}
