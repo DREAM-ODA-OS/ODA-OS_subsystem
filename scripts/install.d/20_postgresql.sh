@@ -30,7 +30,6 @@ service postgresql start
 
 # STEP 4: SETUP POSTGIS DATABASE TEMPLATE 
 
-set -x 
 if [ -z "`sudo sudo -u postgres psql --list | grep template_postgis`" ] 
 then 
     sudo -u postgres createdb template_postgis
