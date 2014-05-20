@@ -61,7 +61,8 @@ then
     #URL="`get_release_url`"
 
     #fixed version download
-    URL="https://github.com/DREAM-ODA-OS/IngestionEngine/archive/v0.6.0.tar.gz"
+    #URL="https://github.com/DREAM-ODA-OS/IngestionEngine/archive/v0.6.0.tar.gz"
+    URL="https://github.com/DREAM-ODA-OS/IngestionEngine/archive/patch_0518.tar.gz"
 
     info "Downloading from: $URL"
 
