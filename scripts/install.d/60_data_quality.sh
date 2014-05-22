@@ -78,7 +78,7 @@ DQ_INSTALLER="$ODAOS_DQ_HOME/q2/install.sh"
 
 info "Data Quality subsytem service initialization ..."
 DQ_STARTUP_SRC="$ODAOS_DQ_HOME/q2/$DQ_SERVICE"
-sudo -u "$DQ_USER" ex -V "$DQ_STARTUP_SRC" <<END
+sudo -u "$DQ_USER" ex "$DQ_STARTUP_SRC" <<END
 1,\$s/^\(CATALINA_USER=\).*$/\1"$DQ_USER"/
 wq
 END
@@ -87,4 +87,3 @@ cp -fv "$DQ_STARTUP_SRC" "/etc/init.d"
 
 chkconfig "$DQ_SERVICE" on
 service "$DQ_SERVICE" restart
-

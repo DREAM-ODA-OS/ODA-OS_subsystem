@@ -85,8 +85,12 @@ service httpd restart
 #-------------------------------------------------------------------------------
 # Data Quality subsytem 
 
-if [ -f "$ODAOS_DQ_HOME/reset_hostname.sh" ] 
-then 
-    sudo -u "$ODAOS_DQ_HOME/reset_hostname.sh" "$HOSTNAME" 80 
-    service "tomcat7-dq" restart
-fi
+service tomcat-dq stop
+
+DQ_CFG="$ODAOS_DQ_HOME/q2/local/tomcat/webapps/constellation/WEB-INF/constellation.properties"
+ex "$DQ_CFG" <<END
+s#\(^[ 	]*services.url=\)[a-zA-Z0-9]*://[^/\?\#]*\(.*\)#\1http://${HOSTNAME}:80\2#
+wq
+END
+
+service tomcat-dq start
