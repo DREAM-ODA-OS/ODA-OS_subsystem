@@ -15,8 +15,8 @@ info "Configuring EOxServer ... "
 [ -z "$ODAOSHOSTNAME" ] && error "Missing the required ODAOSHOSTNAME variable!"
 [ -z "$ODAOSROOT" ] && error "Missing the required ODAOSROOT variable!"
 [ -z "$ODAOSUSER" ] && error "Missing the required ODAOSUSER variable!"
+[ -z "$ODAOSGROUP" ] && error "Missing the required ODAOSGROUP variable!"
 [ -z "$ODAOSLOGDIR" ] && error "Missing the required ODAOSLOGDIR variable!"
-export ODAOSLOGDIR=${ODAOSLOGDIR:-/var/log/odaos}
 
 HOSTNAME="$ODAOSHOSTNAME"
 INSTANCE="eoxs"
