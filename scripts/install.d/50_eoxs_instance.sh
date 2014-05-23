@@ -228,6 +228,11 @@ LOGGING = {
         },
     },
     'loggers': {
+        'eoxserver': {
+            'handlers': ['eoxserver_file'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
         '': {
             'handlers': ['eoxserver_file'],
             'level': 'DEBUG' if DEBUG else 'INFO',
