@@ -245,17 +245,6 @@ wq
 END
 #wq
 
-# enable WPS component
-sudo -u "$ODAOSUSER" ex "$SETTINGS" <<END
-/^COMPONENTS[	 ]*=[	 ]*(/
-/^COMPONENTS[	 ]*=[	 ]*(/,/^[	 ]*)/g/'eoxserver\.services\.ows\.wps\.\*\*/d
-/^COMPONENTS[	 ]*=[	 ]*(/
-/'eoxserver\.services\.ows\.wms\.\*\*/a
-    'eoxserver.services.ows.wps.**',
-.
-wq
-END
-
 # touch the logfifile and set the right permissions
 [ -f "$EOXSLOG" ] && rm -fv "$EOXSLOG"
 touch "$EOXSLOG"
