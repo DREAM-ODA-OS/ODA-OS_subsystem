@@ -235,7 +235,7 @@ LOGGING = {
         },
         '': {
             'handlers': ['eoxserver_file'],
-            'level': 'DEBUG' if DEBUG else 'INFO',
+            'level': 'INFO' if DEBUG else 'WARNING',
             'propagate': False,
         },
     }
@@ -262,8 +262,9 @@ sudo -u "$ODAOSUSER" python "$MNGCMD" collectstatic -l --noinput
 # setup new database
 sudo -u "$ODAOSUSER" python "$MNGCMD" syncdb --noinput
 
-# load range types
-sudo -u "$ODAOSUSER" python "$MNGCMD" eoxs_rangetype_load < "$ODAOS_IEAS_HOME/range_types.json"
+# load range types (when available) 
+INITIAL_RANGETYPES="$ODAOS_IEAS_HOME/range_types.json"
+[ -f "$INITIAL_RANGETYPES" ] && sudo -u "$ODAOSUSER" python "$MNGCMD" eoxs_rangetype_load < "$INITIAL_RANGETYPES"
 
 #-------------------------------------------------------------------------------
 # restart apache to force the changes to take effect
