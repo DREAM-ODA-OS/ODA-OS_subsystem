@@ -29,12 +29,19 @@ DQ_PROXY_PORT=8080
 ODAOS_PORT=80
 DQ_SERVICE="tomcat-dq"
 
+EOXS_ID2PATH_URL="http://127.0.0.1/eoxs/id2path?id="
+IE_ADDPRODUCT_URL="http://127.0.0.1:8000/ingest"
+IE_UPDATEMD_URL="http://127.0.0.1:8000/ingest"
+
 if [ ! -d "$ODAOS_DQ_HOME" ]
 then
     error "Data Quality subsytem does not seem to be installed in: $ODAOS_DQ_HOME"
     error "Data Quality subsytem configuration is terminated."
     exit 0
 fi
+
+# try to stop the service if it is running
+[ -f "/etc/init.d/$DQ_SERVICE" ] && service "$DQ_SERVICE" stop || :
 
 #======================================================================
 
@@ -66,12 +73,22 @@ DQ_INSTALLER="$ODAOS_DQ_HOME/q2/install.sh"
 #       to be the same as the location of the script.
 (
     cd "`dirname "$DQ_INSTALLER" `"
-    sudo -u "$DQ_USER" sh -x "./`basename "$DQ_INSTALLER" `" \
+    sudo -u "$DQ_USER" sh "./`basename "$DQ_INSTALLER" `" \
             -t "$DQ_PROXY_HOST" -u "$DQ_PROXY_PORT" \
             -j "http" -k "$ODAOSHOSTNAME" -l "$ODAOS_PORT" \
             -p "$DQ_SERVICE_HOST" -q "$DQ_SERVICE_PORT" -r "$DQ_WPS_CONTEXT" \
             -a "$DQ_LOG_DIR" -b "$DQ_DATA_DIR"
 )
+
+# fix the configuration of the interfaces
+set -x
+sudo -u "$DQ_USER" ex -V "$ODAOS_DQ_HOME/q2/config/_.dream/dream.properties" <<END
+1,\$s#^\([ 	]*ODA_ID2PATH_URL[ 	]*=\).*\$#\1$EOXS_ID2PATH_URL#
+1,\$s#^\([ 	]*ODA_ADDPRODUCT_URL[ 	]*=\).*\$#\1$IE_ADDPRODUCT_URL#
+1,\$s#^\([ 	]*ODA_UPDATEMD_URL[ 	]*=\).*\$#\1$IE_UPDATEMD_URL#
+wq
+END
+set +x
 
 #======================================================================
 # start the service
@@ -79,11 +96,54 @@ DQ_INSTALLER="$ODAOS_DQ_HOME/q2/install.sh"
 info "Data Quality subsytem service initialization ..."
 DQ_STARTUP_SRC="$ODAOS_DQ_HOME/q2/$DQ_SERVICE"
 sudo -u "$DQ_USER" ex "$DQ_STARTUP_SRC" <<END
-1,\$s/^\(CATALINA_USER=\).*$/\1"$DQ_USER"/
+1,\$s/^\([ 	]*CATALINA_USER[ 	]*=\).*\$/\1"$DQ_USER"/
 wq
 END
 
 cp -fv "$DQ_STARTUP_SRC" "/etc/init.d"
 
 chkconfig "$DQ_SERVICE" on
-service "$DQ_SERVICE" restart
+service "$DQ_SERVICE" start
+
+#======================================================================
+# Integration with the Apache web server
+
+info "Setting Data Quality proxy behind the Apache reverse proxy ..."
+
+# locate proper configuration file (see also apache configuration)
+
+CONFS="/etc/httpd/conf/httpd.conf /etc/httpd/conf.d/*.conf"
+CONF=
+
+for F in $CONFS
+do
+    if [ 0 -lt `grep -c '^[ 	]*<VirtualHost[ 	]*\*:80>' $F` ]
+    then
+        CONF=$F
+        break
+    fi
+done
+
+[ -z "CONFS" ] && error "Cannot find the Apache VirtualHost configuration file."
+
+# insert the configuration to the virtual host
+
+# delete any previous configuration
+# and write new one
+{ ex "$CONF" || /bin/true ; } <<END
+/DQ00_BEGIN/,/DQ00_END/de
+/^[ 	]*<\/VirtualHost>/i
+    # DQ00_BEGIN - Data Qaulity Proxy - Do not edit or remove this line!
+
+    # reverse proxy to the Data Qaulity Proxy
+
+    ProxyPass        /constellation http://127.0.0.1:8080/constellation
+    ProxyPassReverse /constellation http://127.0.0.1:8080/constellation
+
+    # DQ00_END - Data Qaulity Proxy - Do not edit or remove this line!
+.
+wq
+END
+
+# restart apache to force the changes to take effect
+service httpd restart
