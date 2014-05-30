@@ -1,18 +1,19 @@
 #!/bin/sh
 #
-# install Rasdaman RPMs 
+# install Rasdaman RPMs
 #
 #======================================================================
 
-. `dirname $0`/../lib_logging.sh  
+. `dirname $0`/../lib_logging.sh
 
 info "Installing Rasdaman ... "
 
 #======================================================================
 
-#TODO: testing repo conflicts 
+#TODO: testing repo conflicts
 
 info "Enabling Rasdaman packages from the EOX testing repository... "
+
 ex /etc/yum.repos.d/eox-testing.repo <<END
 /\[eox-testing\]
 /^[ 	]*includepkgs[ 	]*=.*\$/
@@ -23,12 +24,17 @@ s/^\([ 	]*includepkgs[ 	]*=.*\)\$/\1 rasdaman*/
 /\[eox-testing-noarch\]
 /^[ 	]*includepkgs[ 	]*=.*\$/
 s/^\([ 	]*includepkgs[ 	]*=.*\)\$/\1 rasdaman*/
-wq 
+wq
 END
 
-# reset yum cache
+# reset yum cache and install the RPMs 
 yum clean all
+yum --assumeyes install rasdaman rasdaman-petascope #rasdaman-rasgeo
 
-# install RPMs 
-yum --assumeyes install rasdaman rasdaman-petascope
+#configure the service 
+cat >/etc/sysconfig/rasdaman <<END
+PGDATA="${ODAOS_PGDATA_DIR:-/var/lib/pgsql/data}"
+END
 
+# register the rasdaman service 
+chkconfig rasdaman on

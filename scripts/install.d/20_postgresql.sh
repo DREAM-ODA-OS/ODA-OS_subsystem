@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# install PostgreSQL and PostGIS installation
+# install PostgreSQL and PostGIS
 #
 #======================================================================
 
