@@ -71,9 +71,9 @@ sudo -u "$ODAOSUSER" eoxserver-admin.py create_instance "$INSTANCE" "$INSTROOT/$
 
 info "Creating EOxServer instance's Postgres database '$DBNAME' ..."
 
-# deleting any previously existing database and user
+# deleting any previously existing database
 sudo -u postgres psql -q -c "DROP DATABASE $DBNAME ;" 2>/dev/null \
-  && warn " The alredy existing database '$DBNAME' was removed." || /bin/true
+  && warn " The already existing database '$DBNAME' was removed." || /bin/true
 
 # deleting any previously existing user
 TMP=`sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='$DBUSER' ;"`
