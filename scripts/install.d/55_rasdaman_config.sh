@@ -9,6 +9,7 @@
 info "Configuring Rasdaman ... "
 
 #======================================================================
+[ -z "$ODAOSUSER" ] && error "Missing the required ODAOSUSER variable!"
 
 dbuser_delete()
 {
@@ -28,10 +29,12 @@ DBHOST=""
 DBPORT=""
 DBRASDAMAN="RASBASE"
 DBPETASCOP="petascopedb"
-DBADMN="rasadmin"
+RASADMIN="rasadmin"
 PSDBUSER="petascope"
 PSDBPASSWD="petascope_`head -c 24 < /dev/urandom | base64 | tr '/' '_'`"
 PSPROP="/etc/rasdaman/petascope.properties"
+RASCONNECT_DIR="/srv/odaos/.rasdaman"
+RASCONNECT_FILE="$RASCONNECT_DIR/rasconnect"
 
 # stop the services if they are runngin
 service rasdaman stop || :
@@ -108,10 +111,10 @@ service postgresql restart
 ex $PSPROP <<END 
 g/metadata_user/s/^[ 	]*\(metadata_user\)[ 	]*=.*\$/\1=$PSDBUSER/
 g/metadata_pass/s/^[ 	]*\(metadata_pass\)[ 	]*=.*\$/\1=$PSDBPASSWD/
-g/rasdaman_user/s/^[ 	]*\(rasdaman_user\)[ 	]*=.*\$/\1=$DBADMN/
-g/rasdaman_pass/s/^[ 	]*\(rasdaman_pass\)[ 	]*=.*\$/\1=$DBADMN/
-g/rasdaman_admin_user/s/^[ 	]*\(rasdaman_admin_user\)[ 	]*=.*\$/\1=$DBADMN/
-g/rasdaman_admin_pass/s/^[ 	]*\(rasdaman_admin_pass\)[ 	]*=.*\$/\1=$DBADMN/
+g/rasdaman_user/s/^[ 	]*\(rasdaman_user\)[ 	]*=.*\$/\1=$RASADMIN/
+g/rasdaman_pass/s/^[ 	]*\(rasdaman_pass\)[ 	]*=.*\$/\1=$RASADMIN/
+g/rasdaman_admin_user/s/^[ 	]*\(rasdaman_admin_user\)[ 	]*=.*\$/\1=$RASADMIN/
+g/rasdaman_admin_pass/s/^[ 	]*\(rasdaman_admin_pass\)[ 	]*=.*\$/\1=$RASADMIN/
 wq
 END
 
@@ -162,4 +165,29 @@ END
 # restart apache to force the changes to take effect
 service httpd restart
 
+#----------------------------------------------------------------------
+# needed by rasimport - to be removed 
+
+[ -d "$RASCONNECT_DIR" ] || sudo -u "$ODAOSUSER" mkdir -p "$RASCONNECT_DIR"
+[ -f "$RASCONNECT_FILE" ] && rm -fv "$RASCONNECT_FILE"
+
+if [ ! -f "$RASCONNECT_FILE" ] 
+then 
+    sudo -u "$ODAOSUSER" touch "$RASCONNECT_FILE"
+    sudo -u "$ODAOSUSER" chmod 0700 "$RASCONNECT_DIR"
+    sudo -u "$ODAOSUSER" chmod 0600 "$RASCONNECT_FILE"
+    sudo -u "$ODAOSUSER" cat >>"$RASCONNECT_FILE" <<END 
+host=localhost
+rasport=7001
+pgport=5432
+rasdbname=RASBASE
+petadbname=petascopedb
+rasuser=$RASADMIN
+raspassword=$RASADMIN
+petauser=$PSDBUSER
+petapassword=$PSDBPASSWD
+rasloginuser=$RASADMIN
+rasloginpassword=$RASADMIN
+END
+fi 
 #----------------------------------------------------------------------
