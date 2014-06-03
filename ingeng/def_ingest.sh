@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# 
+#
 #  DREAM Ingestion script template.
 #  This script is invoked by the Ingestion Engine
 #  to ingest a downloaded product into the ODA server.
@@ -27,35 +27,25 @@
 #
 #
 #-----------------------------------------------------------------------------
-
-PATH="/srv/odaos/tools/metadata:$PATH"
-PATH="/srv/odaos/tools/imgproc:$PATH"
-MNG="/usr/bin/python /srv/odaos/eoxs00/manage.py"
-
-export DJANGO_SETTINGS_MODULE="eoxs00.settings"
+# load common definitions
+. lib_common.sh
 
 #-----------------------------------------------------------------------------
 
-EXENAME=`basename $0`
-
-error() { echo "ERROR: $EXENAME: $1" ; }
-info()  { echo "INFO: $EXENAME: $1" ; }
-warn()  { echo "WARNING: $EXENAME: $1" ; }
-
-drop() { echo "DEMO: dropping product ingestion: $1" ; exit 0 ; } 
+drop() { echo "DEMO: dropping product ingestion: $1" ; exit 0 ; }
 
 #-----------------------------------------------------------------------------
 
 info "ODA-Server ingestion ... "
- 
-[ $# -lt 1 ] && { error "Missing the required manifest file!" ; exit 1 ; } 
-[ -f "$1" ] || { error "The manifest file does not exist! MANIFEST=$1" ; exit 1 ; } 
+
+[ $# -lt 1 ] && { error "Missing the required manifest file!" ; exit 1 ; }
+[ -f "$1" ] || { error "The manifest file does not exist! MANIFEST=$1" ; exit 1 ; }
 
 MANIFEST=$1
 echo "MANIFEST:  $MANIFEST"
 
 #-----------------------------------------------------------------------------
-# parse manifest 
+# parse manifest
 
 DATA="`cat "$MANIFEST" | sed -ne 's/^DATA="\(.*\)"/\1/p'`"
 COVDESCR="`cat "$MANIFEST" | sed -ne 's/^METADATA="\(.*\)"/\1/p'`"
@@ -64,10 +54,10 @@ METADATA="`expr "$DATA" : '\(.*\)\.[a-zA_Z]*'`.xml"
 
 EOP20="http://www.opengis.net/eop/2.0"
 
-# extract the metadata profile 
+# extract the metadata profile
 xml_extract.py "$COVDESCR" "//{$EOP20}EarthObservation" PRETTY > "$METADATA"
 
-# extract product type 
+# extract product type
 ID="`xml_extract.py "$METADATA" "//{$EOP20}identifier" TEXT`"
 PFORM="`xml_extract.py "$METADATA" "//{$EOP20}Platform/{$EOP20}shortName" TEXT`"
 PTYPE="`xml_extract.py "$METADATA" "//{$EOP20}productType" TEXT`"
@@ -78,7 +68,7 @@ echo "PLATFORM:  $PFORM"
 echo "PROD.TYPE: $PTYPE"
 
 #-----------------------------------------------------------------------------
-# get range-type 
+# get range-type
 #
 #  RGBA
 #  Mask_uint8
@@ -89,60 +79,60 @@ echo "PROD.TYPE: $PTYPE"
 #  Landsat7ETM_int16
 #
 
-if [ "${PTYPE:0:10}" = "Spot4Take5" ] 
-then 
+if [ "${PTYPE:0:10}" = "Spot4Take5" ]
+then
     # SPOT4-TAKE5
     T="`expr "$ID" : ".*\(N[12][AC].*\)"`"
 
-    case "$T" in 
-        N1C | N2A_PENTE | N2A_ENV )     drop "$ID" ; RANGE="SPOT4HRVIR_int16" ;; 
-        N1C_RGB )                       drop "$ID" ; RANGE="RGBA" ;; 
-        N2A_RGB )                       RANGE="RGBA" ;; 
-        N1C_SAT | N2A_SAT | N2A_DIV )   drop "$ID" ; RANGE="Mask_uint8" ;; 
-        N2A_AOT | N2A_NUA )             drop "$ID" ; RANGE="Mask_int16" ;; 
-        * ) error "Unknown product range type!" ; exit 1 ;; 
-    esac 
+    case "$T" in
+        N1C | N2A_PENTE | N2A_ENV )     drop "$ID" ; RANGE="SPOT4HRVIR_int16" ;;
+        N1C_RGB )                       drop "$ID" ; RANGE="RGBA" ;;
+        N2A_RGB )                       RANGE="RGBA" ;;
+        N1C_SAT | N2A_SAT | N2A_DIV )   drop "$ID" ; RANGE="Mask_uint8" ;;
+        N2A_AOT | N2A_NUA )             drop "$ID" ; RANGE="Mask_int16" ;;
+        * ) error "Unknown product range type!" ; exit 1 ;;
+    esac
 
 elif [ "$PFORM" == "LANDSAT" -a "${ID:0:5}" == "S2sim" ]
-then 
+then
     # GISAT - LANDSAT S2-SIM
 
     case "$PTYPE" in
-        L1C_rad )           drop "$ID" ; RANGE="SimS2_LandsatTM_uint8" ;; 
+        L1C_rad )           drop "$ID" ; RANGE="SimS2_LandsatTM_uint8" ;;
         L1C_cm )            drop "$ID" ; RANGE="Mask_uint8" ;;
         L1C_rgb_wgs84 )     RANGE="RGBA" ;;
-        * ) error "Unknown product range type!" ; exit 1 ;; 
-    esac 
+        * ) error "Unknown product range type!" ; exit 1 ;;
+    esac
 
 elif [ \( "$PFORM" == "LANDSAT5" -o  "$PFORM" == "LANDSAT7" \) -a "${ID:0:1}" == "L" \
     -a \( "${ID:28:18}" == "ESA_surf_pente_30m" -o "${ID:28:19}" == "USGS_surf_pente_30m" \) ]
-then 
-    # CESBIO Landsat Dataset 
+then
+    # CESBIO Landsat Dataset
 
     if [ "$ID" != "${ID//_surf_pente_30m/}" ]
-    then 
+    then
         case "$PFORM" in
-            "LANDSAT5" ) RANGE="Landsat5TM_int16" ;; 
-            "LANDSAT7" ) RANGE="Landsat7ETM_int16" ;; 
-            * ) error "Unknown product range type!" ; exit 1 ;; 
+            "LANDSAT5" ) RANGE="Landsat5TM_int16" ;;
+            "LANDSAT7" ) RANGE="Landsat7ETM_int16" ;;
+            * ) error "Unknown product range type!" ; exit 1 ;;
         esac
 
     elif [ "$ID" != "${ID//RGB_WSG84/}" ]
     then
-        RANGE="RGBA" 
-    else 
-        error "Unknown product range type!" ; exit 1 
-    fi 
+        RANGE="RGBA"
+    else
+        error "Unknown product range type!" ; exit 1
+    fi
 
     # fix the metadata
     sed -e 's/\(<gml:beginPosition>\)\([0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}T[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\)\(<\/gml:beginPosition>\)/\1\2Z\3/' \
         -e 's/\(<gml:endPosition>\)\([0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}T[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\)\(<\/gml:endPosition>\)/\1\2Z\3/' \
-        -i "$METADATA" 
-        
-else 
+        -i "$METADATA"
+
+else
 
     error "Unknown product!"
-    exit 1 
+    exit 1
 
 fi
 
@@ -150,34 +140,34 @@ echo "RANGE TYPE: $RANGE"
 
 
 #-----------------------------------------------------------------------------
-# registration 
+# registration
 
-set -e 
+set -e
 
-# refuse register already registered coverages 
+# refuse register already registered coverages
 
 
-# create scenario data-set 
-if $MNG eoxs_eoid_check -i "$SCENARIO" -f DatasetSeries 
-then 
-    # everyhting is fine - do nothing 
-    echo -n 
-else 
-    $MNG eoxs_series_create -i "$SCENARIO"
+# create scenario data-set
+if $EOXS_MNG eoxs_eoid_check -i "$SCENARIO" -f DatasetSeries
+then
+    # everyhting is fine - do nothing
+    echo -n
+else
+    $EOXS_MNG eoxs_series_create -i "$SCENARIO"
 fi
 
-# register dataset 
-if $MNG eoxs_eoid_check -i "$ID" -f Coverage 
-then 
+# register dataset
+if $EOXS_MNG eoxs_eoid_check -i "$ID" -f Coverage
+then
     warn "There is already a coverage registered under the same ID."
-    $MNG eoxs_series_link -s "$SCENARIO" -a "$ID"
-else 
-    $MNG eoxs_dataset_register -i "$ID" -r "$RANGE" -d "$DATA" -m "$METADATA" --series "$SCENARIO"
-fi 
+    $EOXS_MNG eoxs_series_link -s "$SCENARIO" -a "$ID"
+else
+    $EOXS_MNG eoxs_dataset_register -i "$ID" -r "$RANGE" -d "$DATA" -m "$METADATA" --series "$SCENARIO"
+fi
 
 #-----------------------------------------------------------------------------
 
-# fix the screwed permissions 
+# fix the screwed permissions
 chmod -R +r /srv/tmp/ngeo-dm/
 find /srv/tmp/ngeo-dm/ -type d -exec chmod +x {} \;
 
@@ -219,7 +209,7 @@ info "ODA-Server ingestion finished successfully."
 #fi
 #
 ##-----------------------------------------------------------------------------
-## parse manifest file 
+## parse manifest file
 #
 #echo "---"
 #echo " WARNING: Ingestion action not yet implemented!"
