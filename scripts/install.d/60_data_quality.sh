@@ -25,7 +25,7 @@ DQ_WPS_CONTEXT="ool-wps-server"
 DQ_SERVICE_HOST="services.spotimage.fr"
 DQ_SERVICE_PORT=8443
 DQ_PROXY_HOST="127.0.0.1"
-DQ_PROXY_PORT=8080
+DQ_PROXY_PORT=8088
 ODAOS_PORT=80
 DQ_SERVICE="tomcat-dq"
 
@@ -137,8 +137,8 @@ done
 
     # reverse proxy to the Data Qaulity Proxy
 
-    ProxyPass        /constellation http://127.0.0.1:8080/constellation
-    ProxyPassReverse /constellation http://127.0.0.1:8080/constellation
+    ProxyPass        /constellation http://$DQ_PROXY_HOST:$DQ_PROXY_PORT/constellation
+    ProxyPassReverse /constellation http://$DQ_PROXY_HOST:$DQ_PROXY_PORT/constellation
 
     # DQ00_END - Data Qaulity Proxy - Do not edit or remove this line!
 .
