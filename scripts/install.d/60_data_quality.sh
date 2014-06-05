@@ -81,26 +81,167 @@ DQ_INSTALLER="$ODAOS_DQ_HOME/q2/install.sh"
 )
 
 # fix the configuration of the interfaces
-set -x
-sudo -u "$DQ_USER" ex -V "$ODAOS_DQ_HOME/q2/config/_.dream/dream.properties" <<END
+sudo -u "$DQ_USER" ex "$ODAOS_DQ_HOME/q2/config/_.dream/dream.properties" <<END
 1,\$s#^\([ 	]*ODA_ID2PATH_URL[ 	]*=\).*\$#\1$EOXS_ID2PATH_URL#
 1,\$s#^\([ 	]*ODA_ADDPRODUCT_URL[ 	]*=\).*\$#\1$IE_ADDPRODUCT_URL#
 1,\$s#^\([ 	]*ODA_UPDATEMD_URL[ 	]*=\).*\$#\1$IE_UPDATEMD_URL#
 wq
 END
-set +x
 
 #======================================================================
 # start the service
 
 info "Data Quality subsytem service initialization ..."
-DQ_STARTUP_SRC="$ODAOS_DQ_HOME/q2/$DQ_SERVICE"
-sudo -u "$DQ_USER" ex "$DQ_STARTUP_SRC" <<END
-1,\$s/^\([ 	]*CATALINA_USER[ 	]*=\).*\$/\1"$DQ_USER"/
-wq
-END
 
-cp -fv "$DQ_STARTUP_SRC" "/etc/init.d"
+DQ_INIT_SRC="$ODAOS_DQ_HOME/q2/$DQ_SERVICE"
+DQ_INIT="/etc/init.d/$DQ_SERVICE"
+
+#sudo -u "$DQ_USER" ex "$DQ_INIT_SRC" <<END
+#1,\$s/^\([ 	]*CATALINA_USER[ 	]*=\).*\$/\1"$DQ_USER"/
+#wq
+#END
+#cp -fv "$DQ_INIT_SRC" "$DQ_INIT"
+
+[ -f "$DQ_INIT" ] && rm -fv "$DQ_INIT"
+
+cat >"$DQ_INIT" <<END
+#!/bin/sh
+#
+# $DQ_SERVICE	Tomcat - Data Quality Proxy
+#
+# chkconfig: - 80 20
+# description: starts, stops, and restarts the tomcat instance
+#
+# NOTE: This init script is created by the DREAM ODA-OS installation script.
+# NOTE: The service must be explicitely enabled by 'chkconfig $DQ_SERVICE on' command.
+#
+### BEGIN INIT INFO
+# Provides: $DQ_SERVICE
+# Required-Start: \$local_fs \$remote_fs \$network \$named
+# Required-Stop: \$local_fs \$remote_fs \$network
+# Default-Stop: 0 1 2 3 4 5 6
+# Default-Start:
+# Short-Description: Starts, stops, and restarts the ngEO donwload manager
+# Description: Starts, stops, and restarts the ngEO donwload manager
+### END INIT INFO
+
+. /etc/rc.d/init.d/functions
+
+CATALINA_USER="$DQ_USER"
+CATALINA_HOME="$ODAOS_DQ_HOME/q2/local/tomcat"
+CATALINA_SH="\${CATALINA_HOME}/bin/catalina.sh"
+CATALINA_PID="\${CATALINA_HOME}/var/catalina.pid"
+SHUTDOWN_WAIT=20
+
+prog="$DQ_SERVICE"
+pidfile="\$CATALINA_PID"
+
+status()
+{
+    if [ -f "\${pidfile}" ]
+    then
+        pid="\$( cat "\${pidfile}" )"
+        if ps p "\$pid" >/dev/null
+        then
+            echo \$"\${prog} (pid \$pid) is running ..."
+            return 0
+        else
+            echo \$"\${prog} is dead but pid file exists"
+            return 1
+        fi
+    else
+        echo \$"\${prog} is stopped"
+        return 2
+    fi
+}
+
+start()
+{
+    MSG=\$( status )
+    case "\$?" in
+        0 )
+            echo \$"\$MSG" ;
+            return 0
+            ;;
+        1 )
+            echo \$"WARNING: \$MSG"
+            rm -fv "\$pidfile"
+            ;;
+    esac
+
+    echo \$"Starting tomcat"
+    runuser -l \$CATALINA_USER -c "\${CATALINA_SH} start"
+
+    MSG=\$( status )
+    case "\$?" in
+        0 ) echo \$"OK" ; return 0 ;;
+        1 | 2 ) echo \$"FAILED" ; return 1 ;;
+    esac
+}
+
+stop()
+{
+    MSG=\$( status )
+    case "\$?" in
+        2 )
+            echo \$"\$MSG" ;
+            return 0
+            ;;
+        1 )
+            echo \$"WARNING: \$MSG"
+            rm -fv "\$pidfile"
+            return 0
+            ;;
+    esac
+
+    pid="\$( cat "\${pidfile}" )"
+
+    echo \$"Stopping Tomcat"
+    runuser -l \$CATALINA_USER -c "\${CATALINA_SH} stop"
+
+    count_max="\${SHUTDOWN_WAIT:-5}"
+    count=0
+
+    while [ \$count -le "\$count_max" ] && ps p "\$pid" >/dev/null 2>&1
+    do
+        echo \$"\nwaiting for processes to exit";
+        sleep 1
+        let count=\$count+1;
+    done
+
+    if ps p "\$pid" >/dev/null 2>&1
+    then
+        echo \$"\nkilling processes which didn't stop after \$SHUTDOWN_WAIT seconds"
+        kill -9 \$pid
+    fi
+
+    MSG=\$( status )
+    case "\$?" in
+        2 ) echo \$"OK" ; return 0 ;;
+        1 ) echo \$"OK" ; rm -fv "\$pidfile" ; return 0 ;;
+        0 ) echo \$"FAILED" ; return 1 ;;
+    esac
+}
+
+
+case \$1 in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  restart)
+    stop
+    start
+    ;;
+  status)
+    status
+    ;;
+esac
+exit 0
+END
+chmod +x "$DQ_INIT"
 
 chkconfig "$DQ_SERVICE" on
 service "$DQ_SERVICE" start
