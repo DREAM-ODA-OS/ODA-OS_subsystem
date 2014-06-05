@@ -17,12 +17,12 @@ DM_TMPDIR='/tmp/ngeo-dm'
 [ -z "$ODAOSUSER" ] && error "Missing the required ODAOSUSER variable!"
 [ -z "$ODAOSGROUP" ] && error "Missing the required ODAOSGROUP variable!"
 
-if [ -d "$ODAOS_DM_HOME" ] 
-then 
-    error "ngEO Download Manager seems to be already installed in: $ODAOS_DM_HOME"
-    error "ngEO Download Manager installation is terminated."
-    exit 1 
-fi 
+#if [ -d "$ODAOS_DM_HOME" ]
+#then
+#    error "ngEO Download Manager seems to be already installed in: $ODAOS_DM_HOME"
+#    error "ngEO Download Manager installation is terminated."
+#    exit 1
+#fi
 
 #======================================================================
 # setup automatic cleanup 
