@@ -28,7 +28,7 @@
 #-------------------------------------------------------------------------------
 
 # version 
-export ODAOSVERSION=0.2.0
+export ODAOSVERSION=0.2.1
 
 # public hostname (or IP number) under which the ODA-OS shall be accessable 
 # NOTE: Critical parameter! Be sure you set to proper value.
