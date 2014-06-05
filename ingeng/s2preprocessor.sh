@@ -20,7 +20,12 @@
 #
 #
 
-script_name="s2_atm_pre_process"
+. "`dirname $0`/lib_common.sh"
+
+info "S2 preprosessing started ..."
+info "   ARGUMENTS: $* "
+
+script_name="$EXENAME"
 opts="-f GEOTIFF"
 
 date +"$script_name script started at "%c

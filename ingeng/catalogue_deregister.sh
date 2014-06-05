@@ -1,19 +1,28 @@
-#!/usr/bin/env sh
-# 
-#  DREAM Local Catalogue de-registration script template.
-#  This script is invoked by the delete script.
-#  Note it is not invoked directly by the Ingestion Engine.
+#!/bin/sh
 #
-#  The script should exit with a 0 status to indicate
-# success; a non-zero status indicates failure.
+#  Deregister product's metadata form a catalogue.
 #
+# USAGE: 
+#  catalogue_deregister.sh <identifier> [TBC]
+#
+# DESCRIPTION: 
+#  Deregister product metadata form a catalogue. The product
+#  is specified by the provided identifier.
+#
+# NOTE: 
+#  This script is not invoked directly by the Ingestion Engine.
 #
 
-echo "Default Local Catalogue de-registration script started."
+. "`dirname $0`/lib_common.sh"
 
-echo "---"
-echo " WARNING: Catalogue meta-data ingestion not yet implemented!"
-echo "---"
+info "Catalogue metadata deregistration started ..."
 
-echo "Default Local Cat de-registration script finishing with status 0."
-exit 0
+if [ $# -lt 1 ]
+then
+    error "Not enough args, exiting with status 1."
+    exit 1
+fi
+
+info "    IDENTIFIER: '$1'"
+
+error "NOT IMPLEMENTED!" ; exit 1 

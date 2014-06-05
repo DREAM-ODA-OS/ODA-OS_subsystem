@@ -1,14 +1,14 @@
 #!/usr/bin/env sh
 #
-#  DREAM Ingestion script template.
-#  This script is invoked by the Ingestion Engine
-#  to ingest a downloaded product into the ODA server.
+#  INgest product to the ODA server. 
 #
-# usage:
-# $0 manifest-file [-catreg=script]
+# USAGE: 
+#   product_ingest.sh <manifest-file> [-catreg=<script>]
+#
+# DESCRIPTION: 
 #
 #  The script should exit with a 0 status to indicate
-# success; a non-zero status indicates failure.
+#  success; a non-zero status indicates failure.
 #
 # catreg is used to request registration in the local
 #        metadata catalogue. The script is the name of
@@ -27,12 +27,15 @@
 #
 #
 #-----------------------------------------------------------------------------
-# load common definitions
-. lib_common.sh
+
+. "`dirname $0`/lib_common.sh"
+
+info "Product ingestion started ..."
+info "   ARGUMENTS: $* "
 
 #-----------------------------------------------------------------------------
 
-drop() { echo "DEMO: dropping product ingestion: $1" ; exit 0 ; }
+drop() { info "DEMO: dropping product ingestion: $1" ; exit 0 ; }
 
 #-----------------------------------------------------------------------------
 
@@ -42,7 +45,8 @@ info "ODA-Server ingestion ... "
 [ -f "$1" ] || { error "The manifest file does not exist! MANIFEST=$1" ; exit 1 ; }
 
 MANIFEST=$1
-echo "MANIFEST:  $MANIFEST"
+info "MANIFEST:  $MANIFEST"
+cat "$MANIFEST" >> "$LOG_FILE"
 
 #-----------------------------------------------------------------------------
 # parse manifest
@@ -63,9 +67,9 @@ PFORM="`xml_extract.py "$METADATA" "//{$EOP20}Platform/{$EOP20}shortName" TEXT`"
 PTYPE="`xml_extract.py "$METADATA" "//{$EOP20}productType" TEXT`"
 
 
-echo "ID:        $ID"
-echo "PLATFORM:  $PFORM"
-echo "PROD.TYPE: $PTYPE"
+info "ID:        $ID"
+info "PLATFORM:  $PFORM"
+info "PROD.TYPE: $PTYPE"
 
 #-----------------------------------------------------------------------------
 # get range-type
@@ -136,7 +140,7 @@ else
 
 fi
 
-echo "RANGE TYPE: $RANGE"
+info "RANGE TYPE: $RANGE"
 
 
 #-----------------------------------------------------------------------------
