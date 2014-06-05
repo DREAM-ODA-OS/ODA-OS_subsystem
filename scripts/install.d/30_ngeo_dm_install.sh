@@ -24,6 +24,9 @@ DM_TMPDIR='/tmp/ngeo-dm'
 #    exit 1
 #fi
 
+# stop the service if already running
+service ngeo-dm stop || :
+
 #======================================================================
 # setup automatic cleanup 
 
@@ -71,7 +74,7 @@ then
     BASEURL="ftp://ftp.spacebel.be/Inbox/ASU/MAGELLIUM/DM-Releases"
 
     # fixed version download - comment out to get the latest version
-    DM_VERSION=0.6.0
+    DM_VERSION=0.7.0
     DM_ARCHIVE="download-manager-$DM_VERSION-linux_x64.tar.gz"
 
     if [ -z "$DM_ARCHIVE" ] 
@@ -128,4 +131,3 @@ chown -R "$ODAOSUSER:$ODAOSGROUP" "$ODAOS_DM_HOME"
 
 info "ngEO Download Manager installed to: $ODAOS_DM_HOME"
 
-# TODO: get rid of the embedded JRE 
