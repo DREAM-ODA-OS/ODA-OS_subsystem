@@ -56,6 +56,8 @@ END
 
 # settings.py - scripts' directory 
 sudo -u "$ODAOSUSER" ex "$SETTINGS" <<END
+1,\$s/\(^ALLOWED_HOSTS[	 ]*=[	 ]*\).*/\1['$HOSTNAME','127.0.0.1','::1']/
+g/^DEBUG[	 ]*=/s#\(^DEBUG[	 ]*=[	 ]*\).*#\1False#
 1,\$g/Following line is set by the ODA-OS installation script/d
 1,\$s:^\(LOGGING_FILE[	 ]*=[	 ]*\).*$:\1"$IE_LOG":
 /^\(LOGGING_FILE[	 ]*=[	 ]*\).*$/i

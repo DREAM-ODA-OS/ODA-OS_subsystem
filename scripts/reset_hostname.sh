@@ -1,7 +1,7 @@
 #!/bin/sh
 #-------------------------------------------------------------------------------
 #
-# Project: DREAM - Task 5 - ODA-OS 
+# Project: DREAM - Task 5 - ODA-OS
 # Purpose: reset hostname in the ODA-OS configuration
 # Authors: Martin Paces <martin.paces@eox.at>
 #
@@ -11,8 +11,8 @@
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
-# copies of the Software, and to permit persons to whom the Software is 
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
 #
 # The above copyright notice and this permission notice shall be included in all
@@ -27,25 +27,44 @@
 # THE SOFTWARE.
 #-------------------------------------------------------------------------------
 
-#source common parts 
+#source common parts
 . `dirname $0`/lib_common.sh
-. `dirname $0`/lib_logging.sh  
+. `dirname $0`/lib_logging.sh
 
 #-------------------------------------------------------------------------------
 
-if [ "$#" -lt "1" ] 
-then 
-    echo "ERROR: $EXENAME: Missing the required host name!" >&2 
-    echo "USAGE: $EXENAME <hostname>" >&2 
-    exit 1 
-fi 
+if [ "$#" -lt "1" ]
+then
+    echo "ERROR: $EXENAME: Missing the required host name!" >&2
+    echo "USAGE: $EXENAME <hostname>" >&2
+    exit 1
+fi
 
 info "Setting the service hostname to: $1"
 
 HOSTNAME="$1"
 
+[ -z "$ODAOSROOT" ] && error "Missing the required ODAOSROOT variable!"
+[ -z "$ODAOS_IE_HOME" ] && error "Missing the required ODAOS_IE_HOME variable!"
+[ -z "$ODAOS_DQ_HOME" ] && error "Missing the required ODAOS_DQ_HOME variable!"
+[ -z "$ODAOS_ODAC_HOME" ] && error "Missing the required ODAOS_ODAC_HOME variable!"
+
 #-------------------------------------------------------------------------------
-# EOxServer set the service url 
+# ingestion engine
+INSTANCE="ingestion"
+INSTROOT="$ODAOS_IE_HOME"
+SETTINGS="${INSTROOT}/${INSTANCE}/settings.py"
+
+# set the allowed hosts
+sudo -u "$ODAOSUSER" ex "$EOXSTNGS" <<END
+1,\$s/\(^ALLOWED_HOSTS[	 ]*=[	 ]*\).*/\1['$HOSTNAME','127.0.0.1','::1']/
+wq
+END
+
+service ingeng restart
+
+#-------------------------------------------------------------------------------
+# EOxServer set the service url
 
 INSTANCE="eoxs"
 INSTROOT="$ODAOSROOT"
@@ -59,18 +78,18 @@ END
 
 # set the allowed hosts
 sudo -u "$ODAOSUSER" ex "$EOXSTNGS" <<END
-1,\$s/\(^ALLOWED_HOSTS[	 ]*=[	 ]*\).*/\1['$HOSTNAME']/
+1,\$s/\(^ALLOWED_HOSTS[	 ]*=[	 ]*\).*/\1['$HOSTNAME','127.0.0.1','::1']/
 wq
 END
 
 #-------------------------------------------------------------------------------
-# ODA Client 
+# ODA Client
 
 CONFIG_JSON="${ODAOS_ODAC_HOME}/config.json"
 IE_BASE_URL="http://${HOSTNAME}/ingest/ManageScenario/"
 LAYERS_URL="http://${HOSTNAME}/eoxs/eoxc"
 
-# define JQ filters 
+# define JQ filters
 _F1=".ingestionEngineT5.baseUrl=\"$IE_BASE_URL\""
 _F2=".mapConfig.dataconfigurl=\"$LAYERS_URL\""
 
@@ -83,7 +102,7 @@ sudo -u "$ODAOSUSER" rm -f "$CONFIG_JSON~"
 service httpd restart
 
 #-------------------------------------------------------------------------------
-# Data Quality subsytem 
+# Data Quality subsytem
 
 service tomcat-dq stop
 
