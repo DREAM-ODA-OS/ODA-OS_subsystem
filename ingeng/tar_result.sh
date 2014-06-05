@@ -3,7 +3,7 @@
 #  DREAM tar result script.
 #  This script is invoked by the Ingestion Engine
 #  when the 'tar results' flag is set.  The intent is 
-#  is to package up in a tar file the comple result
+#  is to package up in a tar file the complete result
 #  of the ingestion, i.e. the ingested data with the
 #   corresponding metadata files for off-line use.
 #

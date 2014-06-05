@@ -1,15 +1,15 @@
-#!/bin/sh 
+#!/bin/sh
 #
-# configure ODA-OS ingestion engine 
+# configure ODA-OS ingestion engine
 #
 #======================================================================
 
-. `dirname $0`/../lib_logging.sh  
+. `dirname $0`/../lib_logging.sh
 
 info "Configuring Ingestion Engine ... "
 
 #======================================================================
-# NOTE: In ODA-OS, it is not expected to have mutiple instances of the Ingestion Engine 
+# NOTE: In ODA-OS, it is not expected to have mutiple instances of the Ingestion Engine
 
 [ -z "$ODAOS_IEAS_HOME" ] && error "Missing the required ODAOS_IEAS_HOME variable!"
 [ -z "$ODAOS_DM_HOME" ] && error "Missing the required ODAOS_DM_HOME variable!"
@@ -30,23 +30,10 @@ SETTINGS="${INSTROOT}/${INSTANCE}/settings.py"
 INGESTION_CONFIG="${INSTROOT}/ingestion_config.json"
 MNGCMD="${INSTROOT}/manage.py"
 #
-#DBENGINE="django.contrib.gis.db.backends.postgis"
-#DBNAME="eoxs_${INSTANCE}"
-#DBUSER="eoxs_admin_${INSTANCE}"
-#DBPASSWD="${INSTANCE}_admin_eoxs"
-#DBHOST=""
-#DBPORT=""
-#
-#PG_HBA="/var/lib/pgsql/data/pg_hba.conf"
-#
-#EOXSLOG="${ODAOSLOGDIR}/eoxserver.log"
-#EOXSCONF="${INSTROOT}/${INSTANCE}/${INSTANCE}/conf/eoxserver.conf"
-#EOXSURL="http://${HOSTNAME}/${INSTANCE}/ows"
-
 IE_LOG="${ODAOSLOGDIR}/ingestion_engine.log"
 
 #-------------------------------------------------------------------------------
-# configuration 
+# configuration
 
 # ingestion_config.json - download manager
 sudo -u "$ODAOSUSER" ex "$INGESTION_CONFIG" <<END
@@ -54,7 +41,7 @@ sudo -u "$ODAOSUSER" ex "$INGESTION_CONFIG" <<END
 wq
 END
 
-# settings.py - scripts' directory 
+# settings.py - scripts' directory
 sudo -u "$ODAOSUSER" ex "$SETTINGS" <<END
 1,\$s/\(^ALLOWED_HOSTS[	 ]*=[	 ]*\).*/\1['$HOSTNAME','127.0.0.1','::1']/
 g/^DEBUG[	 ]*=/s#\(^DEBUG[	 ]*=[	 ]*\).*#\1False#
@@ -64,25 +51,33 @@ g/^DEBUG[	 ]*=/s#\(^DEBUG[	 ]*=[	 ]*\).*#\1False#
 # Following line is set by the ODA-OS installation script. Do not edit!
 .
 1,\$s:^\(IE_SCRIPTS_DIR[	 ]*=[	 ]*\).*$:\1"$ODAOS_IEAS_HOME":
+1,\$s:^\(IE_DEFAULT_INGEST_SCRIPT[	 ]*=[	 ]*\).*$:\1"product_ingest.sh":
+1,\$s:^\(IE_DEFAULT_ADDPROD_SCRIPT[	 ]*=[	 ]*\).*$:\1"product_add.sh":
+1,\$s:^\(IE_DEFAULT_DEL_SCRIPT[	 ]*=[	 ]*\).*$:\1"product_remove.sh":
+1,\$s:^\(IE_DEFAULT_CATREG_SCRIPT[	 ]*=[	 ]*\).*$:\1"catalogue_register.sh":
+1,\$s:^\(IE_DEFAULT_CATREG_SCRIPT[	 ]*=[	 ]*\).*$:\1"catalogue_deregister.sh":
+1,\$s:^\(IE_S2ATM_PREPROCESS_SCRIPT[	 ]*=[	 ]*\).*$:\1"s2preprocessor.sh":
+1,\$s:^\(IE_TAR_RESULT_SCRIPT[	 ]*=[	 ]*\).*$:\1"tar_result.sh":
+1,\$s:^\(IE_DEFAULT_UQMD_SCRIPT[	 ]*=[	 ]*\).*$:\1"uqmd.sh":
 wq
 END
 
-# touch the logfifile and set the right permissions 
+# touch the logfifile and set the right permissions
 [ -f "$IE_LOG" ] && rm -fv "$IE_LOG"
 touch "$IE_LOG"
 chown -v "$ODAOSUSER:$ODAOSGROUP" "$IE_LOG"
 chmod -v 0664 "$IE_LOG"
 
 #-------------------------------------------------------------------------------
-# Django syncdb (without interactive prompts) 
+# Django syncdb (without interactive prompts)
 
 info "Initializing EOxServer instance '${INSTANCE}' ..."
 
 # collect static files (do not use the -l option!)
 sudo -u "$ODAOSUSER" python "$MNGCMD" collectstatic --noinput
 
-# setup new database 
-sudo -u "$ODAOSUSER" python "$MNGCMD" syncdb --noinput 
+# setup new database
+sudo -u "$ODAOSUSER" python "$MNGCMD" syncdb --noinput
 
 #======================================================================
 # wrapper script
@@ -97,7 +92,7 @@ info "Cretating the Ingestion Engine's daemon start-up script: $IE_DAEMON"
 cat >"$IE_DAEMON" <<END
 #!/bin/sh
 #
-# Ingestion Engine start-up script 
+# Ingestion Engine start-up script
 #
 IE_HOME="\$( dirname \$0 )"
 IE_HOME="\$( cd \$IE_HOME ; pwd ; )"
@@ -106,18 +101,18 @@ IE_PORT=\${IE_PORT:-8000}
 IE_OPT="--nothreading --noreload \\"\$IE_ADDR:\$IE_PORT\\""
 
 if [ -z "\$IE_USER" ]
-then 
+then
     EXEC="/bin/sh"
-else 
+else
     EXEC="runuser "\$IE_USER" -s /bin/sh"
 fi
 
 PID=\$( \$EXEC -c "ulimit -S -c 0 ; cd \\"\$IE_HOME\\" ; /usr/bin/python $MNGCMD runserver \$IE_OPT >'$IE_CONSOLE_LOG' 2>&1 & echo \\\$!" )
 
-# check whether the daemon is still alive 
-sleep 2 
-[ -z "\$PID" ] && exit 1 
-ps p "\$PID" >/dev/null 2>&1 || exit 1 
+# check whether the daemon is still alive
+sleep 2
+[ -z "\$PID" ] && exit 1
+ps p "\$PID" >/dev/null 2>&1 || exit 1
 
 # IE_PIDFILE optionally contains file-name where the daemons PID shall be written.
 if [ -n "\$IE_PIDFILE" ]
@@ -129,10 +124,10 @@ fi
 END
 
 chown "$ODAOSUSER:$ODAOSGROUP" "$IE_DAEMON"
-chmod 0755 "$IE_DAEMON" 
+chmod 0755 "$IE_DAEMON"
 
 #======================================================================
-# init script  
+# init script
 
 IE_INIT="/etc/init.d/ingeng"
 IE_PIDFILE="/var/run/ingend.pid"
@@ -140,13 +135,13 @@ IE_LOCK="/var/lock/subsys/ingeng"
 
 info "Cretating the Ingestion Engine's init script: $IE_INIT"
 
-cat >"$IE_INIT" <<END 
-#!/bin/sh 
-# 
-# ingeng        Ingestion Engine 
+cat >"$IE_INIT" <<END
+#!/bin/sh
+#
+# ingeng        Ingestion Engine
 #
 # chkconfig: - 85 15
-# description: starts, stops, and restarts the donwload manager 
+# description: starts, stops, and restarts the donwload manager
 #
 # NOTE: This init script is created by the DREAM ODA-OS installation script.
 # NOTE: The service must be explicitely enabled by 'chkconfig ingeng on' command.
@@ -155,12 +150,12 @@ cat >"$IE_INIT" <<END
 # lockfile: $IE_LOCK
 #
 ### BEGIN INIT INFO
-# Provides: ngeo-dm 
+# Provides: ngeo-dm
 # Required-Start: \$local_fs \$remote_fs \$network \$named
 # Required-Stop: \$local_fs \$remote_fs \$network
 # Default-Stop: 0 1 2 3 4 5 6
-# Default-Start: 
-# Short-Description: Starts, stops, and restarts the ngEO donwload manager 
+# Default-Start:
+# Short-Description: Starts, stops, and restarts the ngEO donwload manager
 # Description: Starts, stops, and restarts the ngEO donwload manager
 ### END INIT INFO
 
@@ -175,114 +170,114 @@ lockfile="$IE_LOCK"
 timeout="5"
 
 
-# create PID-file directory if it does not exists 
+# create PID-file directory if it does not exists
 [ -d "\$(dirname \${pidfile})" ] || mkdir -p "\$(dirname \${pidfile})"
 
 #---------
 ie_status()
-{ 
+{
     if [ -f "\${pidfile}" ]
-    then 
+    then
 
         pid="\$( cat "\${pidfile}" )"
 
-        if ps p "\$pid" >/dev/null 
-        then 
+        if ps p "\$pid" >/dev/null
+        then
             echo $"\${prog} (pid \$pid) is running ..."
-            return 0 
-        else 
+            return 0
+        else
             echo $"\${prog} is dead but pid file exists"
             return 1
-        fi 
+        fi
 
     elif [ -f "\${lockfile}" ]
-    then 
+    then
 
-        echo $"\${prog} is dead but subsys locked" 
-        return 2 
+        echo $"\${prog} is dead but subsys locked"
+        return 2
 
-    else 
+    else
 
         echo $"\${prog} is stopped"
-        return 3 
+        return 3
 
-    fi 
-} 
+    fi
+}
 
 #---------
-ie_start() 
-{ 
+ie_start()
+{
     # parameters of the daemon's statup script
     export IE_PIDFILE="\$pidfile"
     export IE_USER="\$user"
 
-    # check status and write message if something's wrong 
+    # check status and write message if something's wrong
     MSG=\$( ie_status )
-    case "\$?" in 
-        0 | 1 | 2 ) echo $"WARNING: \$MSG" ;; 
-    esac 
+    case "\$?" in
+        0 | 1 | 2 ) echo $"WARNING: \$MSG" ;;
+    esac
 
     echo -n \$"Starting \$prog: "
 
-    # start the daemon 
+    # start the daemon
     daemon --pidfile=\${pidfile} \${ingengd}
     RETVAL=\$?
 
     echo
     [ \$RETVAL = 0 ] && touch \${lockfile}
     return \$RETVAL
-} 
+}
 
 #---------
-ie_stop() 
-{ 
-    # check status and write message if something's wrong 
+ie_stop()
+{
+    # check status and write message if something's wrong
     MSG=\$( ie_status )
-    case "\$?" in 
-        1 | 2 | 3 ) echo $"WARNING: \$MSG" ;; 
-    esac 
+    case "\$?" in
+        1 | 2 | 3 ) echo $"WARNING: \$MSG" ;;
+    esac
 
     echo -n \$"Stopping \$prog: "
     killproc -p \${pidfile} -d \${timeout} \${ingengd}
     RETVAL=\$?
-    echo 
+    echo
     [ \$RETVAL = 0 ] && rm -f \${lockfile} \${pidfile}
-} 
+}
 
 #---------
-ie_reset() 
+ie_reset()
 {
-    # check status and write message if something's wrong 
+    # check status and write message if something's wrong
     MSG=\$( ie_status )
-    case "\$?" in 
+    case "\$?" in
         0 | 1 | 2 )
-            echo $"WARNING: \$MSG" 
+            echo $"WARNING: \$MSG"
             echo $"ERROR: Stop \$prog properly before the DB reset!"
-            return 3 
-            ;; 
-    esac 
+            return 3
+            ;;
+    esac
     echo -n \$"Resetting \$prog: "
 }
 
 #---------
-case "\$1" in 
+case "\$1" in
 
-    start) ie_start ;; 
+    start) ie_start ;;
 
-    stop) ie_stop ;; 
+    stop) ie_stop ;;
 
-    restart) ie_stop ; ie_start ;; 
+    restart) ie_stop ; ie_start ;;
 
     status)
-        ie_status 
+        ie_status
         RETVAL=\$?
-        ;; 
+        ;;
 
-    reset) 
+    reset)
         ie_reset
         RETVAL=\$?
-        ;; 
-    *) 
+        ;;
+    *)
         echo \$"Usage: \$prog {start|stop|restart|reset|status}"
         RETVAL=2
         ;;
@@ -291,20 +286,20 @@ esac
 exit \$RETVAL
 END
 
-chmod 0755 "$IE_INIT" 
+chmod 0755 "$IE_INIT"
 
 #add service for managemnt by chkconfig
 chkconfig --add ingeng
 
 #======================================================================
-# make the donwload manager enabled permanently and start the service 
+# make the donwload manager enabled permanently and start the service
 
 info "Enabling the download manager's service ..."
-chkconfig ingeng on 
+chkconfig ingeng on
 service ingeng restart
 
 #======================================================================
-# Integration with the Apache web server  
+# Integration with the Apache web server
 
 info "Setting Ingestion Engine instance '${INSTANCE}' behind the Apache reverse proxy ..."
 
@@ -313,27 +308,27 @@ info "Setting Ingestion Engine instance '${INSTANCE}' behind the Apache reverse 
 CONFS="/etc/httpd/conf/httpd.conf /etc/httpd/conf.d/*.conf"
 CONF=
 
-for F in $CONFS 
+for F in $CONFS
 do
-    if [ 0 -lt `grep -c '^[ 	]*<VirtualHost[ 	]*\*:80>' $F` ] 
-    then 
+    if [ 0 -lt `grep -c '^[ 	]*<VirtualHost[ 	]*\*:80>' $F` ]
+    then
         CONF=$F
-        break 
+        break
     fi
 done
 
 [ -z "CONFS" ] && error "Cannot find the Apache VirtualHost configuration file."
 
-# insert the configuration to the virtual host 
+# insert the configuration to the virtual host
 
 # delete any previous configuration
-# and write new one 
+# and write new one
 { ex "$CONF" || /bin/true ; } <<END
 /IE00_BEGIN/,/IE00_END/de
 /^[ 	]*<\/VirtualHost>/i
-    # IE00_BEGIN - Ingestion Engine instance - Do not edit or remove this line! 
+    # IE00_BEGIN - Ingestion Engine instance - Do not edit or remove this line!
 
-    # reverse proxy to the Ingestion Engine daemon 
+    # reverse proxy to the Ingestion Engine daemon
 
     ProxyPass        /ingestion http://127.0.0.1:8000/ingestion
     ProxyPassReverse /ingestion http://127.0.0.1:8000/ingestion
@@ -350,12 +345,12 @@ done
     ProxyPass        /static http://127.0.0.1:8000/static
     ProxyPassReverse /static http://127.0.0.1:8000/static
 
-    # IE00_END - Ingestion Engine instance - Do not edit or remove this line! 
+    # IE00_END - Ingestion Engine instance - Do not edit or remove this line!
 .
 wq
 END
 
 #-------------------------------------------------------------------------------
-# restart apache to force the changes to take effect 
+# restart apache to force the changes to take effect
 
 service httpd restart
