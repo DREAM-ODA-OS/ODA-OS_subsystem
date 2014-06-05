@@ -187,7 +187,7 @@ END
 
 # set the allowed hosts
 sudo -u "$ODAOSUSER" ex "$SETTINGS" <<END
-1,\$s/\(^ALLOWED_HOSTS[	 ]*=[	 ]*\).*/\1['$HOSTNAME']/
+1,\$s/\(^ALLOWED_HOSTS[	 ]*=[	 ]*\).*/\1['$HOSTNAME','127.0.0.1','::1']/
 wq
 END
 
