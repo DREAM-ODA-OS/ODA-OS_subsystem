@@ -14,7 +14,8 @@ info "Configuring ngEO Download Manager ... "
 [ -z "$ODAOSUSER" ] && error "Missing the required ODAOSUSER variable!"
 [ -z "$ODAOSGROUP" ] && error "Missing the required ODAOSGROUP variable!"
 [ -z "$ODAOSLOGDIR" ] && error "Missing the required ODAOSLOGDIR variable!"
-[ -z "$ODAOSTMPDIR" ] && error "Missing the required ODAOSTMPDIR variable!"
+#[ -z "$ODAOSTMPDIR" ] && error "Missing the required ODAOSTMPDIR variable!"
+[ -z "$ODAOSDATADIR" ] && error "Missing the required ODAOSDATADIR variable!"
 
 DM_USER="$ODAOSUSER"
 DM_GROUP="$ODAOSGROUP"
@@ -284,7 +285,7 @@ chkconfig --add ngeo-dm
 #======================================================================
 # set the default downaload location
 
-DM_DOWNLOAD_DIR="$ODAOSTMPDIR/ngeo-dm"
+DM_DOWNLOAD_DIR="$ODAOSDATADIR/ngeo-dm"
 
 info "Setting the default donwload location to $DM_DOWNLOAD_DIR"
 

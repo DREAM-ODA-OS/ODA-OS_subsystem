@@ -46,10 +46,10 @@ export ODAOS_PGDATA_DIR=${ODAOS_PGDATA_DIR:-/srv/pgdata}
 # directory of the long-term data storage - by default set to '/srv/eodata'
 export ODAOSDATADIR=${ODAOSDATADIR:-/srv/eodata}
 
-# directory of the short-term data storage - by default set to '/srv/tmp'
+# directory of the short-term data storage - by default set to '/srv/eodata/tmp'
 # NOTE: the purpose of this directory is not to replace the /tmp but 
 #       rather to be used as a subsytem's temporary workspace
-export ODAOSTMPDIR=${ODAOSTMPDIR:-/srv/tmp}
+export ODAOSTMPDIR=${ODAOSTMPDIR:-/srv/eodata/tmp}
 
 # names of the ODA-OS user and group - by default set to 'odaos:apache'
 export ODAOSGROUP=${ODAOSGROUP:-apache}
