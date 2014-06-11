@@ -53,10 +53,10 @@ HOSTNAME="$1"
 # ingestion engine
 INSTANCE="ingestion"
 INSTROOT="$ODAOS_IE_HOME"
-SETTINGS="${INSTROOT}/${INSTANCE}/settings.py"
+IE_SETTINGS="${INSTROOT}/${INSTANCE}/settings.py"
 
 # set the allowed hosts
-sudo -u "$ODAOSUSER" ex "$EOXSTNGS" <<END
+sudo -u "$ODAOSUSER" ex "$IE_SETTINGS" <<END
 1,\$s/\(^ALLOWED_HOSTS[	 ]*=[	 ]*\).*/\1['$HOSTNAME','127.0.0.1','::1']/
 wq
 END
