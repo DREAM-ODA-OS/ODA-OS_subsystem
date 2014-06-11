@@ -32,6 +32,7 @@ MNGCMD="${INSTROOT}/manage.py"
 #
 IE_LOG="${ODAOSLOGDIR}/ingestion_engine.log"
 
+service ingeng stop || :
 #-------------------------------------------------------------------------------
 # configuration
 
@@ -44,7 +45,6 @@ END
 # settings.py - scripts' directory
 sudo -u "$ODAOSUSER" ex "$SETTINGS" <<END
 1,\$s/\(^ALLOWED_HOSTS[	 ]*=[	 ]*\).*/\1['$HOSTNAME','127.0.0.1','::1']/
-g/^DEBUG[	 ]*=/s#\(^DEBUG[	 ]*=[	 ]*\).*#\1False#
 1,\$g/Following line is set by the ODA-OS installation script/d
 1,\$s:^\(LOGGING_FILE[	 ]*=[	 ]*\).*$:\1"$IE_LOG":
 /^\(LOGGING_FILE[	 ]*=[	 ]*\).*$/i
@@ -59,6 +59,60 @@ g/^DEBUG[	 ]*=/s#\(^DEBUG[	 ]*=[	 ]*\).*#\1False#
 1,\$s:^\(IE_S2ATM_PREPROCESS_SCRIPT[	 ]*=[	 ]*\).*$:\1"s2preprocessor.sh":
 1,\$s:^\(IE_TAR_RESULT_SCRIPT[	 ]*=[	 ]*\).*$:\1"tar_result.sh":
 1,\$s:^\(IE_DEFAULT_UQMD_SCRIPT[	 ]*=[	 ]*\).*$:\1"update_quality_metadata.sh":
+wq
+END
+
+# set-up logging
+sudo -u "$ODAOSUSER" ex "$SETTINGS" <<END
+g/^DEBUG[	 ]*=/s#\(^DEBUG[	 ]*=[	 ]*\).*#\1False#
+g/^LOGGING[	 ]*=/,/^}/d
+i
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
+    'formatters': {
+        'simple': {
+            'format': '[%(module)s] %(levelname)s: %(message)s'
+        },
+        'verbose': {
+            'format': '[%(asctime)s][%(module)s] %(levelname)s: %(message)s'
+        }
+    },
+    'handlers': {
+        'ielog_file': {
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'maxBytes' : 1000000,
+            'backupCount' : 1,
+            'filename': LOGGING_FILE,
+            'formatter':'verbose',
+            'filters': [],
+        },
+        'stderr_stream': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+            'filters': [],
+        },
+    },
+    'loggers': {
+        'dream.file_logger': {
+            'handlers': ['ielog_file'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+        },
+        '': {
+            'handlers': ['stderr_stream'],
+            'level': 'INFO' if DEBUG else 'WARNING',
+            'propagate': False,
+        },
+    },
+}
+.
 wq
 END
 
@@ -296,7 +350,7 @@ chkconfig --add ingeng
 
 info "Enabling the download manager's service ..."
 chkconfig ingeng on
-service ingeng restart
+service ingeng start
 
 #======================================================================
 # Integration with the Apache web server

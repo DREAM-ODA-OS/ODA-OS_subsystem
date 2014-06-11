@@ -24,6 +24,8 @@ IE_TMPDIR='/tmp/ieng'
 #    exit 1 
 #fi 
 
+service ingeng stop || :
+
 #======================================================================
 # setup automatic cleanup 
 
