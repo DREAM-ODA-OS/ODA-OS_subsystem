@@ -12,18 +12,25 @@ info "Installing Data Quality subsytem ... "
 
 DQ_TMPDIR='/tmp/data-quality'
 
+[ -z "$ODAOSROOT" ] && error "Missing the required ODAOSROOT variable!"
+[ -z "$ODAOSLOGDIR" ] && error "Missing the required ODAOSLOGDIR variable!"
+[ -z "$ODAOSDATADIR" ] && error "Missing the required ODAOSDATADIR variable!"
 [ -z "$ODAOS_DQ_HOME" ] && error "Missing the required ODAOS_DQ_HOME variable!"
 [ -z "$CONTRIB" ] && error "Missing the required CONTRIB variable!"
 [ -z "$ODAOSUSER" ] && error "Missing the required ODAOSUSER variable!"
 [ -z "$ODAOSGROUP" ] && error "Missing the required ODAOSGROUP variable!"
 [ -z "$ODAOSHOSTNAME" ] && error "Missing the required ODAOSHOSTNAME variable!"
 
-if [ -d "$ODAOS_DQ_HOME" ]
-then
-    error "Data Quality subsytem seems to be already installed in: $ODAOS_DQ_HOME"
-    error "Data Quality subsytem installation is terminated."
-    exit 0
-fi
+#if [ -d "$ODAOS_DQ_HOME" ]
+#then
+#    error "Data Quality subsytem seems to be already installed in: $ODAOS_DQ_HOME"
+#    error "Data Quality subsytem installation is terminated."
+#    exit 0
+#fi
+
+# try to stop the service if it is running
+DQ_SERVICE="tomcat-dq"
+[ ! -f "/etc/init.d/$DQ_SERVICE" ] || service "$DQ_SERVICE" stop
 
 #======================================================================
 # setup automatic cleanup
@@ -33,10 +40,10 @@ RESTORE_NETRC_BACKUP=FALSE
 
 on_exit()
 {
-    [ "$REMOVE_NETRC_BACKUP" == TRUE ] && rm -fv "$HOME/.netrc"
-    [ "$RESTORE_NETRC_BACKUP" == TRUE ] && mv -fv "$HOME/.netrc.bak" "$HOME/.netrc"
+    [ "$REMOVE_NETRC_BACKUP" != TRUE ] || rm -fv "$HOME/.netrc"
+    [ "$RESTORE_NETRC_BACKUP" != TRUE ] || mv -fv "$HOME/.netrc.bak" "$HOME/.netrc"
 
-    [ -d "$DQ_TMPDIR" ] && rm -fR "$DQ_TMPDIR"
+    [ ! -d "$DQ_TMPDIR" ] || rm -fR "$DQ_TMPDIR"
 }
 
 trap on_exit EXIT
@@ -88,12 +95,23 @@ info "$DQ_TARBALL"
 # unpack the download manager
 
 # clean-up any existing stuff
-[ -d "$ODAOS_DQ_HOME" ] && rm -fR "$ODAOS_DQ_HOME"
-[ -d "$DQ_TMPDIR" ] && rm -fR "$DQ_TMPDIR"
+{
+    echo "$ODAOS_DQ_HOME"
+    echo "$ODAOSROOT/.constellation"
+    echo "$ODAOSROOT/.constellation-data"
+    echo "$ODAOSROOT/.geotoolkit.org"
+    echo "$ODAOSROOT/.dream"
+    echo "$ODAOSROOT/derby.log"
+    echo "$ODAOSLOGDIR/data-quality"
+    echo "$ODAOSDATADIR/data-quality"
+    echo "$DQ_TMPDIR"
+} | while read ITEM
+do
+    [ -d "$ITEM" -o -f "$ITEM" -o -h "$ITEM" ] && rm -fR "$ITEM" || :
+done
 
 mkdir -p "$DQ_TMPDIR"
 tar -xzf "$DQ_TARBALL" --directory="$DQ_TMPDIR"
-
 
 [ 1 -eq `find "$DQ_TMPDIR" -mindepth 1 -maxdepth 1 -type d | wc -l` ] || {
     ls -la "$DQ_TMPDIR"
