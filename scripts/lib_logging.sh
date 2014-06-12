@@ -44,17 +44,17 @@ tstamp()
 
 error()
 {
-    echo -e "`tstamp` ${RED}ERROR: $EXENAME: $1 ${RES}" 
+    echo -e "`tstamp` ${RED}ERROR: $EXENAME: $* ${RES}" 
     exit 1
 }
 
 info()
 {
-    echo -e "`tstamp` ${YEL}INFO: $EXENAME: $1 ${RES}" 
+    echo -e "`tstamp` ${YEL}INFO: $EXENAME: $* ${RES}" 
 }
 
 warn()
 {
-    echo -e "`tstamp` ${RED}WARNING: $EXENAME: $1 ${RES}" 
+    echo -e "`tstamp` ${RED}WARNING: $EXENAME: $* ${RES}" 
 }
 
