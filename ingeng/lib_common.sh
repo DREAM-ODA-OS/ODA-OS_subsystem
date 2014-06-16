@@ -7,8 +7,7 @@ export PATH="/srv/odaos/tools/metadata:$PATH"
 export PATH="/srv/odaos/tools/imgproc:$PATH"
 export DJANGO_SETTINGS_MODULE="eoxs.settings"
 
-#LOG_FILE="/var/log/odaos/ie_actions.log"
-LOG_FILE="./ie_actions.log"
+LOG_FILE="/var/log/odaos/ie_actions.log"
 
 EXENAME=`basename $0`
 
