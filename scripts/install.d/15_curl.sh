@@ -1,9 +1,9 @@
 #!/bin/sh
 #
-# get CURL installed 
+# get CURL installed
 #
-. `dirname $0`/../lib_logging.sh  
+. `dirname $0`/../lib_logging.sh
 
 info "Installing CURL ..."
 
-yum --assumeyes install curl 
+yum --assumeyes install curl
