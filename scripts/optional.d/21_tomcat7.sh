@@ -8,8 +8,8 @@
 TOMCAT7_CONF="/etc/sysconfig/tomcat"
 TOMCAT7_SERVER_XML="/etc/tomcat/server.xml"
 TOMCAT7_PORT=8088
-TOMCAT7_PORT_APJ=8085
-TOMCAT7_PORT_SHD=8089
+TOMCAT7_PORT_SHD=8085
+TOMCAT7_PORT_AJP=8089
 TOMCAT7_PORT_SSL=8483
 
 info "Installing Tomcat7 ... "
@@ -41,8 +41,8 @@ cp -fv "${TOMCAT7_SERVER_XML}.bak" "$TOMCAT7_SERVER_XML"
 # fix the port numbers in server.xml
 ex -V "$TOMCAT7_SERVER_XML" <<END
 1,\$s/port="8080"/port="$TOMCAT7_PORT"/g
-1,\$s/port="8005"/port="$TOMCAT7_PORT_APJ"/g
-1,\$s/port="8009"/port="$TOMCAT7_PORT_SHD"/g
+1,\$s/port="8005"/port="$TOMCAT7_PORT_SHD"/g
+1,\$s/port="8009"/port="$TOMCAT7_PORT_AJP"/g
 1,\$s/port="8443"/port="$TOMCAT7_PORT_SSL"/g
 1,\$s/redirectPort="8443"/redirectPort="$TOMCAT7_PORT_SSL"/g
 wq
