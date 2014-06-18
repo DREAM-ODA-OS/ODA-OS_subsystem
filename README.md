@@ -37,9 +37,11 @@ manually.
 *SW Component* | *On-line Source* | *Comment*
 --- | --- | --- 
 ngEO-DM | Spacebel FTP [1] | Required. Downloaded automatically when a valid `.netrc` found in the `contrib/` directory.
+DQ subsystem | Spacebel FTP [2] | Downloaded automatically when a valid `.netrc` found in the `contrib/` directory.
 local catalogue | *n/a* | Optional. Not yet integrated. 
 [1] `ftp://ftp.spacebel.be/Inbox/ASU/MAGELLIUM/DM-Releases/`
 
+[2] `ftp://ftp.spacebel.be/Software deliveries/Task13-ASV/QSS/`
 #### Step 1 - Get the Installation Scripts
 
 The installer (i.e., content of this repository) can be obtained
