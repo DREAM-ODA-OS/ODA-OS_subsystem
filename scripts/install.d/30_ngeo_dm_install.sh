@@ -1,10 +1,10 @@
 #!/bin/sh
 #
-# install ngEO downaload manager 
+# install ngEO downaload manager
 #
 #======================================================================
 
-. `dirname $0`/../lib_logging.sh  
+. `dirname $0`/../lib_logging.sh
 
 info "Installing ngEO Download Manager ... "
 
@@ -28,46 +28,46 @@ DM_TMPDIR='/tmp/ngeo-dm'
 service ngeo-dm stop || :
 
 #======================================================================
-# setup automatic cleanup 
+# setup automatic cleanup
 
 REMOVE_NETRC_BACKUP=FALSE
 RESTORE_NETRC_BACKUP=FALSE
 
-on_exit() 
-{ 
-    [ "$REMOVE_NETRC_BACKUP" == TRUE ] && rm -fv "$HOME/.netrc" 
-    [ "$RESTORE_NETRC_BACKUP" == TRUE ] && mv -fv "$HOME/.netrc.bak" "$HOME/.netrc" 
+on_exit()
+{
+    [ "$REMOVE_NETRC_BACKUP" != TRUE ] || rm -fv "$HOME/.netrc"
+    [ "$RESTORE_NETRC_BACKUP" != TRUE ] || mv -fv "$HOME/.netrc.bak" "$HOME/.netrc"
 
     [ -d "$DM_TMPDIR" ] && rm -fR "$DM_TMPDIR"
-} 
+}
 
-trap on_exit EXIT 
+trap on_exit EXIT
 
 #======================================================================
-# trying to locate the download manager tarball in DM directory 
+# trying to locate the download manager tarball in DM directory
 
-DM_TARBALL="`find "$CONTRIB" -name 'download-manager*-linux_x64.tar.gz' | sort -r | head -n 1`" 
+DM_TARBALL="`find "$CONTRIB" -name 'download-manager*-linux_x64.tar.gz' | sort -r | head -n 1`"
 
-if [ -z "$DM_TARBALL" ] 
-then 
+if [ -z "$DM_TARBALL" ]
+then
 
-    # try to use temporarily .netrc in contrib directory 
+    # try to use temporarily .netrc in contrib directory
     if [ -f "$CONTRIB/.netrc" ]
-    then 
-        # backup existing .netrc file 
+    then
+        # backup existing .netrc file
 
         if [ -f "$HOME/.netrc" ]
-        then 
+        then
             mv -fv "$HOME/.netrc" "$HOME/.netrc.bak"
             RESTORE_NETRC_BACKUP=TRUE
-        fi 
+        fi
 
         cp "$CONTRIB/.netrc" "$HOME/.netrc"
         chmod 0600 "$HOME/.netrc"
         REMOVE_NETRC_BACKUP=TRUE
-    fi 
+    fi
 
-    # not found - downloading archive from the spacebel ftp server 
+    # not found - downloading archive from the spacebel ftp server
 
     # NOTE: assuming the server supports NLST command and lists directories
 
@@ -77,23 +77,23 @@ then
     DM_VERSION=0.7.0
     DM_ARCHIVE="download-manager-$DM_VERSION-linux_x64.tar.gz"
 
-    if [ -z "$DM_ARCHIVE" ] 
-    then 
-        # select the latest DM version available 
+    if [ -z "$DM_ARCHIVE" ]
+    then
+        # select the latest DM version available
 
         info "Listing: $BASEURL/"
         DM_VERSION=`curl -n -l "$BASEURL/" | grep '^[0-9]*\.[0-9]*\.[0-9]*' | sort | tail -n 1`
 
-        [ -z "$DM_VERSION" ] && { echo "ERROR: Failed to locate the DM download directory!" >&2 ; exit 1 ; } 
+        [ -z "$DM_VERSION" ] && { echo "ERROR: Failed to locate the DM download directory!" >&2 ; exit 1 ; }
 
-        # select binary tarball to be used 
+        # select binary tarball to be used
         info "Listing: $BASEURL/$DM_VERSION/"
         DM_ARCHIVE=`curl -n -l "$BASEURL/$DM_VERSION/" | grep -m 1 '^download-manager.*-linux_x64\.tar\.gz$'`
 
-        [ -z "$DM_ARCHIVE" ] && { echo "ERROR: Failed to locate the DM package!" >&2 ; exit 1 ; } 
-    fi  
+        [ -z "$DM_ARCHIVE" ] && { echo "ERROR: Failed to locate the DM package!" >&2 ; exit 1 ; }
+    fi
 
-    # download the DM tarball 
+    # download the DM tarball
 
     DM_TARBALL="$CONTRIB/$DM_ARCHIVE"
 
@@ -102,31 +102,31 @@ then
     curl -n -s -S "$BASEURL/$DM_VERSION/$DM_ARCHIVE" -o "$DM_TARBALL"
     info "Download completed."
 
-else # found - using local copy  
+else # found - using local copy
 
     info "Using the existing local copy of the download manager."
 
-fi 
+fi
 
 info "$DM_TARBALL"
 
 #======================================================================
-# unpack the download manager 
+# unpack the download manager
 
-# clean-up previous mess 
+# clean-up previous mess
 [ -d "$ODAOS_DM_HOME" ] && rm -fR "$ODAOS_DM_HOME"
 [ -d "$DM_TMPDIR" ] && rm -fR "$DM_TMPDIR"
 
-# init 
+# init
 mkdir -p "$DM_TMPDIR"
 
-# unpack 
+# unpack
 tar -xzf "$DM_TARBALL" --directory="$DM_TMPDIR"
 
-# move to the destination 
+# move to the destination
 mv -f "$DM_TMPDIR/ngEO-download-manager" "$ODAOS_DM_HOME"
 
-# fix permisions 
+# fix permisions
 chown -R "$ODAOSUSER:$ODAOSGROUP" "$ODAOS_DM_HOME"
 
 info "ngEO Download Manager installed to: $ODAOS_DM_HOME"
