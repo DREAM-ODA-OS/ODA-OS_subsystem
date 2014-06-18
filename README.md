@@ -37,11 +37,14 @@ manually.
 *SW Component* | *On-line Source* | *Comment*
 --- | --- | --- 
 ngEO-DM | Spacebel FTP [1] | Required. Downloaded automatically when a valid `.netrc` found in the `contrib/` directory.
-DQ subsystem | Spacebel FTP [2] | Downloaded automatically when a valid `.netrc` found in the `contrib/` directory.
-local catalogue | *n/a* | Optional. Not yet integrated. 
+DQ subsystem | Spacebel FTP [2] | Optional. Downloaded automatically when a valid `.netrc` found in the `contrib/` directory.
+eXcat catalogue | *n/a* | Optional. Requires manual download and copying of the zip archive to the `contrib` directory. 
+S2-preprocessor | Spacebel FTP [3] | Not yet fully integrated. 
 [1] `ftp://ftp.spacebel.be/Inbox/ASU/MAGELLIUM/DM-Releases/`
 
 [2] `ftp://ftp.spacebel.be/Software deliveries/Task13-ASV/QSS/`
+
+[3] `ftp://ftp.spacebel.be/Inbox/EOX/software/gisat`
 #### Step 1 - Get the Installation Scripts
 
 The installer (i.e., content of this repository) can be obtained
@@ -96,6 +99,18 @@ $ sudo ODA-OS_subsytem/scripts/install.sh ODA-OS_subsytem/scripts/install.d/{30_
 
 This allows installation and/or update of selected SW packages only. 
 
+The optional components are excluded from the automatic installation.
+The optional installers are located in the `scripts/optional.d/` directory:
+
+```
+$ ls ODA-OS_subsytem/scripts/optional.d/
+21_tomcat7.sh  30_excat2_install.sh  35_data_quality_install.sh  60_data_quality_config.sh
+```
+These scritps have to be executed manually, e.g:
+
+```
+$ sudo ODA-OS_subsytem/scripts/install.sh ODA-OS_subsytem/scripts/install.d/{21_tomcat7.sh,30_excat2_install.sh}
+```
 
 #### Step 4 - Hostname Configuration
 
@@ -144,7 +159,11 @@ and `service` command [2])
 -  `ngeo-dm` - The ngEO Download Manager (local deamon, not exposed to the external world)
 -  `ingeng`  - The Ingestion Engine (autonomous daemon accesible via Apache reverse proxy)  
 -  `httpd`   - The Apche web server - the web interface. 
--  `postgresql` - The PostgreSQL database. 
+-  `postgresql` - The PostgreSQL database.
+-  `tomcat6` - Tomcat 6 (Rasdaman Petascope).
+-  `rasdaman` - Rasdaman (raster-DB backend).
+-  `tomcat` - (optional) Tomcat 7 (eXcat catalogue).
+-  `tomcat-dq` - (optional) Tomcat 7 (Data Qaulity proxy).
 
 *Additional services may still be added.*
 
@@ -157,6 +176,7 @@ The ODA-OS is structure in the following subdirectories:
 -  `/srv/eodata/` - data storage (anticipated to be mounted from a separate storage volume). 
 -  `/srv/odaos/` - location of the installed SW and its configuration.
 -  `/var/log/odaos` - location of the logfiles of the SW components. 
+-  `/srv/pgdata/` - PosgreSQL DB files (including Rasdaman raster-DB) 
 
 #### User Identities 
 
