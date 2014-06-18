@@ -39,7 +39,7 @@ manually.
 ngEO-DM | Spacebel FTP [1] | Required. Downloaded automatically when a valid `.netrc` found in the `contrib/` directory.
 DQ subsystem | Spacebel FTP [2] | Optional. Downloaded automatically when a valid `.netrc` found in the `contrib/` directory.
 eXcat catalogue | *n/a* | Optional. Requires manual download and copying of the zip archive to the `contrib` directory. 
-S2-preprocessor | Spacebel FTP [3] | Not yet fully integrated. 
+S2-preprocessor | Spacebel FTP [3] | Optional. Downloaded automatically when a valid `.netrc` found in the `contrib/` directory.
 [1] `ftp://ftp.spacebel.be/Inbox/ASU/MAGELLIUM/DM-Releases/`
 
 [2] `ftp://ftp.spacebel.be/Software deliveries/Task13-ASV/QSS/`
@@ -154,7 +154,7 @@ of the idividual components.
 #### System Service
 
 The ODA-OS utilizes following system service (administred via the `chkconfig`
-and `service` command [2])
+and `service` command [4])
 
 -  `ngeo-dm` - The ngEO Download Manager (local deamon, not exposed to the external world)
 -  `ingeng`  - The Ingestion Engine (autonomous daemon accesible via Apache reverse proxy)  
@@ -167,7 +167,7 @@ and `service` command [2])
 
 *Additional services may still be added.*
 
-[2] https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Deployment_Guide/ch-Services_and_Daemons.html
+[4] https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Deployment_Guide/ch-Services_and_Daemons.html
 
 
 #### Directories and File Locations 
