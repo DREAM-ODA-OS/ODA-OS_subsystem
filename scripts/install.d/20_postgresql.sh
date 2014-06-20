@@ -10,6 +10,16 @@ info "Installing PosgreSQL RDBM ... "
 
 #======================================================================
 
+# STEP 0: Shut-down the porgress if already installed and running.
+
+if [ -f "/etc/init.d/postgresql" ]
+then 
+    service postgresql stop || :
+    # remove existing DB cluster - all data will be lost
+    [ ! -d "/var/lib/pgsql/data" ] || rm -fR "/var/lib/pgsql/data" 
+    [ ! -d "$ODAOS_PGDATA_DIR" ] || rm -fR "$ODAOS_PGDATA_DIR" 
+fi
+
 # STEP 1: INSTALL RPMS
 
 yum --assumeyes install postgresql postgresql-server postgis python-psycopg2
