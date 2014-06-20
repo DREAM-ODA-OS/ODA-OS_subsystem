@@ -15,6 +15,7 @@ info "Installing PosgreSQL RDBM ... "
 if [ -f "/etc/init.d/postgresql" ]
 then 
     service postgresql stop || :
+    info "Removing the existing PosgreSQL DB cluster ..."
     # remove existing DB cluster - all data will be lost
     [ ! -d "/var/lib/pgsql/data" ] || rm -fR "/var/lib/pgsql/data" 
     [ ! -d "$ODAOS_PGDATA_DIR" ] || rm -fR "$ODAOS_PGDATA_DIR" 
