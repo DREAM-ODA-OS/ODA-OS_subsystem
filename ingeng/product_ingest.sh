@@ -58,8 +58,15 @@ METADATA="`expr "$DATA" : '\(.*\)\.[a-zA_Z]*'`.xml"
 
 EOP20="http://www.opengis.net/eop/2.0"
 
-# extract the metadata profile
-xml_extract.py "$COVDESCR" "//{$EOP20}EarthObservation" PRETTY > "$METADATA"
+# check the manifest whether the EOP metadaata are available 
+# if not extract if from the from the XML input
+if [ -z "`grep "^METADATA_EOP20=" "$MANIFEST"`" ]
+then
+    # extract the metadata profile
+    xml_extract.py "$COVDESCR" "//{$EOP20}EarthObservation" PRETTY > "$METADATA"
+
+    echo "METADATA_EOP20=$METADATA" >> "$MANIFEST"
+fi
 
 # extract product type
 ID="`xml_extract.py "$METADATA" "//{$EOP20}identifier" TEXT`"
