@@ -102,14 +102,17 @@ sudo -u "$ODAOSUSER" rm -f "$CONFIG_JSON~"
 service httpd restart
 
 #-------------------------------------------------------------------------------
-# Data Quality subsytem
+# Data Quality subsytem (if installed)
 
-service tomcat-dq stop
+if [ -f '/etc/init.d/tomcat-dq' ]
+then 
+    service tomcat-dq stop
 
-DQ_CFG="$ODAOS_DQ_HOME/q2/local/tomcat/webapps/constellation/WEB-INF/constellation.properties"
-ex "$DQ_CFG" <<END
+    DQ_CFG="$ODAOS_DQ_HOME/q2/local/tomcat/webapps/constellation/WEB-INF/constellation.properties"
+    ex "$DQ_CFG" <<END
 s#\(^[ 	]*services.url=\)[a-zA-Z0-9]*://[^/\?\#]*\(.*\)#\1http://${HOSTNAME}:80\2#
 wq
 END
 
-service tomcat-dq start
+    service tomcat-dq start
+fi
