@@ -156,6 +156,7 @@ done
             AllowOverride None
             Order Allow,Deny
             Allow from all
+            Header set Access-Control-Allow-Origin "*"
             Header set Access-Control-Allow-Headers Content-Type
             Header set Access-Control-Allow-Methods "POST, GET"
     </Directory>
@@ -167,6 +168,7 @@ done
             AllowOverride None
             Order Allow,Deny
             Allow from all
+            Header set Access-Control-Allow-Origin "*"
     </Directory>
 
     # EOXS00_END - EOxServer instance - Do not edit or remove this line!
