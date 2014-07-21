@@ -72,3 +72,6 @@ export ODAOS_DQ_HOME=${ODAOS_DQ_HOME:-$ODAOSROOT/data-quality}
 
 # location of the BEAM installation
 export ODAOS_BEAM_HOME=${ODAOS_BEAM_HOME:-$ODAOSROOT/beam}
+
+# location of the FWTools installation
+export ODAOS_FWTOOLS_HOME=${ODAOS_FWTOOLS_HOME:-$ODAOSROOT/fwtools}
