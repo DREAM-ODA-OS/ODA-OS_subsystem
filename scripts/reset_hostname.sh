@@ -72,7 +72,7 @@ EOXSCONF="${INSTROOT}/${INSTANCE}/${INSTANCE}/conf/eoxserver.conf"
 EOXSTNGS="${INSTROOT}/${INSTANCE}/${INSTANCE}/settings.py"
 
 sudo -u "$ODAOSUSER" ex "$EOXSCONF" <<END
-/^[	 ]*http_service_url[	 ]*=/s;\(^[	 ]*http_service_url[	 ]*=\).*;\1http://${HOSTNAME}/${INSTANCE}/ows;
+/^[	 ]*http_service_url[	 ]*=/s;\(^[	 ]*http_service_url[	 ]*=\).*;\1http://${HOSTNAME}/${INSTANCE}/ows?;
 wq
 END
 

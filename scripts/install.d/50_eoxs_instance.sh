@@ -39,7 +39,7 @@ PG_HBA="${ODAOS_PGDATA_DIR:-/var/lib/pgsql/data}/pg_hba.conf"
 
 EOXSLOG="${ODAOSLOGDIR}/eoxserver.log"
 EOXSCONF="${INSTROOT}/${INSTANCE}/${INSTANCE}/conf/eoxserver.conf"
-EOXSURL="http://${HOSTNAME}/${INSTANCE}/ows"
+EOXSURL="http://${HOSTNAME}/${INSTANCE}/ows?"
 
 #-------------------------------------------------------------------------------
 # create instance
