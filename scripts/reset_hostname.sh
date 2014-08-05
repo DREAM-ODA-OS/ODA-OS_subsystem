@@ -33,16 +33,28 @@
 
 #-------------------------------------------------------------------------------
 
-if [ "$#" -lt "1" ]
+if [ "$1" == "-s" ]
+then
+    SCHEME="https://"
+    PORT="443"
+    shift
+else
+    SCHEME="http://"
+    PORT="80"
+fi
+
+if [ -z "$1" ]
 then
     echo "ERROR: $EXENAME: Missing the required host name!" >&2
-    echo "USAGE: $EXENAME <hostname>" >&2
+    echo "USAGE: $EXENAME [-s] <hostname>" >&2
+    echo "OPTIONS:" >&2
+    echo "    -s  Force HTTPS instead of the default plain HTTP." >&2
     exit 1
 fi
 
-info "Setting the service hostname to: $1"
-
 HOSTNAME="$1"
+
+info "Setting the service to: ${SCHEME}${HOSTNAME}:${PORT}"
 
 [ -z "$ODAOSROOT" ] && error "Missing the required ODAOSROOT variable!"
 [ -z "$ODAOS_IE_HOME" ] && error "Missing the required ODAOS_IE_HOME variable!"
@@ -72,7 +84,7 @@ EOXSCONF="${INSTROOT}/${INSTANCE}/${INSTANCE}/conf/eoxserver.conf"
 EOXSTNGS="${INSTROOT}/${INSTANCE}/${INSTANCE}/settings.py"
 
 sudo -u "$ODAOSUSER" ex "$EOXSCONF" <<END
-/^[	 ]*http_service_url[	 ]*=/s;\(^[	 ]*http_service_url[	 ]*=\).*;\1http://${HOSTNAME}/${INSTANCE}/ows?;
+/^[	 ]*http_service_url[	 ]*=/s;\(^[	 ]*http_service_url[	 ]*=\).*;\1${SCHEME}${HOSTNAME}/${INSTANCE}/ows?;
 wq
 END
 
@@ -86,8 +98,8 @@ END
 # ODA Client
 
 CONFIG_JSON="${ODAOS_ODAC_HOME}/config.json"
-IE_BASE_URL="http://${HOSTNAME}/ingest/ManageScenario/"
-LAYERS_URL="http://${HOSTNAME}/eoxs/eoxc"
+IE_BASE_URL="${SCHEME}${HOSTNAME}/ingest/ManageScenario/"
+LAYERS_URL="${SCHEME}${HOSTNAME}/eoxs/eoxc"
 
 # define JQ filters
 _F1=".ingestionEngineT5.baseUrl=\"$IE_BASE_URL\""
@@ -105,12 +117,12 @@ service httpd restart
 # Data Quality subsytem (if installed)
 
 if [ -f '/etc/init.d/tomcat-dq' ]
-then 
+then
     service tomcat-dq stop
 
     DQ_CFG="$ODAOS_DQ_HOME/q2/local/tomcat/webapps/constellation/WEB-INF/constellation.properties"
     ex "$DQ_CFG" <<END
-s#\(^[ 	]*services.url=\)[a-zA-Z0-9]*://[^/\?\#]*\(.*\)#\1http://${HOSTNAME}:80\2#
+s#\(^[ 	]*services.url=\)[a-zA-Z0-9]*://[^/\?\#]*\(.*\)#\1${SCHEME}${HOSTNAME}:${PORT}\2#
 wq
 END
 

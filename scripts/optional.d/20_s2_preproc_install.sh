@@ -78,9 +78,9 @@ mkdir -p "$S2PP_TMPDIR"
 # unpack the archive
 tar -xvzf "$S2PP_FILE" -C "$S2PP_TMPDIR" || echo FAILED
 
-# install the plugins 
+# install the plugins
 for JAR in "$S2PP_TMPDIR/"*.jar
-do 
-    sudo -u "$ODAOSUSER" cp -fv "$JAR" "$BEAM_PLUGIN_DIR" 
+do
+    sudo -u "$ODAOSUSER" cp -fv "$JAR" "$BEAM_PLUGIN_DIR"
     sudo -u "$ODAOSUSER" chmod +x "$BEAM_PLUGIN_DIR/`basename "$JAR"`"
 done

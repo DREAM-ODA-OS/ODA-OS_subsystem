@@ -5,6 +5,7 @@
 #======================================================================
 
 . `dirname $0`/../lib_logging.sh
+. `dirname $0`/../lib_apache.sh
 
 info "Configuring Data Quality subsytem ... "
 
@@ -252,26 +253,13 @@ service "$DQ_SERVICE" start
 info "Setting Data Quality proxy behind the Apache reverse proxy ..."
 
 # locate proper configuration file (see also apache configuration)
-
-CONFS="/etc/httpd/conf/httpd.conf /etc/httpd/conf.d/*.conf"
-CONF=
-
-for F in $CONFS
+{
+    locate_apache_conf 80
+    locate_apache_conf 443
+} | while read CONF
 do
-    if [ 0 -lt `grep -c '^[ 	]*<VirtualHost[ 	]*\*:80>' $F` ]
-    then
-        CONF=$F
-        break
-    fi
-done
-
-[ -z "CONFS" ] && error "Cannot find the Apache VirtualHost configuration file."
-
-# insert the configuration to the virtual host
-
-# delete any previous configuration
-# and write new one
-{ ex "$CONF" || /bin/true ; } <<END
+    # delete any previous configuration and write a new one
+    { ex "$CONF" || /bin/true ; } <<END
 /DQ00_BEGIN/,/DQ00_END/de
 /^[ 	]*<\/VirtualHost>/i
     # DQ00_BEGIN - Data Qaulity Proxy - Do not edit or remove this line!
@@ -285,6 +273,7 @@ done
 .
 wq
 END
+done
 
 # restart apache to force the changes to take effect
 service httpd restart

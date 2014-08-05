@@ -4,7 +4,7 @@
 #
 #======================================================================
 
-. `dirname $0`/../lib_logging.sh  
+. `dirname $0`/../lib_logging.sh
 
 info "Installing the Ingestion Engine action scripts ... "
 
@@ -22,19 +22,19 @@ USE_SYMLINKS=FALSE
 
 #======================================================================
 
-# clean-up previous mess 
+# clean-up previous mess
 [ -d "$ODAOS_IEAS_HOME" -o -h "$ODAOS_IEAS_HOME" ] && rm -fR "$ODAOS_IEAS_HOME"
 
 if [ "TRUE" == "$USE_SYMLINKS" ]
-then 
+then
     # symbolic link
     sudo -u "$ODAOSUSER" ln -fs "$INGENG" "$ODAOS_IEAS_HOME"
 
-else 
-    # copied files 
+else
+    # copied files
     cp -fvR "$INGENG" "$ODAOS_IEAS_HOME"
 
-    # set owner  
+    # set owner
     chown -R "$ODAOSUSER:$ODAOSGROUP" "$ODAOS_IEAS_HOME"
 fi
 

@@ -5,6 +5,7 @@
 #======================================================================
 
 . `dirname $0`/../lib_logging.sh
+. `dirname $0`/../lib_apache.sh
 
 info "Configuring EOxServer ... "
 
@@ -122,25 +123,12 @@ END
 info "Mapping EOxServer instance '${INSTANCE}' to URL path '${INSTANCE}' ..."
 
 # locate proper configuration file (see also apache configuration)
-
-CONFS="/etc/httpd/conf/httpd.conf /etc/httpd/conf.d/*.conf"
-CONF=
-
-for F in $CONFS
+{
+    locate_apache_conf 80
+    locate_apache_conf 443
+} | while read CONF
 do
-    if [ 0 -lt `grep -c '^[ 	]*<VirtualHost[ 	]*\*:80>' $F` ]
-    then
-        CONF=$F
-        break
-    fi
-done
-
-[ -z "CONFS" ] && error "Cannot find the Apache VirtualHost configuration file."
-
-# insert the configuration to the virtual host
-
-#/^[ 	]*<VirtualHost[ 	]*\*:80>/a
-{ ex "$CONF" || /bin/true ; } <<END
+    { ex "$CONF" || /bin/true ; } <<END
 /EOXS00_BEGIN/,/EOXS00_END/de
 /^[ 	]*<\/VirtualHost>/i
     # EOXS00_BEGIN - EOxServer instance - Do not edit or remove this line!
@@ -175,6 +163,7 @@ done
 .
 wq
 END
+done
 
 #-------------------------------------------------------------------------------
 # EOxServer configuration
@@ -264,7 +253,7 @@ sudo -u "$ODAOSUSER" python "$MNGCMD" collectstatic -l --noinput
 # setup new database
 sudo -u "$ODAOSUSER" python "$MNGCMD" syncdb --noinput
 
-# load range types (when available) 
+# load range types (when available)
 INITIAL_RANGETYPES="$ODAOS_IEAS_HOME/range_types.json"
 [ -f "$INITIAL_RANGETYPES" ] && sudo -u "$ODAOSUSER" python "$MNGCMD" eoxs_rangetype_load < "$INITIAL_RANGETYPES"
 

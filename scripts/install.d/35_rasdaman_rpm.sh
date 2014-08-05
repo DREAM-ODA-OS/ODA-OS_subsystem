@@ -27,14 +27,14 @@ s/^\([ 	]*includepkgs[ 	]*=.*\)\$/\1 rasdaman*/
 wq
 END
 
-# reset yum cache and install the RPMs 
+# reset yum cache and install the RPMs
 yum clean all
 yum --assumeyes install rasdaman rasdaman-petascope #rasdaman-rasgeo
 
-#configure the service 
+#configure the service
 cat >/etc/sysconfig/rasdaman <<END
 PGDATA="${ODAOS_PGDATA_DIR:-/var/lib/pgsql/data}"
 END
 
-# register the rasdaman service 
+# register the rasdaman service
 chkconfig rasdaman on

@@ -1,10 +1,11 @@
-#!/bin/sh 
+#!/bin/sh
 #
-# install NLR eXcat2 CSW catalogue 
+# install NLR eXcat2 CSW catalogue
 #
 #======================================================================
 
-. `dirname $0`/../lib_logging.sh  
+. `dirname $0`/../lib_logging.sh
+. `dirname $0`/../lib_apache.sh
 
 info "Installing eXcat2 ... "
 
@@ -14,28 +15,28 @@ XCAT_NAME="excat2"
 
 [ -z "$CONTRIB" ] && error "Missing the required CONTRIB variable!"
 
-service tomcat stop || : 
+service tomcat stop || :
 
 #======================================================================
-# setup automatic cleanup 
+# setup automatic cleanup
 
-on_exit() 
-{ 
+on_exit()
+{
     [ ! -d "$XCAT_TMPDIR" ] || rm -fR "$XCAT_TMPDIR"
-} 
+}
 
-trap on_exit EXIT 
+trap on_exit EXIT
 
 #======================================================================
 # trying to locate the ingestion package
 
-XCAT_ZIP="`find "$CONTRIB" -name 'excat2-*.zip' | sort -r | head -n 1`" 
+XCAT_ZIP="`find "$CONTRIB" -name 'excat2-*.zip' | sort -r | head -n 1`"
 
-if [ -z "$XCAT_ZIP" ] 
-then 
+if [ -z "$XCAT_ZIP" ]
+then
     warn "The eXcat installation package was not found in the contrib directory! CONTRIB=$CONTRIB"
     warn "The eXcat is aborted!"
-    exit 0 
+    exit 0
 else
     info "The eXcat installation package found in in the contrib directory."
 fi
@@ -50,13 +51,13 @@ info "$XCAT_ZIP"
 [ -d "$XCAT_WEBAPPDIR/$XCAT_NAME" ] && rm -fR "$XCAT_WEBAPPDIR/$XCAT_NAME"
 [ -f "$XCAT_WEBAPPDIR/$XCAT_NAME.war" ] && rm -fR "$XCAT_WEBAPPDIR/$XCAT_NAME.war"
 
-mkdir -p "$XCAT_TMPDIR" 
+mkdir -p "$XCAT_TMPDIR"
 
-#unpack the archive 
+#unpack the archive
 unzip "$XCAT_ZIP" -d "$XCAT_TMPDIR"
 
 if [ -f "$XCAT_TMPDIR/$XCAT_NAME.war" ]
-then 
+then
     info "Deploying the eXcat WAR file..."
     mv "$XCAT_TMPDIR/$XCAT_NAME.war" "$XCAT_WEBAPPDIR"
 else
@@ -64,34 +65,21 @@ else
     exit 1
 fi
 
-service tomcat start 
+service tomcat start
 
 #======================================================================
-# set the reverse proxy 
+# set the reverse proxy
 
 info "Setting eXcat app behind the Apache reverse proxy ..."
 
 # locate proper configuration file (see also apache configuration)
-
-CONFS="/etc/httpd/conf/httpd.conf /etc/httpd/conf.d/*.conf"
-CONF=
-
-for F in $CONFS
+{
+    locate_apache_conf 80
+    locate_apache_conf 443
+} | while read CONF
 do
-    if [ 0 -lt `grep -c '^[ 	]*<VirtualHost[ 	]*\*:80>' $F` ]
-    then
-        CONF=$F
-        break
-    fi
-done
-
-[ -z "CONFS" ] && { error "Cannot find the Apache VirtualHost configuration file." ; exit 1 ; } 
-
-# insert the configuration to the virtual host
-
-# delete any previous configuration
-# and write new one
-{ ex "$CONF" || /bin/true ; } <<END
+    # delete any previous configuration and write a new one
+    { ex "$CONF" || /bin/true ; } <<END
 /XCT00_BEGIN/,/XCT00_END/de
 /^[ 	]*<\/VirtualHost>/i
     # XCT00_BEGIN - eXcat - Do not edit or remove this line!
@@ -104,6 +92,7 @@ done
 .
 wq
 END
+done
 
 #-------------------------------------------------------------------------------
 # restart apache to force the changes to take effect

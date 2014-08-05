@@ -1,10 +1,10 @@
-#!/bin/sh 
+#!/bin/sh
 #
-# install EOX image and metadata processing tools 
+# install EOX image and metadata processing tools
 #
 #======================================================================
 
-. `dirname $0`/../lib_logging.sh  
+. `dirname $0`/../lib_logging.sh
 
 info "Installing EOX Tools ... "
 
@@ -18,47 +18,47 @@ info "Installing EOX Tools ... "
 TOOLS_TMPDIR='/tmp/tools'
 TOOLS_HOME="$ODAOSROOT/tools"
 
-#if [ -d "$TOOLS_HOME" ] 
-#then 
+#if [ -d "$TOOLS_HOME" ]
+#then
 #    error "EOX Tools seem to be already installed."
 #    error "EOX Tools' installation is terminated."
-#    exit 1 
-#fi 
+#    exit 1
+#fi
 
 #======================================================================
-# setup automatic cleanup 
+# setup automatic cleanup
 
-on_exit() 
-{ 
+on_exit()
+{
     [ ! -d "$TOOLS_TMPDIR" ] || rm -fR "$TOOLS_TMPDIR"
-} 
+}
 
-trap on_exit EXIT 
+trap on_exit EXIT
 
 #======================================================================
-# list release 
+# list release
 
 get_release_url()
-{ 
+{
     URL_BASE="https://github.com"
     PATH="`curl -S "$URL_BASE/DREAM-ODA-OS/tools/releases" | sed -ne 's/.*href="\(.*\.tar\.gz\)" .*/\1/p' | head -n 1`"
     echo -n "$URL_BASE$PATH"
-} 
+}
 
 get_filename()
-{ 
+{
     echo -n "`curl -sIL "$1" | sed -ne 's/Content-Disposition:.*filename=\(.*gz\).*/\1/p'`"
-} 
+}
 
 #======================================================================
-# trying to locate the download manager tarball in DM directory 
+# trying to locate the download manager tarball in DM directory
 
-TOOLS_TARBALL="`find "$CONTRIB" -name 'tools*' | grep -e '\.tgz$' -e '\.tar\.gz$' | sort -r | head -n 1`" 
+TOOLS_TARBALL="`find "$CONTRIB" -name 'tools*' | grep -e '\.tgz$' -e '\.tar\.gz$' | sort -r | head -n 1`"
 
-if [ -z "$TOOLS_TARBALL" ] 
-then 
-    
-    # automatic download of the latest release 
+if [ -z "$TOOLS_TARBALL" ]
+then
+
+    # automatic download of the latest release
     #URL="`get_release_url`"
 
     #fixed version download
@@ -75,32 +75,32 @@ then
     [ -f "$TOOLS_TARBALL" ] || error "Failed to download the EOX Tools release!" \
         && info "EOX Tools downloaded."
 
-else # found - using local copy  
+else # found - using local copy
 
     info "Using the existing local copy of the EOX Tools."
 
-fi 
+fi
 
 info "$TOOLS_TARBALL"
 
 #======================================================================
-# unpack the download manager 
+# unpack the download manager
 
-# clean-up the previous installation if needed 
+# clean-up the previous installation if needed
 [ -d "$TOOLS_HOME" ] && rm -fR "$TOOLS_HOME"
 [ -d "$TOOLS_TMPDIR" ] && rm -fR "$TOOLS_TMPDIR"
 
-# init 
+# init
 mkdir -p "$TOOLS_TMPDIR"
 
-# unpack 
+# unpack
 tar -xzf "$TOOLS_TARBALL" --directory="$TOOLS_TMPDIR"
 
-# move to destination 
+# move to destination
 TOOLS_ROOT="`find "$TOOLS_TMPDIR" -mindepth 1 -maxdepth 1 -name 'tools*' -type d | head -n 1`"
 mv -f "$TOOLS_ROOT" "$TOOLS_HOME"
 
-# fix permisions 
+# fix permisions
 chown -R "$ODAOSUSER:$ODAOSGROUP" "$TOOLS_HOME"
 
 #======================================================================

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# download and install FW tools 
+# download and install FW tools
 #
 # Copyright (C) 2014 EOX IT Services GmbH
 #
@@ -50,7 +50,7 @@ else
 fi
 
 #======================================================================
-# installation 
+# installation
 # cleanup old stuff
 
 [ ! -d "$FWT_TMPDIR" -a ! -f "$FWT_TMPDIR" ] || rm -fR "$FWT_TMPDIR"
@@ -59,12 +59,12 @@ mkdir -p "$FWT_TMPDIR"
 # unpack the archive
 tar -xzf "$FWT_FILE" -C "$FWT_TMPDIR" || echo FAILED
 
-# move to destination 
+# move to destination
 FWT_ROOT="`find "$FWT_TMPDIR" -mindepth 1 -maxdepth 1 -name 'FWTools-linux*' -type d | head -n 1`"
 [ ! -d "$ODAOS_FWTOOLS_HOME" -a ! -f "$ODAOS_FWTOOLS_HOME" ] || rm -fR "$ODAOS_FWTOOLS_HOME"
 mv -f "$FWT_ROOT" "$ODAOS_FWTOOLS_HOME"
 
-# fix permisions 
+# fix permisions
 chown -R "$ODAOSUSER:$ODAOSGROUP" "$ODAOS_FWTOOLS_HOME"
 
 pushd "$ODAOS_FWTOOLS_HOME"

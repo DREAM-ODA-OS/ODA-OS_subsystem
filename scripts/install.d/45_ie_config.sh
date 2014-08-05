@@ -5,6 +5,7 @@
 #======================================================================
 
 . `dirname $0`/../lib_logging.sh
+. `dirname $0`/../lib_apache.sh
 
 info "Configuring Ingestion Engine ... "
 
@@ -358,26 +359,12 @@ service ingeng start
 info "Setting Ingestion Engine instance '${INSTANCE}' behind the Apache reverse proxy ..."
 
 # locate proper configuration file (see also apache configuration)
-
-CONFS="/etc/httpd/conf/httpd.conf /etc/httpd/conf.d/*.conf"
-CONF=
-
-for F in $CONFS
+{
+    locate_apache_conf 80
+    locate_apache_conf 443
+} | while read CONF 
 do
-    if [ 0 -lt `grep -c '^[ 	]*<VirtualHost[ 	]*\*:80>' $F` ]
-    then
-        CONF=$F
-        break
-    fi
-done
-
-[ -z "CONFS" ] && error "Cannot find the Apache VirtualHost configuration file."
-
-# insert the configuration to the virtual host
-
-# delete any previous configuration
-# and write new one
-{ ex "$CONF" || /bin/true ; } <<END
+    { ex "$CONF" || /bin/true ; } <<END
 /IE00_BEGIN/,/IE00_END/de
 /^[ 	]*<\/VirtualHost>/i
     # IE00_BEGIN - Ingestion Engine instance - Do not edit or remove this line!
@@ -403,7 +390,7 @@ done
 .
 wq
 END
-
+done
 #-------------------------------------------------------------------------------
 # restart apache to force the changes to take effect
 

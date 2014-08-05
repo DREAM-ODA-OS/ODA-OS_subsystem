@@ -325,7 +325,7 @@ chown -v "$ODAOSUSER:$ODAOSGROUP" "$DM_DBDIR"
 chmod -v 0775 "$DM_DBDIR"
 
 #======================================================================
-# Uncomment following lines to grant DM daemon permission to write 
+# Uncomment following lines to grant DM daemon permission to write
 # in its installation directory tree.
 
 #chmod -R g+w "$ODAOS_DM_HOME"
