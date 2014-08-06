@@ -262,14 +262,14 @@ do
     { ex "$CONF" || /bin/true ; } <<END
 /DQ00_BEGIN/,/DQ00_END/de
 /^[ 	]*<\/VirtualHost>/i
-    # DQ00_BEGIN - Data Qaulity Proxy - Do not edit or remove this line!
+    # DQ00_BEGIN - Data Quality Proxy - Do not edit or remove this line!
 
     # reverse proxy to the Data Qaulity Proxy
 
     ProxyPass        /constellation http://$DQ_PROXY_HOST:$DQ_PROXY_PORT/constellation
     ProxyPassReverse /constellation http://$DQ_PROXY_HOST:$DQ_PROXY_PORT/constellation
 
-    # DQ00_END - Data Qaulity Proxy - Do not edit or remove this line!
+    # DQ00_END - Data Quality Proxy - Do not edit or remove this line!
 .
 wq
 END
