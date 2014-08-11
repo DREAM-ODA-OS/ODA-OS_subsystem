@@ -141,10 +141,10 @@ then
             # Envisat MERIS
             . "`dirname $0`/products.d/envisat.sh"
             ;;
-        'ASA_IMP_1' | 'ASA_IMM__1' | 'ASA_WSM_1' )
+        'ASA_IMP_1' | 'ASA_IMM_1' | 'ASA_WSM_1' )
             . "`dirname $0`/products.d/envisat.sh"
             ;;
-        'ASA_APP_1' | 'ASA_APM__1' )
+        'ASA_APP_1' | 'ASA_APM_1' )
             . "`dirname $0`/products.d/envisat.sh"
             ;;
         *) error "Unsupported product type  ${N1_PRODUCT:0:9}!" ; exit 1 ;;
