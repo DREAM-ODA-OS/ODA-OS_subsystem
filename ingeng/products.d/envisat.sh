@@ -235,7 +235,7 @@ then
         trap "_remove '$_tmpG' '$_tmp0'" EXIT
         beam_meris_l1_tristim_graph > "$_tmpG"
         gpt.sh "$_tmpG" -c 256M -e -SINPUT="$IMG_DATA" -POUTPUT="$_tmp0" || exit 1
-        range_stretch.py "$_tmp0" "$IMG_VIEW" 0 0 0 ADDALPHA NOSCALE `echo $TOPT | sed -e 's/-co//g'` "PHOTOMETRIC=RGB" || exit 1
+        range_stretch.py "$_tmp0" "$IMG_VIEW" 2 255 0 ADDALPHA `echo $TOPT | sed -e 's/-co//g'` "PHOTOMETRIC=RGB" || exit 1
         _remove "$_tmpG" "$_tmp0"
         trap - EXIT
     fi
