@@ -179,7 +179,6 @@ _tmp_eop_xml="${IMG_META}_eop.xml"
 _tmp_ftp_wkb="${IMG_META}_ftp.wkb"
 _tmp_cnt_wkb="${IMG_META}_wkb.wkb"
 
-set -x 
 # extract EO-metadata
 envisat2rangetype.py "$IMG_DATA" > "$IMG_RTYPE"
 envisat2eop.py "$IMG_DATA" > "$_tmp_eop_xml"
@@ -193,6 +192,7 @@ rm -fv "$_tmp_eop_xml" "$_tmp_ftp_wkb" "$_tmp_cnt_wkb"
 
 if [ ${N1_PRODUCT:0:3} == "ASA" ] 
 then
+    # ASAR dB scale view 
     IMG_VIEW_RTYPE="GrayAlpha"
     _type="MINISBLACK"
     if [ ! -f "$IMG_VIEW" ]
@@ -225,20 +225,18 @@ then
 
 elif [ ${N1_PRODUCT:0:3} == "MER" ] 
 then
+    # MERIS fake tri-stimulus 
     IMG_VIEW_RTYPE="RGBA"
     _type="RGB"
     if [ ! -f "$IMG_VIEW" ]
     then
         _tmpG="`mktemp`.gpt"
         _tmp0="`mktemp`.tif"
-        _tmp1="`mktemp`.tif"
-        trap "_remove '$_tmpG' '$_tmp0' '$_tmp1'" EXIT
-        beam_graph > "$_tmpG"
-        gpt.sh "$_tmpG" -e -SINPUT="$IMG_DATA" -POUTPUT="$_tmp0" || exit 1
-        gdal_translate "$_tmp0" "$_tmp1" -a_nodata 0 $TOPT -co "PHOTOMETRIC=RGB" && \
-        _remove "$_tmp0"
-        range_stretch.py "$_tmp1" "$IMG_VIEW" 0 0 0 ADDALPHA NOSCALE `echo $TOPT | sed -e 's/-co//g'` "PHOTOMETRIC=RGB" || exit 1
-        _remove "$_tmpG" "$_tmp1"
+        trap "_remove '$_tmpG' '$_tmp0'" EXIT
+        beam_meris_l1_tristim_graph > "$_tmpG"
+        gpt.sh "$_tmpG" -c 256M -e -SINPUT="$IMG_DATA" -POUTPUT="$_tmp0" || exit 1
+        range_stretch.py "$_tmp0" "$IMG_VIEW" 0 0 0 ADDALPHA NOSCALE `echo $TOPT | sed -e 's/-co//g'` "PHOTOMETRIC=RGB" || exit 1
+        _remove "$_tmpG" "$_tmp0"
         trap - EXIT
     fi
 fi
@@ -251,4 +249,3 @@ then
     _remove "$IMG_VIEW_OVR"
     [ -n "$_levels" ]&& time "$GDALADDO" $_adoopt "$IMG_VIEW" $_levels
 fi
-set +x
