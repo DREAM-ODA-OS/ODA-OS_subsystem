@@ -63,7 +63,7 @@ then
     #URL="`get_release_url`"
 
     #fixed version download
-    URL="https://github.com/DREAM-ODA-OS/IngestionEngine/archive/v0.6.3.tar.gz"
+    URL="https://github.com/DREAM-ODA-OS/IngestionEngine/archive/v0.6.4.tar.gz"
 
     info "Downloading from: $URL"
 
