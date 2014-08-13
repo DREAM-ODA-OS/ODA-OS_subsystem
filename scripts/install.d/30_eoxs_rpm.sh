@@ -57,7 +57,7 @@ then
     #URL="`get_release_url`"
 
     #fixed version download
-    URL="https://github.com/DREAM-ODA-OS/eoxserver/releases/download/release-0.4-dream-0.3.1/EOxServer_dream-0.4dev4-1.x86_64.rpm"
+    URL="https://github.com/DREAM-ODA-OS/eoxserver/releases/download/release-0.4-dream-0.3.2/EOxServer_dream-0.4dev5-1.x86_64.rpm"
 
     info "Downloading from: $URL"
 

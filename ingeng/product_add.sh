@@ -183,10 +183,12 @@ $EOXS_MNG eoxs_dataset_register -r "$IMG_VIEW_RTYPE" -i "${IDENTIFIER}_view" \
     [ -n "$META" ] && echo "$META;metadata;"
     echo "$IMG_META;metadata;EOP2.0"
     echo "$IMG_DATA;data"
+    echo "$IMG_RTYPE;file;range-type"
     echo "#${IDENTIFIER}_view"
     [ -n "$IMG_DIR" ] && echo "$IMG_DIR;directory"
     echo "$IMG_META;metadata;EOP2.0"
     echo "$IMG_VIEW;data;RGBA-WGS84"
+    echo "$IMG_VIEW_OVR;file;overviews"
 } | $EOXS_MNG eoxs_i2p_load 
 
 info "Add product handler finished sucessfully."

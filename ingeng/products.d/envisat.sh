@@ -44,28 +44,28 @@ cat <<END
                     <name>valid</name>
                     <expression> ((radiance_1>0)&amp;&amp;(radiance_2>0)&amp;&amp;(radiance_3>0)&amp;&amp;(radiance_4>0)&amp;&amp;(radiance_5>0)&amp;&amp;(radiance_6>0)&amp;&amp;(radiance_7>0)) ? 1.0 : 0.0 </expression>
                     <description>valid pixel flag</description>
-                    <type>uint8</type>
+                    <type>float32</type>
                     <noDataValue>0</noDataValue>                  
                 </targetBand>              
                 <targetBand>
                     <name>red0</name>
                     <expression>(1.0+max(0,254*scale*(log(1.0 + 0.35 * radiance_2 + 0.60 * radiance_5 + radiance_6 + 0.13 * radiance_7)+r_off)/r_scl))</expression>
                     <description>pseudo-red-tmp</description>
-                    <type>uint8</type>
+                    <type>float32</type>
                     <noDataValue>0</noDataValue>                  
                 </targetBand>              
                 <targetBand>
                     <name>green0</name>
                     <expression>1.0+max(0,254*scale*(log(1.0 + 0.21 * radiance_3 + 0.50 * radiance_4 + radiance_5 + 0.38 * radiance_6)+g_off)/g_scl)</expression>
                     <description>pseudo-green-tmp</description>
-                    <type>uint8</type>
+                    <type>float32</type>
                     <noDataValue>0</noDataValue>                  
                 </targetBand>              
                 <targetBand>
                     <name>blue0</name>
                     <expression>1.0+max(0,254*scale*(log(1.0 + 0.21 * radiance_1 + 1.75 * radiance_2 + 0.47 * radiance_3 + 0.16 * radiance_4)+b_off)/b_scl)</expression>
                     <description>pseudo-blue-tmp</description>
-                    <type>uint8</type>
+                    <type>float32</type>
                     <noDataValue>0</noDataValue>                  
                 </targetBand>              
             </targetBands>
@@ -119,21 +119,21 @@ cat <<END
                     <name>red</name>
                     <expression>red0*valid</expression>
                     <description>pseudo-red</description>
-                    <type>uint8</type>
+                    <type>uint16</type>
                     <noDataValue>0</noDataValue>                  
                 </targetBand>              
                 <targetBand>
                     <name>green</name>
                     <expression>green0*valid</expression>
                     <description>pseudo-green</description>
-                    <type>uint8</type>
+                    <type>uint16</type>
                     <noDataValue>0</noDataValue>                  
                 </targetBand>              
                 <targetBand>
                     <name>blue</name>
                     <expression>blue0*valid</expression>
                     <description>pseudo-blue</description>
-                    <type>uint8</type>
+                    <type>uint16</type>
                     <noDataValue>0</noDataValue>                  
                 </targetBand>              
             </targetBands>
@@ -235,7 +235,7 @@ then
         trap "_remove '$_tmpG' '$_tmp0'" EXIT
         beam_meris_l1_tristim_graph > "$_tmpG"
         gpt.sh "$_tmpG" -c 256M -e -SINPUT="$IMG_DATA" -POUTPUT="$_tmp0" || exit 1
-        range_stretch.py "$_tmp0" "$IMG_VIEW" 0 0 0 ADDALPHA NOSCALE `echo $TOPT | sed -e 's/-co//g'` "PHOTOMETRIC=RGB" || exit 1
+        range_stretch.py "$_tmp0" "$IMG_VIEW" 2 255 0 ADDALPHA `echo $TOPT | sed -e 's/-co//g'` "PHOTOMETRIC=RGB" || exit 1
         _remove "$_tmpG" "$_tmp0"
         trap - EXIT
     fi
