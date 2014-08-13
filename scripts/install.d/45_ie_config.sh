@@ -386,6 +386,9 @@ do
     ProxyPass        /static http://127.0.0.1:8000/static
     ProxyPassReverse /static http://127.0.0.1:8000/static
 
+    ProxyPass        /dajaxice http://127.0.0.1:8000/dajaxice
+    ProxyPassReverse /dajaxice http://127.0.0.1:8000/dajaxice
+
     # IE00_END - Ingestion Engine instance - Do not edit or remove this line!
 .
 wq
