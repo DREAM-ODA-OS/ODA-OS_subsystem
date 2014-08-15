@@ -33,9 +33,6 @@
 info "ODA-Server product ingestion started ..."
 info "   ARGUMENTS: $* "
 
-drop() { info "DEMO: dropping product ingestion: $1" ; exit 0 ; }
-
-#-----------------------------------------------------------------------------
 # check and extract the inputs
 
 MANIFEST=
