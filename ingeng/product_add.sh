@@ -150,8 +150,8 @@ info "IMG_RTYPE=$IMG_RTYPE"
 # EOxServer registration
 
 #create time-series
-if $EOXS_MNG eoxs_id_check --type DatasetSeries "$COLLECTION" 
-then 
+if $EOXS_MNG eoxs_id_check --type DatasetSeries "$COLLECTION"
+then
     $EOXS_MNG eoxs_collection_create --type DatasetSeries -i "$COLLECTION"
     $EOXS_MNG eoxs_metadata_set -i "$COLLECTION" -s 'wms_view' -l "${COLLECTION}_view"
     $EOXS_MNG eoxc_layer_create -i "$COLLECTION" --time
@@ -166,8 +166,8 @@ fi
 # load range-type
 $EOXS_MNG eoxs_rangetype_load -i "$IMG_RTYPE"
 
-# register the data and view 
-set -x 
+# register the data and view
+#TODO: fix coverage removal
 $EOXS_MNG eoxs_id_check --type Coverage "$IDENTIFIER" || $EOXS_MNG eoxs_dataset_deregister "$IDENTIFIER"
 $EOXS_MNG eoxs_id_check --type Coverage "${IDENTIFIER}_view" || $EOXS_MNG eoxs_dataset_deregister "${IDENTIFIER}_view"
 $EOXS_MNG eoxs_dataset_register -r "`jq -r .name "$IMG_RTYPE"`" \
@@ -175,9 +175,9 @@ $EOXS_MNG eoxs_dataset_register -r "`jq -r .name "$IMG_RTYPE"`" \
     --view "${IDENTIFIER}_view" $IMG_REG_OPT
 $EOXS_MNG eoxs_dataset_register -r "$IMG_VIEW_RTYPE" -i "${IDENTIFIER}_view" \
     -d "$IMG_VIEW" -m "$IMG_META" --collection "${COLLECTION}_view" \
-    --alias "$COLLECTION" 
+    --alias "$COLLECTION"
 # id2path file registry
-{ 
+{
     echo "#$IDENTIFIER"
     [ -n "$IMG_DIR" ] && echo "$IMG_DIR;directory"
     [ -n "$META" ] && echo "$META;metadata;"
@@ -187,8 +187,8 @@ $EOXS_MNG eoxs_dataset_register -r "$IMG_VIEW_RTYPE" -i "${IDENTIFIER}_view" \
     echo "#${IDENTIFIER}_view"
     [ -n "$IMG_DIR" ] && echo "$IMG_DIR;directory"
     echo "$IMG_META;metadata;EOP2.0"
-    echo "$IMG_VIEW;data;RGBA-WGS84"
+    echo "$IMG_VIEW;data;browse"
     echo "$IMG_VIEW_OVR;file;overviews"
-} | $EOXS_MNG eoxs_i2p_load 
+} | $EOXS_MNG eoxs_i2p_load
 
 info "Add product handler finished sucessfully."
