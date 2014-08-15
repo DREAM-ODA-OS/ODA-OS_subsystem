@@ -56,7 +56,7 @@ sudo -u "$ODAOSUSER" ex "$SETTINGS" <<END
 1,\$s:^\(IE_DEFAULT_ADDPROD_SCRIPT[	 ]*=[	 ]*\).*$:\1"product_add.sh":
 1,\$s:^\(IE_DEFAULT_DEL_SCRIPT[	 ]*=[	 ]*\).*$:\1"product_remove.sh":
 1,\$s:^\(IE_DEFAULT_CATREG_SCRIPT[	 ]*=[	 ]*\).*$:\1"catalogue_register.sh":
-1,\$s:^\(IE_DEFAULT_CATREG_SCRIPT[	 ]*=[	 ]*\).*$:\1"catalogue_deregister.sh":
+1,\$s:^\(IE_DEFAULT_CATDEREG_SCRIPT[	 ]*=[	 ]*\).*$:\1"catalogue_deregister.sh":
 1,\$s:^\(IE_S2ATM_PREPROCESS_SCRIPT[	 ]*=[	 ]*\).*$:\1"s2preprocessor.sh":
 1,\$s:^\(IE_TAR_RESULT_SCRIPT[	 ]*=[	 ]*\).*$:\1"tar_result.sh":
 1,\$s:^\(IE_DEFAULT_UQMD_SCRIPT[	 ]*=[	 ]*\).*$:\1"update_quality_metadata.sh":
