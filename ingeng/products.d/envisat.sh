@@ -215,7 +215,6 @@ then
             _remove "$_tmp1"
             gdal_translate -b 1 "$_tmp0" "$_tmp1" $TOPT || exit 1
             range_stretch.py "$_tmp1" "$IMG_VIEW" 23 41 0 dB `echo $TOPT | sed -e 's/-co//g'` || exit 1
-
         else 
             range_stretch.py "$_tmp0" "$IMG_VIEW" 23 41 0 dB `echo $TOPT | sed -e 's/-co//g'` || exit 1
         fi 
