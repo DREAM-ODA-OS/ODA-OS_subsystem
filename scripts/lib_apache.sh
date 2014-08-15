@@ -38,24 +38,26 @@ function _locate_conf()
         if [ 0 -lt `grep -c "$1" "$_F_"` ]
         then
             echo "$_F_"
-            break
+            return 0
         fi
     done
+    return 1 
 }
 
 function locate_apache_conf()
 {
-    _locate_conf '^[ 	]*<VirtualHost[ 	]*_default_:'${1:-80}'>'
+    _locate_conf '^[ 	]*<VirtualHost[ 	]*_default_:'${1:-80}'>' || \
+    _locate_conf '^[ 	]*<VirtualHost[ 	]*\*:'${1:-80}'>' || true
 }
 
 function locate_wsgi_socket_prefix_conf()
 {
-    _locate_conf '^[ 	]*WSGISocketPrefix'
+    _locate_conf '^[ 	]*WSGISocketPrefix' || true
 }
 
 function locate_wsgi_daemon()
 {
-    _locate_conf '^[ 	]*WSGIDaemonProcess[ 	]*'$1
+    _locate_conf '^[ 	]*WSGIDaemonProcess[ 	]*'$1 || true
 }
 
 function disable_virtual_host()
