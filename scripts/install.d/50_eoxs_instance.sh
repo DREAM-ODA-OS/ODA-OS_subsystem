@@ -41,6 +41,8 @@ PG_HBA="${ODAOS_PGDATA_DIR:-/var/lib/pgsql/data}/pg_hba.conf"
 EOXSLOG="${ODAOSLOGDIR}/eoxserver.log"
 EOXSCONF="${INSTROOT}/${INSTANCE}/${INSTANCE}/conf/eoxserver.conf"
 EOXSURL="http://${HOSTNAME}/${INSTANCE}/ows?"
+EOXSMAXSIZE="20480"
+EOXSMAXPAGE="200"
 
 #-------------------------------------------------------------------------------
 # create instance
@@ -173,6 +175,18 @@ done
 sudo -u "$ODAOSUSER" ex "$EOXSCONF" <<END
 /^[	 ]*http_service_url[	 ]*=/s;\(^[	 ]*http_service_url[	 ]*=\).*;\1${EOXSURL};
 g/^#.*supported_crs/,/^$/ s/^#//
+wq
+END
+
+#set the limits
+sudo -u "$ODAOSUSER" ex "$EOXSCONF" <<END
+g/^[ 	#]*maxsize[ 	]/d
+/\[services\.ows\.wcs\]/a
+# maximum allowed output coverage size 
+# (nether width nor height can exceed this limit)
+maxsize = $EOXSMAXSIZE
+.
+/^[	 ]*paging_count_default[	 ]*=/s/\(^[	 ]*paging_count_default[	 ]*=\).*/\1${EOXSMAXPAGE}/
 wq
 END
 
