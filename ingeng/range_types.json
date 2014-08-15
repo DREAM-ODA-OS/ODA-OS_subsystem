@@ -41,6 +41,54 @@
                 }
             ],
             "uom": "W.m-2.Sr-1"
+        }
+    ],
+    "data_type": "Byte",
+    "name": "RGB"
+},
+{
+    "bands": [
+        {
+            "definition": "http://www.opengis.net/def/property/netcdf/1.0/byte",
+            "description": "Red Channel",
+            "gdal_interpretation": "RedBand",
+            "identifier": "red",
+            "name": "red",
+            "nil_values": [
+                {
+                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
+                    "value": 0
+                }
+            ],
+            "uom": "W.m-2.Sr-1"
+        },
+        {
+            "definition": "http://www.opengis.net/def/property/netcdf/1.0/byte",
+            "description": "Green Channel",
+            "gdal_interpretation": "GreenBand",
+            "identifier": "green",
+            "name": "green",
+            "nil_values": [
+                {
+                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
+                    "value": 0
+                }
+            ],
+            "uom": "W.m-2.Sr-1"
+        },
+        {
+            "definition": "http://www.opengis.net/def/property/netcdf/1.0/byte",
+            "description": "Blue Channel",
+            "gdal_interpretation": "BlueBand",
+            "identifier": "blue",
+            "name": "blue",
+            "nil_values": [
+                {
+                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
+                    "value": 0
+                }
+            ],
+            "uom": "W.m-2.Sr-1"
         },
         {
             "definition": "http://www.opengis.net/def/property/netcdf/1.0/byte",
@@ -75,6 +123,26 @@
                 }
             ],
             "uom": "none"
+        }
+    ],
+    "data_type": "Byte",
+    "name": "Grayscale"
+},
+{
+    "bands": [
+        {
+            "definition": "http://www.opengis.net/def/property/netcdf/1.0/byte",
+            "description": "Mask uint8",
+            "gdal_interpretation": "GrayIndex",
+            "identifier": "gray",
+            "name": "gray",
+            "nil_values": [
+                {
+                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
+                    "value": 255
+                }
+            ],
+            "uom": "none"
         },
         {
             "definition": "http://www.opengis.net/def/property/netcdf/1.0/byte",
@@ -93,377 +161,4 @@
     ],
     "data_type": "Byte",
     "name": "GrayAlpha"
-},
-{
-    "bands": [
-        {
-            "definition": "http://www.opengis.net/def/property/netcdf/1.0/byte",
-            "description": "Mask uint8",
-            "gdal_interpretation": "GrayIndex",
-            "identifier": "mask_uint8",
-            "name": "mask_uint8",
-            "nil_values": [
-                {
-                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
-                    "value": 255
-                }
-            ],
-            "uom": "none"
-        }
-    ],
-    "data_type": "Byte",
-    "name": "Mask_uint8"
-},
-{
-    "bands": [
-        {
-            "definition": "http://www.opengis.net/def/property/netcdf/1.0/unsignedShort",
-            "description": "Mask uint16",
-            "gdal_interpretation": "GrayIndex",
-            "identifier": "mask",
-            "name": "mask_uint16",
-            "nil_values": [
-                {
-                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
-                    "value": 0
-                }
-            ],
-            "uom": "none"
-        }
-    ],
-    "data_type": "UInt16",
-    "name": "Mask_uint16"
-},
-{
-    "bands": [
-        {
-            "definition": "http://www.opengis.net/def/property/netcdf/1.0/short",
-            "description": "Mask int16",
-            "gdal_interpretation": "GrayIndex",
-            "identifier": "mask",
-            "name": "mask_int16",
-            "nil_values": [],
-            "uom": "none"
-        }
-    ],
-    "data_type": "Int16",
-    "name": "Mask_int16"
-},
-{
-    "bands": [
-        {
-            "definition": "http://www.opengis.net/def/property/netcdf/1.0/byte",
-            "description": "Simulated Sentinel 2 Band 02 - Landsat/TM Band 1 (Blue) - uint8",
-            "gdal_interpretation": "Undefined",
-            "identifier": "B01",
-            "name": "SimS2_B02_LandsatTM_B1_uint8",
-            "nil_values": [
-                {
-                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
-                    "value": 0
-                }
-            ],
-            "uom": "W.m-2.sr-1.nm-1"
-        },
-        {
-            "definition": "http://www.opengis.net/def/property/netcdf/1.0/byte",
-            "description": "Simulated Sentinel 2 Band 03 - Landsat/TM Band 2 (Green) uint8",
-            "gdal_interpretation": "Undefined",
-            "identifier": "B02",
-            "name": "SimS2_B03_LandsatTM_B2_uint8",
-            "nil_values": [
-                {
-                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
-                    "value": 0
-                }
-            ],
-            "uom": "W.m-2.sr-1.nm-1"
-        },
-        {
-            "definition": "http://www.opengis.net/def/property/netcdf/1.0/byte",
-            "description": "Simulated Sentinel 2 Band 04 - Landsat/TM Band 3 (Red) uint8",
-            "gdal_interpretation": "Undefined",
-            "identifier": "B03",
-            "name": "SimS2_B04_LandsatTM_B3_uint8",
-            "nil_values": [
-                {
-                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
-                    "value": 0
-                }
-            ],
-            "uom": "W.m-2.sr-1.nm-1"
-        },
-        {
-            "definition": "http://www.opengis.net/def/property/netcdf/1.0/byte",
-            "description": "Simulated Sentinel 2 Band 08 - Landsat/TM Band 4 (NIR) uint8",
-            "gdal_interpretation": "Undefined",
-            "identifier": "B04",
-            "name": "SimS2_B08_LandsatTM_B4_uint8",
-            "nil_values": [
-                {
-                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
-                    "value": 0
-                }
-            ],
-            "uom": "W.m-2.sr-1.nm-1"
-        },
-        {
-            "definition": "http://www.opengis.net/def/property/netcdf/1.0/byte",
-            "description": "Simulated Sentinel 2 Band 11 - Landsat/TM Band 5 (SWIR1) uint8",
-            "gdal_interpretation": "Undefined",
-            "identifier": "B05",
-            "name": "SimS2_B11_LandsatTM_B5_uint8",
-            "nil_values": [
-                {
-                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
-                    "value": 0
-                }
-            ],
-            "uom": "W.m-2.sr-1.nm-1"
-        }
-    ],
-    "data_type": "Byte",
-    "name": "SimS2_LandsatTM_uint8"
-},
-{
-    "bands": [
-        {
-            "definition": "http://www.opengis.net/def/property/netcdf/1.0/short",
-            "description": "SPOT-4 HRVIR-1/2 Band 01 - Green - int16",
-            "gdal_interpretation": "Undefined",
-            "identifier": "B01",
-            "name": "SPOT4_HRVIR_B01_int16",
-            "nil_values": [
-                {
-                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
-                    "value": -10000
-                }
-            ],
-            "uom": "W.m-2.sr-1.nm-1"
-        },
-        {
-            "definition": "http://www.opengis.net/def/property/netcdf/1.0/short",
-            "description": "SPOT-4 HRVIR-1/2 Band 02 - Red - int16",
-            "gdal_interpretation": "Undefined",
-            "identifier": "B02",
-            "name": "SPOT4_HRVIR_B02_int16",
-            "nil_values": [
-                {
-                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
-                    "value": -10000
-                }
-            ],
-            "uom": "W.m-2.sr-1.nm-1"
-        },
-        {
-            "definition": "http://www.opengis.net/def/property/netcdf/1.0/short",
-            "description": "SPOT-4 HRVIR-1/2 Band 03 - NIR - int16",
-            "gdal_interpretation": "Undefined",
-            "identifier": "B03",
-            "name": "SPOT4_HRVIR_B03_int16",
-            "nil_values": [
-                {
-                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
-                    "value": -10000
-                }
-            ],
-            "uom": "W.m-2.sr-1.nm-1"
-        },
-        {
-            "definition": "http://www.opengis.net/def/property/netcdf/1.0/short",
-            "description": "SPOT-4 HRVIR-1/2 Band 04 - MIR - int16",
-            "gdal_interpretation": "Undefined",
-            "identifier": "B04",
-            "name": "SPOT4_HRVIR_B04_int16",
-            "nil_values": [
-                {
-                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
-                    "value": -10000
-                }
-            ],
-            "uom": "W.m-2.sr-1.nm-1"
-        }
-    ],
-    "data_type": "Int16",
-    "name": "SPOT4HRVIR_int16"
-},
-{
-    "bands": [
-        {
-            "definition": "http://www.opengis.net/def/property/netcdf/1.0/short",
-            "description": "Landsat 5 TM Band 1 (Blue) - int16",
-            "gdal_interpretation": "Undefined",
-            "identifier": "B01",
-            "name": "Landsat5TM_B1_int16",
-            "nil_values": [
-                {
-                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
-                    "value": -10000
-                }
-            ],
-            "uom": "W.m-2.sr-1.nm-1"
-        },
-        {
-            "definition": "http://www.opengis.net/def/property/netcdf/1.0/short",
-            "description": "Landsat 5 TM Band 2 (Green) int16",
-            "gdal_interpretation": "Undefined",
-            "identifier": "B02",
-            "name": "Landsat5TM_B2_int16",
-            "nil_values": [
-                {
-                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
-                    "value": -10000
-                }
-            ],
-            "uom": "W.m-2.sr-1.nm-1"
-        },
-        {
-            "definition": "http://www.opengis.net/def/property/netcdf/1.0/short",
-            "description": "Landsat 5 TM Band 3 (Red) int16",
-            "gdal_interpretation": "Undefined",
-            "identifier": "B03",
-            "name": "Landsat5TM_B3_int16",
-            "nil_values": [
-                {
-                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
-                    "value": -10000
-                }
-            ],
-            "uom": "W.m-2.sr-1.nm-1"
-        },
-        {
-            "definition": "http://www.opengis.net/def/property/netcdf/1.0/short",
-            "description": "Landsat 5 TM Band 4 (NIR) int16",
-            "gdal_interpretation": "Undefined",
-            "identifier": "B04",
-            "name": "Landsat5TM_B4_int16",
-            "nil_values": [
-                {
-                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
-                    "value": -10000
-                }
-            ],
-            "uom": "W.m-2.sr-1.nm-1"
-        },
-        {
-            "definition": "http://www.opengis.net/def/property/netcdf/1.0/short",
-            "description": "Landsat 5 TM Band 5 (SWIR1) int16",
-            "gdal_interpretation": "Undefined",
-            "identifier": "B05",
-            "name": "Landsat5TM_B5_int16",
-            "nil_values": [
-                {
-                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
-                    "value": -10000
-                }
-            ],
-            "uom": "W.m-2.sr-1.nm-1"
-        },
-        {
-            "definition": "http://www.opengis.net/def/property/netcdf/1.0/short",
-            "description": "Landsat 5 TM Band 7 (SWIR2) int16",
-            "gdal_interpretation": "Undefined",
-            "identifier": "B07",
-            "name": "Landsat5TM_B7_int16",
-            "nil_values": [
-                {
-                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
-                    "value": -10000
-                }
-            ],
-            "uom": "W.m-2.sr-1.nm-1"
-        }
-    ],
-    "data_type": "Int16",
-    "name": "Landsat5TM_int16"
-},
-{
-    "bands": [
-        {
-            "definition": "http://www.opengis.net/def/property/netcdf/1.0/short",
-            "description": "Landsat 7 ETM Band 1 (Blue) - int16",
-            "gdal_interpretation": "Undefined",
-            "identifier": "B01",
-            "name": "Landsat7ETM_B1_int16",
-            "nil_values": [
-                {
-                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
-                    "value": -10000
-                }
-            ],
-            "uom": "W.m-2.sr-1.nm-1"
-        },
-        {
-            "definition": "http://www.opengis.net/def/property/netcdf/1.0/short",
-            "description": "Landsat 7 ETM Band 2 (Green) int16",
-            "gdal_interpretation": "Undefined",
-            "identifier": "B02",
-            "name": "Landsat7ETM_B2_int16",
-            "nil_values": [
-                {
-                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
-                    "value": -10000
-                }
-            ],
-            "uom": "W.m-2.sr-1.nm-1"
-        },
-        {
-            "definition": "http://www.opengis.net/def/property/netcdf/1.0/short",
-            "description": "Landsat 7 ETM Band 3 (Red) int16",
-            "gdal_interpretation": "Undefined",
-            "identifier": "B03",
-            "name": "Landsat7ETM_B3_int16",
-            "nil_values": [
-                {
-                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
-                    "value": -10000
-                }
-            ],
-            "uom": "W.m-2.sr-1.nm-1"
-        },
-        {
-            "definition": "http://www.opengis.net/def/property/netcdf/1.0/short",
-            "description": "Landsat 7 ETM Band 4 (NIR) int16",
-            "gdal_interpretation": "Undefined",
-            "identifier": "B04",
-            "name": "Landsat7ETM_B4_int16",
-            "nil_values": [
-                {
-                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
-                    "value": -10000
-                }
-            ],
-            "uom": "W.m-2.sr-1.nm-1"
-        },
-        {
-            "definition": "http://www.opengis.net/def/property/netcdf/1.0/short",
-            "description": "Landsat 7 ETM Band 5 (SWIR1) int16",
-            "gdal_interpretation": "Undefined",
-            "identifier": "B05",
-            "name": "Landsat7ETM_B5_int16",
-            "nil_values": [
-                {
-                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
-                    "value": -10000
-                }
-            ],
-            "uom": "W.m-2.sr-1.nm-1"
-        },
-        {
-            "definition": "http://www.opengis.net/def/property/netcdf/1.0/short",
-            "description": "Landsat 7 ETM Band 7 (SWIR2) int16",
-            "gdal_interpretation": "Undefined",
-            "identifier": "B07",
-            "name": "Landsat7ETM_B7_int16",
-            "nil_values": [
-                {
-                    "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
-                    "value": -10000
-                }
-            ],
-            "uom": "W.m-2.sr-1.nm-1"
-        }
-    ],
-    "data_type": "Int16",
-    "name": "Landsat7ETM_int16"
 }]
