@@ -1,4 +1,4 @@
-ODA-OS subsytem
+ODA-OS subsystem
 ---------------
 
 This repository contains the installation and configuration scripts of the
@@ -48,25 +48,25 @@ S2-preprocessor | Spacebel FTP [3] | Optional. Downloaded automatically when a v
 #### Step 1 - Get the Installation Scripts
 
 The installer (i.e., content of this repository) can be obtained
-either as on of the [tagged releases](https://github.com/DREAM-ODA-OS/ODA-OS_subsytem/releases)
+either as on of the [tagged releases](https://github.com/DREAM-ODA-OS/ODA-OS_subsystem/releases)
 or by clonning of the repository:
 
 ```
-$ git clone https://github.com/DREAM-ODA-OS/ODA-OS_subsytem.git
+$ git clone https://github.com/DREAM-ODA-OS/ODA-OS_subsystem.git
 ```
 
 #### Step 2 - Prepare the installed SW packages
 
 Put the SW packages which i) cannot be downloaded automatically or ii) need to
 be installed from a newer version not yet available on-line to the
-`ODA-OS_subsytem/contrib/` directory of the (unpacked or cloned) installer.
+`ODA-OS_subsystem/contrib/` directory of the (unpacked or cloned) installer.
 
 #### Step 3 - Run the Installation
 
 Execute the installation script with the root's permission:
 
 ```
-$ sudo ODA-OS_subsytem/scripts/install.sh
+$ sudo ODA-OS_subsystem/scripts/install.sh
 ```
 
 The output os the `install.sh` command is automatically saved to a log file
@@ -80,7 +80,7 @@ The `install.sh` command executes the individual installation scrips
 located in the `scripts/install.d/` directory: 
 
 ```
-$ ls ODA-OS_subsytem/scripts/install.d/ 
+$ ls ODA-OS_subsystem/scripts/install.d/ 
 00_selinux.sh    20_django.sh      30_ngeo_dm_install.sh  40_ngeo_dm_cli-fix.sh
 10_rpm_repos.sh  20_gdal.sh        30_odac_install.sh     40_ngeo_dm_config.sh
 15_curl.sh       20_postgresql.sh  30_tools_install.sh    45_ie_config.sh
@@ -94,7 +94,7 @@ the expelicitely selected scripts as, e.g., in following command (re-)installing
 and (re-)configuring the IngestionEngine:
 
 ```
-$ sudo ODA-OS_subsytem/scripts/install.sh ODA-OS_subsytem/scripts/install.d/{30_ie_install.sh,45_ie_config.sh}
+$ sudo ODA-OS_subsystem/scripts/install.sh ODA-OS_subsystem/scripts/install.d/{30_ie_install.sh,45_ie_config.sh}
 ```
 
 This allows installation and/or update of selected SW packages only. 
@@ -103,18 +103,18 @@ The optional components are excluded from the automatic installation.
 The optional installers are located in the `scripts/optional.d/` directory:
 
 ```
-$ ls ODA-OS_subsytem/scripts/optional.d/
+$ ls ODA-OS_subsystem/scripts/optional.d/
 21_tomcat7.sh  30_excat2_install.sh  35_data_quality_install.sh  60_data_quality_config.sh
 ```
 These scritps have to be executed manually, e.g:
 
 ```
-$ sudo ODA-OS_subsytem/scripts/install.sh ODA-OS_subsytem/scripts/install.d/{21_tomcat7.sh,30_excat2_install.sh}
+$ sudo ODA-OS_subsystem/scripts/install.sh ODA-OS_subsystem/scripts/install.d/{21_tomcat7.sh,30_excat2_install.sh}
 ```
 
 #### Step 4 - Hostname Configuration
 
-Some of the services provided by the ODA-OS subsytem require configuration of
+Some of the services provided by the ODA-OS subsystem require configuration of
 the correct host-name under which the service will be available. The host-name
 need not to be always the same as the one announced by the operating system
 during the installation. In case, the service host-name (i.e., fully qualified
@@ -122,7 +122,7 @@ domain-name or IP adress assigned to the computer) has to be corrected the
 following command shall be executed:
 
 ```
-$ sudo ODA-OS_subsytem/scripts/reset_hostname.sh <host-name>
+$ sudo ODA-OS_subsystem/scripts/reset_hostname.sh <host-name>
 ```
 
 ### ODA-OS Core Quick Start 
