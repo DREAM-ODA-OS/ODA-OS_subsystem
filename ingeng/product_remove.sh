@@ -1,13 +1,12 @@
 #!/usr/bin/env sh
-# 
-#   Remove product from the ODA server.
 #
-# USAGE: 
+#   Remove single product from the ODA server.
+#
+# USAGE:
 #   product_remove.sh <nc_id> [-catreg=<script>]
 #
-# DESCRIPTION: 
+# DESCRIPTION:
 #
-#  DREAM Delete script template.
 #  This script is invoked by the Ingestion Engine
 #  when a scenario is deleted.
 #  It is expected that the script will de-register
@@ -27,45 +26,75 @@
 
 . "`dirname $0`/lib_common.sh"
 
-info "Product removal started ..."
+info " Product removal started ..."
 info "   ARGUMENTS: $* "
 
-error "NOT IMPLEMENTED!" ; exit 1 
+# check and extract the inputs
 
+IDENTIFIER=
+CATREG=
+for _arg in $*
+do
+    _key="`expr "$_arg" : '\([^=]*\)'`"
+    _val="`expr "$_arg" : '[^=]*=\(.*\)'`"
+    case "$_key" in
+        '-catreg') CATREG="$_val" ;;
+        *) IDENTIFIER="$_arg" ;;
+    esac
+done
 
-#script_name="Default delete script"
-#
-#echo $script_name "started."
-#
-#if [[ $# < 1 ]]
-#then
-#    echo "Not enough args," $script_name "exiting with status 1."
-#    exit 1
-#fi
-#
-#echo arg1: $1
-#
-#if [[ $2 == -catreg=* ]]
-#then
-#    echo $2
-#    echo $script_name ": Catalogue de-registration requested."
-#    catderegscript=${2:8}
-#    echo "cat deregistration script: " $catderegscript
-#    if [[ -f $catderegscript ]] ; then
-#        echo "Ing. script: Running catalogue de-registration script."
-#        $catderegscript
-#        cat_reg_status=$?
-#        echo 'cat. de-reg. script exited with ' $cat_reg_status
-#        if [ $cat_reg_status != 0 ] ; then ex_status=$cat_reg_status; fi
-#    else
-#        echo $script_name ": did not find an executable cat. de-reg. script ."
-#        ex_status=3
-#    fi
-#fi
-#
-#echo "---"
-#echo " WARNING: Product removal action not yet implemented!"
-#echo "---"
-#
-#echo $script_name "finishing with status 0."
-#exit 0
+[ -z "$IDENTIFIER" ] && { error "Missing the required product identifier!" ; exit 1 ; }
+if [ -n "$CATREG" ]
+then
+    [ -f "$CATREG" ] || { error "The catalogue de-registration script does not exist! CATREG=$CATREG" ; exit 1 ; }
+    [ -x "$CATREG" ] || { error "The catalogue de-registration script is not executable! CATREG=$CATREG" ; exit 1 ; }
+fi
+
+info "CATREG:  $CATREG"
+info "IDENTIFIER:  $IDENTIFIER"
+
+#-----------------------------------------------------------------------------
+# optional catalogue de-registration
+
+if [ -n "$CATREG" ]
+then
+    "$CATREG" "$IDENTIFIER" || warn "Catalogue deregistration failed!"
+fi
+
+#-----------------------------------------------------------------------------
+# get WMS browse identifier
+
+DATA="$IDENTIFIER"
+
+TMP="`$EOXS_MNG eoxs_metadata_list -s 'wms_view' -i "$DATA" | grep wms_view | head -n 1`"
+if [ -n "$TMP" ]
+then
+    eval TMPA=($TMP)
+    VIEW="${TMPA[1]}"
+fi
+
+#-----------------------------------------------------------------------------
+# deregister coverages
+
+$EOXS_MNG eoxs_dataset_deregister "$DATA" || { error "Failed to deregister dataset $DATA!" ; exit 1 ; }
+[ -n "$VIEW" ] && { $EOXS_MNG eoxs_dataset_deregister "$VIEW" || { error "Failed to deregister dataset $VIEW!" ; exit 1 ; } }
+
+#-----------------------------------------------------------------------------
+# remove files
+{
+    $EOXS_MNG eoxs_i2p_list --unbound-strict --full -i "$DATA" || { error "Id2Path list failed for $DATA!" ; exit 1 ; }
+    [ -n "$VIEW" ] && { $EOXS_MNG eoxs_i2p_list --unbound-strict --full -i "$VIEW" || { error "Id2Path list failed for $VIEW!" ; exit 1 ; } }
+} | grep -v "^#" | sed -s 's/;.*$//' | while read F
+do
+    rm -vfR "$F"
+done
+
+#-----------------------------------------------------------------------------
+# clean the id2path records
+
+{
+    $EOXS_MNG eoxs_i2p_list --unbound --full -i "$DATA"
+    [ -n "$VIEW" ] && $EOXS_MNG eoxs_i2p_list --unbound --full -i "$VIEW"
+} | $EOXS_MNG eoxs_i2p_delete || { error "Id2Path deregistration failed!" ; exit 1 ; }
+
+info "Product removal finished sucessfully."

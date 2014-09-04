@@ -48,14 +48,13 @@ do
 done
 
 [ -z "$MANIFEST" ] && { error "Missing the required manifest file!" ; exit 1 ; }
-[ -f "$MANIFEST" ] || { error "The manifest file does not exist! MANIFEST=$1" ; exit 1 ; }
+[ -f "$MANIFEST" ] || { error "The manifest file does not exist! MANIFEST=$MANIFEST" ; exit 1 ; }
 if [ -n "$CATREG" ]
 then
-    [ -f "$CATREG" ] || { error "The catalogue registration script does not exist! CATREG=$1" ; exit 1 ; }
-    [ -x "$CATREG" ] || { error "The catalogue registration script is not executable! CATREG=$1" ; exit 1 ; }
+    [ -f "$CATREG" ] || { error "The catalogue registration script does not exist! CATREG=$CATREG" ; exit 1 ; }
+    [ -x "$CATREG" ] || { error "The catalogue registration script is not executable! CATREG=$CATREG" ; exit 1 ; }
 fi
 
-MANIFEST=$1
 info "CATREG:  $CATREG"
 info "MANIFEST:  $MANIFEST"
 
@@ -232,7 +231,7 @@ $EOXS_MNG eoxs_dataset_register -r "$VIEW_RANGE_TYPE" -i "${IDENTIFIER}_view" \
     echo "$META;metadata;EOP2.0"
 } | $EOXS_MNG eoxs_i2p_load
 
-info "Product ingestion handler finished sucessfully."
+info "Product ingestion finished sucessfully."
 
 #-----------------------------------------------------------------------------
 # optional catalogue registration

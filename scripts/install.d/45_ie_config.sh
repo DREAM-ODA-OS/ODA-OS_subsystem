@@ -54,7 +54,7 @@ sudo -u "$ODAOSUSER" ex "$SETTINGS" <<END
 1,\$s:^\(IE_SCRIPTS_DIR[	 ]*=[	 ]*\).*$:\1"$ODAOS_IEAS_HOME":
 1,\$s:^\(IE_DEFAULT_INGEST_SCRIPT[	 ]*=[	 ]*\).*$:\1"product_ingest.sh":
 1,\$s:^\(IE_DEFAULT_ADDPROD_SCRIPT[	 ]*=[	 ]*\).*$:\1"product_add.sh":
-1,\$s:^\(IE_DEFAULT_DEL_SCRIPT[	 ]*=[	 ]*\).*$:\1"product_remove.sh":
+1,\$s:^\(IE_DEFAULT_DEL_SCRIPT[	 ]*=[	 ]*\).*$:\1"scenario_remove.sh":
 1,\$s:^\(IE_DEFAULT_CATREG_SCRIPT[	 ]*=[	 ]*\).*$:\1"catalogue_register.sh":
 1,\$s:^\(IE_DEFAULT_CATDEREG_SCRIPT[	 ]*=[	 ]*\).*$:\1"catalogue_deregister.sh":
 1,\$s:^\(IE_S2ATM_PREPROCESS_SCRIPT[	 ]*=[	 ]*\).*$:\1"s2preprocessor.sh":
