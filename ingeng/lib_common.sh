@@ -14,6 +14,20 @@ EXENAME=`basename $0`
 
 EOXS_MNG="/usr/bin/python /srv/odaos/eoxs/manage.py"
 
+_hash()
+{
+# get base64(urlsafe) encoded hash of the standard input
+python -c '
+from hashlib import md5;
+from sys import stdin, stdout;
+from base64 import b64encode;
+h = md5();
+h.update(stdin.read());
+s = b64encode(h.digest(),["-","_"]);
+stdout.write(s[:22]);
+'
+}
+
 _remove() { for _file in $* ; do [ -f "$_file" ] && rm -fv "$_file" ; done ; }
 _expand() { cd $1 ; pwd ; }
 
