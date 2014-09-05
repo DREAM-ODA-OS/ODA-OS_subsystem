@@ -154,8 +154,8 @@ then
     [ -n "$_levels" ] && time "$GDALADDO" $_adoopt "$VIEW" $_levels
 fi
 
-# add collection name as a prefix to the coverage identifier
-IDENTIFIER="$COLLECTION:$IDENTIFIER"
+# add collection name as a prefix of the coverage identifier
+[ -z "`grep "^$COLLECTION:" <<< "$IDENTIFIER"`" ] && IDENTIFIER="$COLLECTION:$IDENTIFIER"
 
 # append EOP2.0 metadata and range-type to the manifest
 ex "$MANIFEST" <<END
