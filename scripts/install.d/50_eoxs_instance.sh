@@ -13,6 +13,7 @@ info "Configuring EOxServer ... "
 # NOTE: In ODA-OS, it is not expected to have mutiple instances of the EOxServer
 
 [ -z "$ODAOS_IEAS_HOME" ] && error "Missing the required ODAOS_IEAS_HOME variable!"
+[ -z "$ODAOS_BEAM_HOME" ] && error "Missing the required ODAOS_BEAM_HOME variable!"
 [ -z "$ODAOSHOSTNAME" ] && error "Missing the required ODAOSHOSTNAME variable!"
 [ -z "$ODAOSROOT" ] && error "Missing the required ODAOSROOT variable!"
 [ -z "$ODAOSUSER" ] && error "Missing the required ODAOSUSER variable!"
@@ -181,12 +182,20 @@ END
 #set the limits
 sudo -u "$ODAOSUSER" ex "$EOXSCONF" <<END
 g/^[ 	#]*maxsize[ 	]/d
+g/^[ 	#]*path_beam[ 	]/d
+g/^[ 	#]*beam_options[ 	]/d
 /\[services\.ows\.wcs\]/a
 # maximum allowed output coverage size 
 # (nether width nor height can exceed this limit)
 maxsize = $EOXSMAXSIZE
 .
+/\[core\.system]/a
+path_beam=$ODAOS_BEAM_HOME
+beam_options=-c 256M
+.
+/^[	 ]*source_to_native_format_map[	 ]*=/s#\(^[	 ]*source_to_native_format_map[	 ]*=\).*#\1application/x-esa-envisat,application/x-netcdf#
 /^[	 ]*paging_count_default[	 ]*=/s/\(^[	 ]*paging_count_default[	 ]*=\).*/\1${EOXSMAXPAGE}/
+
 wq
 END
 
