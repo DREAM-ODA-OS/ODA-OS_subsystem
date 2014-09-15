@@ -3,15 +3,15 @@
 #   Remove single product from the ODA server.
 #
 # USAGE:
-#   product_remove.sh <nc_id> [-catreg=<script>]
+#   product_remove.sh <product_id> [-catreg=<script>]
 #
 # DESCRIPTION:
 #
 #  This script is invoked by the Ingestion Engine
-#  when a scenario is deleted.
-#  It is expected that the script will de-register
-#  products associated with the scenario, and delete the
-#  corresponding physical files on the disc (filesystem).
+#  when a single product is deleted.
+#  It is expected that the script will de-register this
+#  product and delete the corresponding physical files 
+#  on the disc (filesystem).
 #
 # catreg is used to request de-registration of products
 #        from the local metadata catalogue. The script
@@ -20,8 +20,7 @@
 #
 #  The script should exit with a 0 status to indicate
 # success; a non-zero status indicates failure, and will
-# prevent the scenario to be deleted from the Ingestion
-# Engine's list of scenarios.
+# prevent the product to be deleted.
 #
 
 . "`dirname $0`/lib_common.sh"

@@ -1,13 +1,12 @@
 #!/usr/bin/env sh
 #
-#   Remove product from the ODA server.
+#   Remove scenario from the ODA server.
 #
 # USAGE:
-#   product_remove.sh <nc_id> [-catreg=<script>]
+#   scenario_remove.sh <nc_id> [-catreg=<script>]
 #
 # DESCRIPTION:
 #
-#  DREAM Delete script template.
 #  This script is invoked by the Ingestion Engine
 #  when a scenario is deleted.
 #  It is expected that the script will de-register
