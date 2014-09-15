@@ -21,10 +21,12 @@
 # KV pairs contained in the manifest file:
 #
 #    SCENARIO_NCN_ID="scid0"
-#    DOWNLOAD_DIR="/path/p_scid0_001"
-#    METADATA="/path/p_scid0_001/ows.meta"
-#    DATA="/path/p_scid0_001/p1.tif"
+#    DOWNLOAD_DIR="./"
+#    METADATA="./ows.meta"
+#    DATA="./p1.tif"
 #
+# NOTE: When a relative path is used the location of the manifest file
+# is used as the reference.
 #
 #-----------------------------------------------------------------------------
 
@@ -58,17 +60,42 @@ fi
 info "CATREG:  $CATREG"
 info "MANIFEST:  $MANIFEST"
 
+# get reference directory
+DIR="`dirname "$MANIFEST"`"
+DIR="`_expand "$DIR"`"
+
+#-----------------------------------------------------------------------------
+# auxiliary methods
+
+set_field()
+{
+    ex "$MANIFEST" <<END
+1,\$g/^$1=/d
+\$a
+$1="$2"
+.
+wq
+END
+}
+get_field() { sed -ne "s/^$1=\"\(.*\)\"/\1/p" "$MANIFEST" ;}
+update_field() { [ "`get_field "$1"`" != "$2" ] && set_field "$1" "$2" ;}
+
+get_path() { get_field "$1" | _pipe_expand "$DIR" ;}
+set_path() { set_field "$1" "`_detach "$2" "$DIR"`" ;}
+update_path() { [ "`get_path "$1"`" != "$2" ] && set_path "$1" "$2" ;}
+
 #-----------------------------------------------------------------------------
 # parse manifest and prepare the metadata
 
-DATA="`cat "$MANIFEST" | sed -ne 's/^DATA="\(.*\)"/\1/p'`"
-VIEW="`cat "$MANIFEST" | sed -ne 's/^VIEW="\(.*\)"/\1/p'`"
-COVDESCR="`cat "$MANIFEST" | sed -ne 's/^METADATA="\(.*\)"/\1/p'`"
-COLLECTION="`cat "$MANIFEST" | sed -ne 's/^SCENARIO_NCN_ID="\(.*\)"/\1/p'`"
-DATADIR="`cat "$MANIFEST" | sed -ne 's/^DOWNLOAD_DIR="\(.*\)"/\1/p'`"
-META="`cat "$MANIFEST" | sed -ne 's/^METADATA_EOP20="\(.*\)"/\1/p'`"
-RANGET="`cat "$MANIFEST" | sed -ne 's/^RANGE_TYPE="\(.*\)"/\1/p'`"
-IDENTIFIER="`cat "$MANIFEST" | sed -ne 's/^IDENTIFIER="\(.*\)"/\1/p'`"
+DATADIR="`get_path DOWNLOAD_DIR`"
+DATA="`get_path DATA`"
+VIEW="`get_path VIEW`"
+VIEW_OVR="`get_path VIEW_OVR`"
+COVDESCR="`get_path METADATA`"
+COLLECTION="`get_field SCENARIO_NCN_ID`"
+META="`get_path METADATA_EOP20`"
+RANGET="`get_path RANGE_TYPE`"
+IDENTIFIER="`get_field IDENTIFIER`"
 
 [ -n "$META" ] || META="`expr "$DATA" : '\(.*\)\.[a-zA_Z]*'`.xml"
 [ -n "$RANGET" ] || RANGET="`expr "$DATA" : '\(.*\)\.[a-zA_Z]*'`_range_type.json"
@@ -158,21 +185,14 @@ fi
 [ -z "`grep "^$COLLECTION:" <<< "$IDENTIFIER"`" ] && IDENTIFIER="$COLLECTION:$IDENTIFIER"
 
 # append EOP2.0 metadata and range-type to the manifest
-ex "$MANIFEST" <<END
-1,\$g/^METADATA_EOP20=/d
-1,\$g/^RANGE_TYPE=/d
-1,\$g/^IDENTIFIER=/d
-1,\$g/^VIEW=/d
-1,\$g/^VIEW_OVR=/d
-\$a
-VIEW="$VIEW"
-VIEW_OVR="$VIEW_OVR"
-METADATA_EOP20="$META"
-RANGE_TYPE="$RANGET"
-IDENTIFIER="$IDENTIFIER"
-.
-wq
-END
+update_field IDENTIFIER "$IDENTIFIER"
+[ -n "$DATADIR" ] && set_path DOWNLOAD_DIR "$DATADIR"
+set_path DATA "$DATA"
+set_path VIEW "$VIEW"
+set_path VIEW_OVR "$VIEW_OVR"
+[ -n "$COVDESCR" ] && set_path METADATA "$COVDESCR"
+set_path METADATA_EOP20 "$META"
+update_path RANGE_TYPE "$RANGET"
 
 # log the content of the manifest file
 cat "$MANIFEST" | while read L
@@ -222,13 +242,13 @@ $EOXS_MNG eoxs_dataset_register -r "$VIEW_RANGE_TYPE" -i "${IDENTIFIER}_view" \
 # id2path file registry
 {
     echo "#$IDENTIFIER"
-    echo "$DATADIR;directory"
+    [ -n "$DATADIR" ] && echo "$DATADIR;directory"
     echo "$DATA;data"
     echo "$META;metadata;EOP2.0"
     echo "$RANGET;file;range-type"
-    echo "$COVDESCR;file;gmlcov"
+    [ -n "$COVDESCR" ] && echo "$COVDESCR;file;gmlcov"
     echo "#${IDENTIFIER}_view"
-    echo "$DATADIR;directory"
+    [ -n "$DATADIR" ] && echo "$DATADIR;directory"
     echo "$VIEW;data;browse"
     echo "$VIEW_OVR;file;overviews"
     echo "$META;metadata;EOP2.0"

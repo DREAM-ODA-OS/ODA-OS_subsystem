@@ -29,7 +29,49 @@ stdout.write(s[:22]);
 }
 
 _remove() { for _file in $* ; do [ -f "$_file" ] && rm -fv "$_file" ; done ; }
-_expand() { cd $1 ; pwd ; }
+
+_expand()
+{
+    # USAGE:
+    #   _expand <rel-path> [<ref-path>]
+    # DESCRIPTION:
+    #   Expand full path if <rel-path> with respect
+    #   to the (optional) <ref-path> directory.
+    #   <rel-path> defaults to the current directory.
+    #
+    cd "${2:-.}"
+    if [ -d "$1" ]
+    then
+        cd "$1"
+        echo "$PWD"
+    else
+        cd "`dirname "$1"`"
+        if [ "$PWD" != "/" ]
+        then
+            echo "$PWD/`basename "$1"`"
+        else
+            echo "/`basename "$1"`"
+        fi
+    fi
+}
+
+_detach()
+{
+    if [ -n "$2" ]
+    then
+        echo "$1" | sed -e "s#^$2#.#" -e "s#^\./##"
+    else
+        echo "$1" | sed -e "s#^$PWD#.#" -e "s#^\./##"
+    fi
+}
+
+_pipe_expand()
+{
+    while read P
+    do
+        _expand "$P" "$1"
+    done
+}
 
 _date() { date -u --iso-8601=seconds | sed -e 's/+0000/Z/' ; }
 

@@ -30,7 +30,11 @@ info "Catalogue metadata registration ..."
 MANIFEST=$1
 [ -z "$MANIFEST" ] && { error "Missing the required manifest file!" ; exit 1 ; }
 
-META="`cat "$MANIFEST" | sed -ne 's/^METADATA_EOP20="\(.*\)"/\1/p'`"
+# get reference directory
+DIR="`dirname "$MANIFEST"`"
+DIR="`_expand "$DIR"`"
+
+META="`cat "$MANIFEST" | sed -ne 's/^METADATA_EOP20="\(.*\)"/\1/p' | _pipe_expand "$DIR"`"
 QUOTED="`python -c "from urllib import quote_plus; print quote_plus('$META'),"`"
 
 URL="http://localhost/excat2/csw?request=Harvest&service=CSW&version=2.0.2&namespace=xmlns(csw=http://www.opengis.net/cat/csw)&source=$QUOTED&resourceFormat=application/xml&resourceType=http://www.opengis.net/eop/2.0"
