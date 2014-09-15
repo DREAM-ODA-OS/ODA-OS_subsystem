@@ -1,17 +1,14 @@
 #!/usr/bin/env sh
 #
-#   Remove scenario from the ODA server.
+#   Deregister scenario from the ODA server.
 #
 # USAGE:
 #   scenario_remove.sh <nc_id> [-catreg=<script>]
 #
 # DESCRIPTION:
 #
-#  This script is invoked by the Ingestion Engine
-#  when a scenario is deleted.
-#  It is expected that the script will de-register
-#  products associated with the scenario, and delete the
-#  corresponding physical files on the disc (filesystem).
+#   Deregister a scenario without actual removal
+#   of the files.
 #
 # catreg is used to request de-registration of products
 #        from the local metadata catalogue. The script
@@ -26,10 +23,10 @@
 
 . "`dirname $0`/lib_common.sh"
 
-info " Scenario removal started ..."
+info " Scenario deregistration started ..."
 info "   ARGUMENTS: $* "
 
-REMOVE="`dirname $0`/product_remove.sh"
+REMOVE="`dirname $0`/product_deregister.sh"
 
 # check and extract the inputs
 
@@ -100,13 +97,7 @@ $EOXS_MNG eoxs_collection_delete -r -i "$DATA" || { error "Failed to remove coll
 
 #-----------------------------------------------------------------------------
 # remove files
-{
-    $EOXS_MNG eoxs_i2p_list --unbound-strict --full -i "$DATA" || { error "Id2Path list failed for $DATA!" ; exit 1 ; }
-    [ -n "$VIEW" ] && { $EOXS_MNG eoxs_i2p_list --unbound-strict --full -i "$VIEW" || { error "Id2Path list failed for $VIEW!" ; exit 1 ; } }
-} | grep -v "^#" | sed -s 's/;.*$//' | while read F
-do
-    rm -vfR "$F"
-done
+# ... skipped 
 
 #-----------------------------------------------------------------------------
 # clean the id2path records
