@@ -12,6 +12,7 @@ info "Installing eXcat2 ... "
 XCAT_TMPDIR="/tmp/excat2"
 XCAT_WEBAPPDIR="/usr/share/tomcat/webapps"
 XCAT_NAME="excat2"
+XCAT_URL_PATH="/excat2"
 
 [ -z "$CONTRIB" ] && error "Missing the required CONTRIB variable!"
 
@@ -68,6 +69,53 @@ fi
 service tomcat start
 
 #======================================================================
+# configuration
+
+# TODO: tomcat restart
+
+wait_for_file()
+{
+    CNT=0
+    while true
+    do
+        let "CNT+=1"
+        [ ! -f "$1" ] || break
+        [ "$CNT" -le 15 ] || { error "$1 did not appear within the allowed time-out!" ; exit 1 ; }
+        info " ... ($CNT) wating before $1 file appears ..."
+        sleep 1
+    done
+    info " ... $1 exists."
+}
+
+# fix the allow.xml
+ALLOW_XML="$XCAT_WEBAPPDIR/$XCAT_NAME/WEB-INF/conf/allow.xml"
+wait_for_file "$ALLOW_XML"
+info "Fixing $ALLOW_XML"
+cat >"$ALLOW_XML" <<END
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<authorization>
+  <harvest>
+   <allow host="::1" />
+   <allow host="127.0.0.1" />
+  </harvest>
+  <transaction>
+     <allow host="::1" />
+     <allow host="127.0.0.1" />
+  </transaction>
+</authorization>
+END
+
+# fix the capabilities.xml
+CAPAB_XML="$XCAT_WEBAPPDIR/$XCAT_NAME/WEB-INF/xml/capabilities.xml"
+wait_for_file "$CAPAB_XML"
+info "Fixing $CAPAB_XML"
+{ ex "$CAPAB_XML" || /bin/true ; } <<END
+g/\s\+<ows:Get/s#xlink:href="https\=://\([^/]*\)\(/\=.*\)"#xlink:href="http://$HOSTNAME:80$XCAT_URL_PATH/csw"#
+g/\s\+<ows:Post/s#xlink:href="https\=://\([^/]*\)\(/\=.*\)"#xlink:href="http://$HOSTNAME:80$XCAT_URL_PATH/csw"#
+wq
+END
+
+#======================================================================
 # set the reverse proxy
 
 info "Setting eXcat app behind the Apache reverse proxy ..."
@@ -85,8 +133,8 @@ do
     # XCT00_BEGIN - eXcat - Do not edit or remove this line!
 
     # reverse proxy to the eXcat CSW catalogue
-    ProxyPass        /excat2 ajp://127.0.0.1:8089/excat2
-    ProxyPassReverse /excat2 ajp://127.0.0.1:8089/excat2
+    ProxyPass        $XCAT_URL_PATH ajp://127.0.0.1:8089$XCAT_URL_PATH
+    ProxyPassReverse $XCAT_URL_PATH ajp://127.0.0.1:8089$XCAT_URL_PATH
 
     # XCT00_END - eXcat - Do not edit or remove this line!
 .

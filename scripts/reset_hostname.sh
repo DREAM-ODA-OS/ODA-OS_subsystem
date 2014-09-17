@@ -128,3 +128,20 @@ END
 
     service tomcat-dq start
 fi
+
+#-------------------------------------------------------------------------------
+# eXcat catalogue (if installed)
+
+EXCAT2_CAPAB_XML="/usr/share/tomcat/webapps/excat2/WEB-INF/xml/capabilities.xml"
+
+if [ -f "$EXCAT2_CAPAB_XML" ]
+then
+
+  { ex "$EXCAT2_CAPAB_XML" || /bin/true ; } <<END
+g/\s\+<ows:Get/s#xlink:href="https\=://\([^/]*\)\(/\=.*\)"#xlink:href="${SCHEME}${HOSTNAME}:${PORT}\2"#
+g/\s\+<ows:Post/s#xlink:href="https\=://\([^/]*\)\(/\=.*\)"#xlink:href="${SCHEME}${HOSTNAME}:${PORT}\2"#
+wq
+END
+
+  service tomcat restart
+fi
