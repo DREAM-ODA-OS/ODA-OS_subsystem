@@ -5,7 +5,7 @@
 # USAGE:
 #  product_add.sh [-replace=<existing_prod_id> | -add[=<collection>] ]
 #    [-dldir=<download_directory>] -response=<filename>
-#    -data=<datafile> [-meta=<metadatafile>]
+#    -data=<datafile> [-meta=<metadatafile>][-catreg=<script>]
 #
 # PARAMETERS:
 #
@@ -22,6 +22,7 @@
 #   -response=<file>    File where the response should be written.
 #   -data=<file>        Datafile to be registered.
 #   -metadata=<file>    Product's meta-data.
+#   -catreg=<script>    Optional catalogue registration script.
 #
 # DESCRIPTION:
 #
@@ -73,6 +74,8 @@ do
             META="$_val" ;;
         '-response' )
             RESPONSE="$_val" ;;
+        '-catreg')
+            CATREG="$_val" ;;
     esac
 done
 
@@ -190,5 +193,26 @@ $EOXS_MNG eoxs_dataset_register -r "$IMG_VIEW_RTYPE" -i "${IDENTIFIER}_view" \
     echo "$IMG_VIEW;data;browse"
     echo "$IMG_VIEW_OVR;file;overviews"
 } | $EOXS_MNG eoxs_i2p_load
+
+#-----------------------------------------------------------------------------
+# optional catalogue registration using on the fly generated manifest
+# TODO: filling the other metadata
+
+if [ -n "$CATREG" ]
+then
+{
+cat - <<END
+IDENTIFIER="$IDENTIFIER"
+DATA="$IMG_DATA"
+VIEW="$IMG_VIEW"
+VIEW_OVR="$IMG_VIEW_OVR"
+RANGE_TYPE="$IMG_RTYPE"
+METADATA_EOP20="$IMG_META"
+END
+[ -n "$IMG_DIR" ] && echo "DOWNLOAD_DIR=\"$IMG_DIR\""
+} | { "$CATREG" - || exit 1 ; }
+fi
+
+#-----------------------------------------------------------------------------
 
 info "Add product handler finished sucessfully."
