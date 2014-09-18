@@ -72,7 +72,9 @@ fi
 #-----------------------------------------------------------------------------
 # deregister coverages
 
+info "Deregistering dataset $DATA ..."
 $EOXS_MNG eoxs_dataset_deregister "$DATA" || { error "Failed to deregister dataset $DATA!" ; exit 1 ; }
+info "Deregistering dataset $VIEW ..."
 [ -n "$VIEW" ] && { $EOXS_MNG eoxs_dataset_deregister "$VIEW" || { error "Failed to deregister dataset $VIEW!" ; exit 1 ; } }
 
 #-----------------------------------------------------------------------------
@@ -82,6 +84,7 @@ $EOXS_MNG eoxs_dataset_deregister "$DATA" || { error "Failed to deregister datas
 #-----------------------------------------------------------------------------
 # clean the id2path records
 
+info "Cleaning the Id2Path records ..."
 {
     $EOXS_MNG eoxs_i2p_list --unbound --full -i "$DATA"
     [ -n "$VIEW" ] && $EOXS_MNG eoxs_i2p_list --unbound --full -i "$VIEW"

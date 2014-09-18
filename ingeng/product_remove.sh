@@ -75,22 +75,26 @@ fi
 #-----------------------------------------------------------------------------
 # deregister coverages
 
+info "Deregistering dataset $DATA ..."
 $EOXS_MNG eoxs_dataset_deregister "$DATA" || { error "Failed to deregister dataset $DATA!" ; exit 1 ; }
+info "Deregistering dataset $VIEW ..."
 [ -n "$VIEW" ] && { $EOXS_MNG eoxs_dataset_deregister "$VIEW" || { error "Failed to deregister dataset $VIEW!" ; exit 1 ; } }
 
 #-----------------------------------------------------------------------------
 # remove files
+info "Removing files ..."
 {
     $EOXS_MNG eoxs_i2p_list --unbound-strict --full -i "$DATA" || { error "Id2Path list failed for $DATA!" ; exit 1 ; }
     [ -n "$VIEW" ] && { $EOXS_MNG eoxs_i2p_list --unbound-strict --full -i "$VIEW" || { error "Id2Path list failed for $VIEW!" ; exit 1 ; } }
 } | grep -v "^#" | sed -s 's/;.*$//' | while read F
 do
-    rm -vfR "$F"
+    info "`rm -vfR "$F"`"
 done
 
 #-----------------------------------------------------------------------------
 # clean the id2path records
 
+info "Cleaning the Id2Path records ..."
 {
     $EOXS_MNG eoxs_i2p_list --unbound --full -i "$DATA"
     [ -n "$VIEW" ] && $EOXS_MNG eoxs_i2p_list --unbound --full -i "$VIEW"
