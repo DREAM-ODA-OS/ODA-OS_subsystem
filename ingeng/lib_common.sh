@@ -79,7 +79,7 @@ _print()
 {
     MSG="`_date` $EXENAME: $*"
     echo "$MSG"
-    echo "$MSG" >> "$LOG_FILE"
+    { echo "$MSG" >> "$LOG_FILE" ; } 2>/dev/null
 }
 
 error() { _print "ERROR: $*" ; }

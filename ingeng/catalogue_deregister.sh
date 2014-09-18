@@ -17,12 +17,18 @@
 
 info "Catalogue metadata deregistration started ..."
 
-if [ $# -lt 1 ]
-then
-    error "Not enough args, exiting with status 1."
-    exit 1
-fi
+ID=$1
+[ -z "$ID" ] && { error "Missing the required product identifier!" ; exit 1 ; }
 
-info "    IDENTIFIER: '$1'"
+info "    IDENTIFIER: '$ID'"
 
-error "NOT IMPLEMENTED!" ; exit 1 
+QUOTED="`python -c "from urllib import quote_plus; print quote_plus('$ID'),"`"
+
+URL="http://127.0.0.1/excat2/csw?request=Transaction&service=CSW&version=2.0.2&namespace=xmlns(csw=http://www.opengis.net/cat/csw/2.0.2)&transactiontype=delete&constraint=apeop:identifier=%27$QUOTED%27&constraintLanguage=CQL_TEXT&constraint_language_version1.1.0&typeName=eop:EarthObservation"
+
+info "Deregistering product ..."
+info "$URL"
+curl -s -S $URL 2>&1 | while read L
+do
+    info "$L"
+done

@@ -37,7 +37,11 @@ DIR="`_expand "$DIR"`"
 META="`cat "$MANIFEST" | sed -ne 's/^METADATA_EOP20="\(.*\)"/\1/p' | _pipe_expand "$DIR"`"
 QUOTED="`python -c "from urllib import quote_plus; print quote_plus('$META'),"`"
 
-URL="http://localhost/excat2/csw?request=Harvest&service=CSW&version=2.0.2&namespace=xmlns(csw=http://www.opengis.net/cat/csw)&source=$QUOTED&resourceFormat=application/xml&resourceType=http://www.opengis.net/eop/2.0"
+URL="http://127.0.0.1/excat2/csw?request=Harvest&service=CSW&version=2.0.2&namespace=xmlns(csw=http://www.opengis.net/cat/csw)&source=$QUOTED&resourceFormat=application/xml&resourceType=http://www.opengis.net/eop/2.0"
 
-info "Registering product ... URL='$URL'"
-curl --verbose $URL
+info "Registering product ..."
+info "$URL"
+curl -s -S $URL 2>&1 | while read L 
+do
+    info "$L"
+done

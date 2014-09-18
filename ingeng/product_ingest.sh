@@ -32,6 +32,21 @@
 
 . "`dirname $0`/lib_common.sh"
 
+_set_eop_identifier() {
+  python <<END
+import sys
+from lxml import etree as et
+xml = et.parse("$1",  et.XMLParser(remove_blank_text=True))
+elm = xml.find("//{http://www.opengis.net/eop/2.0}EarthObservationMetaData/{http://www.opengis.net/eop/2.0}identifier")
+if elm is not None:
+    elm.text = "$2"
+else:
+    sys.exit(1)
+with file("$1", "w") as fid:
+    fid.write(et.tostring(xml, pretty_print=True, xml_declaration=True, encoding="utf-8"))
+END
+}
+
 info "ODA-Server product ingestion started ..."
 info "   ARGUMENTS: $* "
 
@@ -182,7 +197,10 @@ then
 fi
 
 # add collection name as a prefix of the coverage identifier
-[ -z "`grep "^$COLLECTION:" <<< "$IDENTIFIER"`" ] && IDENTIFIER="$COLLECTION:$IDENTIFIER"
+[ -z "`echo "$IDENTIFIER" | grep "^$COLLECTION:"`" ] && IDENTIFIER="$COLLECTION:$IDENTIFIER"
+
+# make sure the EOP metadata XML file contains the right identifier
+_set_eop_identifier "$META" "$IDENTIFIER"
 
 # append EOP2.0 metadata and range-type to the manifest
 update_field IDENTIFIER "$IDENTIFIER"
