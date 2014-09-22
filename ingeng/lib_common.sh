@@ -86,6 +86,10 @@ error() { _print "ERROR: $*" ; }
 info()  { _print "INFO: $*" ; }
 warn()  { _print "WARNING: $*" ; }
 
+error_pipe() { while read L ; do error "$L" ; done ; }
+info_pipe() { while read L ; do info "$L" ; done ; }
+warn_pipe() { while read L ; do warn "$L" ; done ; }
+
 # global warp options
 WOPT="-multi -wo NUM_THREADS=2 -et 0.25 -r lanczos -wm 256"
 

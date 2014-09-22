@@ -3,7 +3,7 @@
 #   Remove scenario from the ODA server.
 #
 # USAGE:
-#   scenario_remove.sh <nc_id> [-catreg=<script>]
+#   scenario_remove.sh <nc_id> [-catreg=<script>][-preserve]
 #
 # DESCRIPTION:
 #
@@ -12,6 +12,10 @@
 #  It is expected that the script will de-register
 #  products associated with the scenario, and delete the
 #  corresponding physical files on the disc (filesystem).
+#
+#  When the preserve options is specified, the clean
+#  scenario (collection) will be preserved while
+#  removing all its products.
 #
 # catreg is used to request de-registration of products
 #        from the local metadata catalogue. The script
@@ -35,12 +39,14 @@ REMOVE="`dirname $0`/product_remove.sh"
 
 COLLECTION=
 CATREG=
+PRESERVE="FALSE"
 for _arg in $*
 do
     _key="`expr "$_arg" : '\([^=]*\)'`"
     _val="`expr "$_arg" : '[^=]*=\(.*\)'`"
     case "$_key" in
         '-catreg') CATREG="$_val" ;;
+        '-preserve') PRESERVE="TRUE" ;;
         *) COLLECTION="$_arg" ;;
     esac
 done
@@ -54,6 +60,7 @@ fi
 
 info "CATREG:  $CATREG"
 info "COLLECTION:  $COLLECTION"
+info "PRESERVE:  $PRESERVE"
 [ -n "$CATREG" ] && CATREG="-catreg=$CATREG"
 
 #-----------------------------------------------------------------------------
@@ -92,6 +99,12 @@ fi
 
 $EOXS_MNG eoxc_layer_delete -i "$DATA" || { error "Failed to remove client layer $DATA!" ; exit 1 ; }
 
+if [ "$PRESERVE" == "TRUE" ]
+then
+    info " The scenario was emptied successfully,."
+    info " Quiting without the actual scenario removal."
+    exit 0
+fi
 #-----------------------------------------------------------------------------
 # remove the dataset series
 

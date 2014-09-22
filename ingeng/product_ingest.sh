@@ -197,7 +197,8 @@ then
 fi
 
 # add collection name as a prefix of the coverage identifier
-[ -z "`echo "$IDENTIFIER" | grep "^$COLLECTION:"`" ] && IDENTIFIER="$COLLECTION:$IDENTIFIER"
+COLLECTION_NOCOLON="`echo "$COLLECTION" | sed -e 's/:/./g'`"
+[ -z "`echo "$IDENTIFIER" | grep "^$COLLECTION_NOCOLON\."`" ] && IDENTIFIER="$COLLECTION_NOCOLON.$IDENTIFIER"
 
 # make sure the EOP metadata XML file contains the right identifier
 _set_eop_identifier "$META" "$IDENTIFIER"
@@ -213,10 +214,7 @@ set_path METADATA_EOP20 "$META"
 update_path RANGE_TYPE "$RANGET"
 
 # log the content of the manifest file
-cat "$MANIFEST" | while read L
-do
-    info "MANIFEST: $L"
-done
+cat "$MANIFEST" | info_pipe
 
 #-----------------------------------------------------------------------------
 # register dataset
@@ -230,6 +228,7 @@ _NBANDS="`python -c "from osgeo import gdal; print gdal.Open('$VIEW').RasterCoun
 [ $_NBANDS -eq 4 ] && VIEW_RANGE_TYPE="RGBA"
 [ -n "$VIEW_RANGE_TYPE" ] || { error "Failed to detect the browse range-type!" ; exit 1 ; }
 
+set -e
 #create time-series
 if $EOXS_MNG eoxs_id_check --type DatasetSeries "$COLLECTION"
 then

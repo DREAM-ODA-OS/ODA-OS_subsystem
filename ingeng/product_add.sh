@@ -151,6 +151,7 @@ info "IMG_RTYPE=$IMG_RTYPE"
 
 #-----------------------------------------------------------------------------
 # EOxServer registration
+set -e
 
 #create time-series
 if $EOXS_MNG eoxs_id_check --type DatasetSeries "$COLLECTION"

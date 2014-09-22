@@ -88,7 +88,7 @@ info "Removing files ..."
     [ -n "$VIEW" ] && { $EOXS_MNG eoxs_i2p_list --unbound-strict --full -i "$VIEW" || { error "Id2Path list failed for $VIEW!" ; exit 1 ; } }
 } | grep -v "^#" | sed -s 's/;.*$//' | while read F
 do
-    info "`rm -vfR "$F"`"
+    rm -vfR "$F" 2>&1 | info_pipe
 done
 
 #-----------------------------------------------------------------------------
