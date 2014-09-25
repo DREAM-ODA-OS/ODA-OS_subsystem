@@ -50,7 +50,11 @@ else
     echo "Startig background background download process ... "
     echo "To see the progress run: tail -f \$0.log"
     nohup \$0 >\$0.log 2>&1 &
-    echo "To stop the process run: kill \$!"
+    PID="\$!"
+    echo "The background download may take hours to finish."
+    echo "It is safe to logout and check the progress later."
+    echo "The PID of the background process is: \$PID"
+    echo "To kill the process use: kill -9 \$PID ; killall wget"
 fi 
 
 END
