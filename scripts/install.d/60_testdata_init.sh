@@ -32,7 +32,7 @@ cd "\`dirname "\$0"\`"
 URL_BASE="http://dream.eox.at/testdata"
 if [ -n "\$USER" -a -n "\$PASSWD" ] 
 then
-    OPT="--no-host-directories --no-parent --cut-dirs=1"
+    OPT="--no-host-directories --no-parent --cut-dirs=1 -nv"
     for C in ENVISAT SPOT4Take5 GISAT
     do
         echo "Collection: $C"
@@ -50,6 +50,7 @@ else
     echo "Startig background background download process ... "
     echo "To see the progress run: tail -f \$0.log"
     nohup \$0 >\$0.log 2>&1 &
+    echo "To stop the process run: kill \$!"
 fi 
 
 END
