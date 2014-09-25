@@ -46,13 +46,32 @@
 # operation.
 #
 
+_set_eop_identifiers() {
+  python <<END
+import sys
+from lxml import etree as et
+xml = et.parse("$1",  et.XMLParser(remove_blank_text=True))
+elm = xml.find("//{http://www.opengis.net/eop/2.0}EarthObservationMetaData/{http://www.opengis.net/eop/2.0}identifier")
+if elm is not None:
+    elm.text = "$2"
+else:
+    sys.exit(1)
+elm = xml.find("//{http://www.opengis.net/eop/2.0}EarthObservationMetaData/{http://www.opengis.net/eop/2.0}parentIdentifier")
+if elm is not None:
+    elm.text = "$3"
+with file("$1", "w") as fid:
+    fid.write(et.tostring(xml, pretty_print=True, xml_declaration=True, encoding="utf-8"))
+END
+}
+
 . "`dirname $0`/lib_common.sh"
 
 info "Add product handler started ..."
-
+info "PARAMS: $*"
 #-----------------------------------------------------------------------------
 # parse the CLI arguments
 ACTION='ADD'
+DIR="."
 
 for _arg in $*
 do
@@ -90,12 +109,18 @@ then
     error "REPLACE action requires the identifier!" ; exit 1
 fi
 
+if [ -n "$DIR" ]
+then
+    DIR="`_expand "$DIR"`"
+fi
+
 if [ -n "$DATA" ] # no-data given
 then
     if [ -n "$DIR" -a "${DATA:0:1}" != '/' ]
     then
         DATA="`expr "$DIR" : '\(.*[^/]\)'`/$DATA"
     fi
+    DATA="`_expand "$DATA"`"
 else
     error "Missing mandatory data ('-data') specification!" ; exit 1
 fi
@@ -106,6 +131,7 @@ then
     then
         META="`expr "$DIR" : '\(.*[^/]\)'`/$META"
     fi
+    META="`_expand "$META"`"
 fi
 
 if [ -n "$RESPONSE" ] # no-response given
@@ -114,7 +140,71 @@ then
     then
         RESPONSE="`expr "$DIR" : '\(.*[^/]\)'`/$RESPONSE"
     fi
+    RESPONSE="`_expand "$RESPONSE"`"
 fi
+
+#-----------------------------------------------------------------------------
+# unpack zip archives
+echo "DATA: $DATA"
+echo "META: $META"
+echo "DIR: $DIR"
+echo "RESPONSE: $RESPONSE"
+
+_unzip()
+{
+    info "Unpacking ZIP archive: $1 -> $2"
+    if [ -f "$2" -o -d "$2" ]
+    then
+        rm -fvR "$2"
+    fi
+    mkdir "$2"
+    unzip "$1" -d "$2"
+}
+_untargz()
+{
+    info "Unpacking TAR.GZ archive: $1 -> $2"
+    if [ -f "$2" -o -d "$2" ]
+    then
+        rm -fvR "$2"
+    fi
+    mkdir "$2"
+    tar -xvzf "$1" -C "$2"
+}
+
+_ungzip()
+{
+    info "Unpacking GZIP compressed file: $1 -> $2"
+    if [ -f "$2" -o -d "$2" ]
+    then
+        rm -fvR "$2"
+    fi
+    gunzip -vc "$1" > "$2"
+}
+
+set -e
+case "`file -b --mime-type "$DATA"`" in
+
+    'application/x-gzip')
+        if [ "`basename "$DATA"`" != "`basename "$DATA" '.tgz'`" -o "`basename "$DATA"`" != "`basename "$DATA" '.tar.gz'`" ]
+        then
+            DATA_SRC="$DATA"
+            _untargz "$DATA" "$DATA.d"
+            DATA="$DATA.d"
+        elif [ "`basename "$DATA"`" != "`basename "$DATA" '.gz'`" ]
+        then
+            DATA_SRC="$DATA"
+            _ungzip "$DATA" "${DATA%%.gz}"
+            DATA="${DATA%%.gz}"
+        fi
+        ;;
+
+    'application/zip')
+        DATA_SRC="$DATA"
+        _unzip "$DATA" "$DATA.d"
+        DATA="$DATA.d"
+        ;;
+esac
+set +e
 
 #-----------------------------------------------------------------------------
 # following command executes the format detection, data preparation,
@@ -133,14 +223,24 @@ _xq="//{$_EOP20}EarthObservationMetaData/{$_EOP20}identifier/text()"
 [ -z "$IDENTIFIER" ] && IDENTIFIER="`xml_extract.py "$IMG_META" "$_xq"`"
 [ -z "$IDENTIFIER" ] && { error "Failed to determine the target dataset identifier!" ; exit 1 ; }
 
+# removing collons from the identifiers + assuring unique identifier
+COLLECTION="`echo "$COLLECTION" | tr ':' '_'`"
+IDENTIFIER="`echo "$IDENTIFIER" | tr ':' '_'`"
+
+# collection prefix
+[ -z "`echo "$IDENTIFIER" | grep "^$COLLECTION\."`" ] && IDENTIFIER="$COLLECTION.$IDENTIFIER"
+
+# fixing the metadata
+_set_eop_identifiers "$IMG_META" "$IDENTIFIER" "$COLLECTION"
+
 info "ACTION=$ACTION"
 info "COLLECTION=$COLLECTION"
 info "IDENTIFIER=$IDENTIFIER"
 info "DIR=$DIR"
+info "DATA_SRC=$DATA_SRC"
 info "DATA=$DATA"
 info "META=$META"
 info "RESPONSE=$RESPONSE"
-info
 info "IMG_DIR=$IMG_DIR"
 info "IMG_DATA=$IMG_DATA"
 info "IMG_VIEW=$IMG_VIEW"
@@ -183,12 +283,14 @@ $EOXS_MNG eoxs_dataset_register -r "$IMG_VIEW_RTYPE" -i "${IDENTIFIER}_view" \
 # id2path file registry
 {
     echo "#$IDENTIFIER"
+    [ -n "$DATA_SRC" ] && echo "$DATA_SRC;file;source-data"
     [ -n "$IMG_DIR" ] && echo "$IMG_DIR;directory"
     [ -n "$META" ] && echo "$META;metadata;"
     echo "$IMG_META;metadata;EOP2.0"
     echo "$IMG_DATA;data"
     echo "$IMG_RTYPE;file;range-type"
     echo "#${IDENTIFIER}_view"
+    [ -n "$DATA_SRC" ] && echo "$DATA_SRC;file;source-data"
     [ -n "$IMG_DIR" ] && echo "$IMG_DIR;directory"
     echo "$IMG_META;metadata;EOP2.0"
     echo "$IMG_VIEW;data;browse"
@@ -215,5 +317,14 @@ END
 fi
 
 #-----------------------------------------------------------------------------
+# generate the reponse file
 
+if [ -n "$RESPONSE" ]
+then
+    info "Generating response file $RESPONSE"
+    echo "productId=$IDENTIFIER" > "$RESPONSE"
+    cat "$RESPONSE" | info_pipe
+fi
+
+#-----------------------------------------------------------------------------
 info "Add product handler finished sucessfully."

@@ -111,6 +111,7 @@ COLLECTION="`get_field SCENARIO_NCN_ID`"
 META="`get_path METADATA_EOP20`"
 RANGET="`get_path RANGE_TYPE`"
 IDENTIFIER="`get_field IDENTIFIER`"
+SRS="`get_field SRS`"
 
 [ -n "$META" ] || META="`expr "$DATA" : '\(.*\)\.[a-zA_Z]*'`.xml"
 [ -n "$RANGET" ] || RANGET="`expr "$DATA" : '\(.*\)\.[a-zA_Z]*'`_range_type.json"
@@ -135,6 +136,12 @@ then
         -i "$META"
 fi
 [ -f "$META" ] || { error "Failed to extract the EOP metadata from $COVDESCR!" ; exit 1 ; }
+
+if [ -z "$SRS" -a -f "$COVDESCR" ]
+then
+    # extract the EPSG code of the projection
+    SRS="`xml_extract.py "$COVDESCR"  '//{http://www.opengis.net/gml/3.2}Envelope/@srsName'`"
+fi
 
 # extract coverage identifier
 [ -n "$IDENTIFIER" ] || IDENTIFIER="`xml_extract.py "$META" //{$EOP}identifier TEXT`"
@@ -212,12 +219,14 @@ set_path VIEW_OVR "$VIEW_OVR"
 [ -n "$COVDESCR" ] && set_path METADATA "$COVDESCR"
 set_path METADATA_EOP20 "$META"
 update_path RANGE_TYPE "$RANGET"
-
+[ -n "$SRS" ] && set_field SRS "$SRS"
 # log the content of the manifest file
 cat "$MANIFEST" | info_pipe
 
 #-----------------------------------------------------------------------------
 # register dataset
+
+SRID="`echo "$SRS" | tr "A-Z" "a-z" | sed -ne 's#^.*epsg.*[/:]\([0-9]*\)$#--srid=\1#p'`"
 
 DATA_RANGE_TYPE="`jq -r '.["name"]' "$RANGET" `"
 [ -n "$DATA_RANGE_TYPE" ] || { error "Failed to detect the data range-type!" ; exit 1 ; }
@@ -250,10 +259,11 @@ $EOXS_MNG eoxs_rangetype_load -i "$RANGET"
 #TODO: fix coverage removal
 $EOXS_MNG eoxs_id_check --type Coverage "$IDENTIFIER" || $EOXS_MNG eoxs_dataset_deregister "$IDENTIFIER"
 $EOXS_MNG eoxs_id_check --type Coverage "${IDENTIFIER}_view" || $EOXS_MNG eoxs_dataset_deregister "${IDENTIFIER}_view"
-$EOXS_MNG eoxs_dataset_register -r "$DATA_RANGE_TYPE" -i "${IDENTIFIER}" \
-    -d "$DATA" -m "$META" --collection "$COLLECTION" \
+set -x
+$EOXS_MNG eoxs_dataset_register --traceback -r "$DATA_RANGE_TYPE" -i "${IDENTIFIER}" \
+    -d "$DATA" -m "$META" --collection "$COLLECTION" $SRID \
     --view "${IDENTIFIER}_view" $DATE_REG_OPT
-$EOXS_MNG eoxs_dataset_register -r "$VIEW_RANGE_TYPE" -i "${IDENTIFIER}_view" \
+$EOXS_MNG eoxs_dataset_register --traceback -r "$VIEW_RANGE_TYPE" -i "${IDENTIFIER}_view" \
     -d "$VIEW" -m "$META" --collection "${COLLECTION}_view" \
     --alias "$COLLECTION"
 # id2path file registry

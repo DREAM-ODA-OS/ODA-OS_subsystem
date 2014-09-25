@@ -84,6 +84,8 @@ then
         _remove "$_tmp0"
     fi
     trap - EXIT
+else
+    info "Using existing preview ..."
 fi
 
 # generate overviews
