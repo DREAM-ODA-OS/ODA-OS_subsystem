@@ -42,12 +42,12 @@ then
     done 
     echo "DOWNLOAD FINISHED"
 else 
-    echo "Startig the automated test data download script ..."
+    echo "Starting the automated test data download script ..."
     read -p "Enter username: " USER
     read -s -p "Enter password: " PASSWD
     export USER 
     export PASSWD
-    echo "Startig background background download process ... "
+    echo "Starting background background download process ... "
     echo "To see the progress run: tail -f \$0.log"
     nohup \$0 >\$0.log 2>&1 &
     PID="\$!"
