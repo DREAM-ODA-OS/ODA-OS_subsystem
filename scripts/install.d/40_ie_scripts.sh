@@ -38,6 +38,19 @@ else
     chown -R "$ODAOSUSER:$ODAOSGROUP" "$ODAOS_IEAS_HOME"
 fi
 
+#setup logrotate configuration
+IESRC_LOG="/var/log/odaos/ie_actions.log"
+cat >"/etc/logrotate.d/odaos_ie_actions" <<END
+$IESRC_LOG {
+    daily
+    minsize 1M
+    compress
+    rotate 7
+    missingok
+    create 0644 odaos apache
+}
+END
+
 #======================================================================
 
 info "Ingestion Engine action scripts installed."

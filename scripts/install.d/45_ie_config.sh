@@ -162,7 +162,7 @@ else
     EXEC="runuser "\$IE_USER" -s /bin/sh"
 fi
 
-PID=\$( \$EXEC -c "ulimit -S -c 0 ; cd \\"\$IE_HOME\\" ; /usr/bin/python $MNGCMD runserver \$IE_OPT >'$IE_CONSOLE_LOG' 2>&1 & echo \\\$!" )
+PID=\$( \$EXEC -c "ulimit -S -c 0 ; cd \\"\$IE_HOME\\" ; /usr/bin/python $MNGCMD runserver \$IE_OPT >>'$IE_CONSOLE_LOG' 2>&1 & echo \\\$!" )
 
 # check whether the daemon is still alive
 sleep 2
@@ -345,6 +345,19 @@ chmod 0755 "$IE_INIT"
 
 #add service for managemnt by chkconfig
 chkconfig --add ingeng
+
+#======================================================================
+#setup logrotate configuration
+cat >"/etc/logrotate.d/odaos_ie_console" <<END
+$IE_CONSOLE_LOG {
+    copytruncate
+    daily
+    minsize 1M
+    compress
+    rotate 7
+    missingok
+}
+END
 
 #======================================================================
 # make the donwload manager enabled permanently and start the service

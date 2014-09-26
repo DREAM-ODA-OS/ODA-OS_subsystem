@@ -303,6 +303,18 @@ touch "$EOXSLOG"
 chown -v "$ODAOSUSER:$ODAOSGROUP" "$EOXSLOG"
 chmod -v 0664 "$EOXSLOG"
 
+#setup logrotate configuration
+cat >"/etc/logrotate.d/odaos_eoxserver" <<END
+$EOXSLOG {
+    copytruncate
+    daily
+    minsize 1M
+    compress
+    rotate 7
+    missingok
+}
+END
+
 #-------------------------------------------------------------------------------
 # Django syncdb (without interactive prompts)
 
