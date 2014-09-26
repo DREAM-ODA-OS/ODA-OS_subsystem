@@ -139,8 +139,8 @@ fi
 
 if [ -z "$SRS" -a -f "$COVDESCR" ]
 then
-    # extract the EPSG code of the projection
-    SRS="`xml_extract.py "$COVDESCR"  '//{http://www.opengis.net/gml/3.2}Envelope/@srsName'`"
+    # try to extract the EPSG code of the projection
+    SRS="`xml_extract.py "$COVDESCR"  '//{http://www.opengis.net/gml/3.2}Envelope/@srsName' 2>/dev/null `"
 fi
 
 # extract coverage identifier
@@ -259,7 +259,6 @@ $EOXS_MNG eoxs_rangetype_load -i "$RANGET"
 #TODO: fix coverage removal
 $EOXS_MNG eoxs_id_check --type Coverage "$IDENTIFIER" || $EOXS_MNG eoxs_dataset_deregister "$IDENTIFIER"
 $EOXS_MNG eoxs_id_check --type Coverage "${IDENTIFIER}_view" || $EOXS_MNG eoxs_dataset_deregister "${IDENTIFIER}_view"
-set -x
 $EOXS_MNG eoxs_dataset_register --traceback -r "$DATA_RANGE_TYPE" -i "${IDENTIFIER}" \
     -d "$DATA" -m "$META" --collection "$COLLECTION" $SRID \
     --view "${IDENTIFIER}_view" $DATE_REG_OPT
