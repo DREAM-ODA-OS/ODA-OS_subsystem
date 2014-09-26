@@ -7,7 +7,6 @@
 
 . `dirname $0`/../lib_logging.sh
 
-set -x 
 TD_DIR="/srv/eodata/testdata"
 DOWNLOAD_SH="$TD_DIR/download_test_data.sh"
 info "Initializing the test data directory $TD_DIR"
