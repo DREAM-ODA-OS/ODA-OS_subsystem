@@ -94,10 +94,8 @@ then
     eval TMPA=($TMP)
     VIEW="${TMPA[1]}"
 fi
-#-----------------------------------------------------------------------------
-# remove the client layer
 
-$EOXS_MNG eoxc_layer_delete -i "$DATA" || { error "Failed to remove client layer $DATA!" ; exit 1 ; }
+#-----------------------------------------------------------------------------
 
 if [ "$PRESERVE" == "TRUE" ]
 then
@@ -105,6 +103,12 @@ then
     info " Quiting without the actual scenario removal."
     exit 0
 fi
+
+#-----------------------------------------------------------------------------
+# remove the client layer
+
+$EOXS_MNG eoxc_layer_delete -i "$DATA" || { error "Failed to remove client layer $DATA!" ; exit 1 ; }
+
 #-----------------------------------------------------------------------------
 # remove the dataset series
 
