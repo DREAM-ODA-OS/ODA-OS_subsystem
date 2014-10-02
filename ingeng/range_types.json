@@ -4,8 +4,8 @@
             "definition": "http://www.opengis.net/def/property/netcdf/1.0/byte",
             "description": "Red Channel",
             "gdal_interpretation": "RedBand",
-            "identifier": "red",
-            "name": "red",
+            "identifier": "Red",
+            "name": "Red",
             "nil_values": [
                 {
                     "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
@@ -18,8 +18,8 @@
             "definition": "http://www.opengis.net/def/property/netcdf/1.0/byte",
             "description": "Green Channel",
             "gdal_interpretation": "GreenBand",
-            "identifier": "green",
-            "name": "green",
+            "identifier": "Green",
+            "name": "Green",
             "nil_values": [
                 {
                     "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
@@ -32,8 +32,8 @@
             "definition": "http://www.opengis.net/def/property/netcdf/1.0/byte",
             "description": "Blue Channel",
             "gdal_interpretation": "BlueBand",
-            "identifier": "blue",
-            "name": "blue",
+            "identifier": "Blue",
+            "name": "Blue",
             "nil_values": [
                 {
                     "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
@@ -52,8 +52,8 @@
             "definition": "http://www.opengis.net/def/property/netcdf/1.0/byte",
             "description": "Red Channel",
             "gdal_interpretation": "RedBand",
-            "identifier": "red",
-            "name": "red",
+            "identifier": "Red",
+            "name": "Red",
             "nil_values": [
                 {
                     "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
@@ -66,8 +66,8 @@
             "definition": "http://www.opengis.net/def/property/netcdf/1.0/byte",
             "description": "Green Channel",
             "gdal_interpretation": "GreenBand",
-            "identifier": "green",
-            "name": "green",
+            "identifier": "Green",
+            "name": "Green",
             "nil_values": [
                 {
                     "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
@@ -80,8 +80,8 @@
             "definition": "http://www.opengis.net/def/property/netcdf/1.0/byte",
             "description": "Blue Channel",
             "gdal_interpretation": "BlueBand",
-            "identifier": "blue",
-            "name": "blue",
+            "identifier": "Blue",
+            "name": "Blue",
             "nil_values": [
                 {
                     "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
@@ -94,8 +94,8 @@
             "definition": "http://www.opengis.net/def/property/netcdf/1.0/byte",
             "description": "Alpha Channel",
             "gdal_interpretation": "AlphaBand",
-            "identifier": "alpha",
-            "name": "aplha",
+            "identifier": "Alpha",
+            "name": "Aplha",
             "nil_values": [
                 {
                     "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
@@ -112,10 +112,10 @@
     "bands": [
         {
             "definition": "http://www.opengis.net/def/property/netcdf/1.0/byte",
-            "description": "Mask uint8",
+            "description": "Gray Channel",
             "gdal_interpretation": "GrayIndex",
-            "identifier": "gray",
-            "name": "gray",
+            "identifier": "Gray",
+            "name": "Gray",
             "nil_values": [
                 {
                     "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
@@ -132,10 +132,10 @@
     "bands": [
         {
             "definition": "http://www.opengis.net/def/property/netcdf/1.0/byte",
-            "description": "Mask uint8",
+            "description": "Gray Channel",
             "gdal_interpretation": "GrayIndex",
-            "identifier": "gray",
-            "name": "gray",
+            "identifier": "Gray",
+            "name": "Gray",
             "nil_values": [
                 {
                     "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
@@ -148,8 +148,8 @@
             "definition": "http://www.opengis.net/def/property/netcdf/1.0/byte",
             "description": "Alpha Channel",
             "gdal_interpretation": "AlphaBand",
-            "identifier": "alpha",
-            "name": "aplha",
+            "identifier": "Alpha",
+            "name": "Aplha",
             "nil_values": [
                 {
                     "reason": "http://www.opengis.net/def/nil/OGC/0/unknown",
