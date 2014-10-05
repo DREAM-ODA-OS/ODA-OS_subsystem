@@ -238,6 +238,8 @@ info "COLLECTION=$COLLECTION"
 info "IDENTIFIER=$IDENTIFIER"
 info "DIR=$DIR"
 info "DATA_SRC=$DATA_SRC"
+info "DATA_LIST=$DATA_LIST"
+info "VIEW_LIST=$VIEW_LIST"
 info "DATA=$DATA"
 info "META=$META"
 info "RESPONSE=$RESPONSE"
@@ -289,12 +291,30 @@ $EOXS_MNG eoxs_dataset_register -r "$IMG_VIEW_RTYPE" -i "${IDENTIFIER}_view" \
     echo "$IMG_META;metadata;EOP2.0"
     echo "$IMG_DATA;data"
     echo "$IMG_RTYPE;file;range-type"
+    if [ -f "$DATA_LIST" ]
+    then
+        echo "$F;file"
+        cat "$DATA_LIST" | while read F
+        do
+            [ -f "$F" ] && echo "$F;file"
+            [ -d "$F" ] && echo "$F;directory"
+        done
+    fi
     echo "#${IDENTIFIER}_view"
     [ -n "$DATA_SRC" ] && echo "$DATA_SRC;file;source-data"
     [ -n "$IMG_DIR" ] && echo "$IMG_DIR;directory"
     echo "$IMG_META;metadata;EOP2.0"
     echo "$IMG_VIEW;data;browse"
-    echo "$IMG_VIEW_OVR;file;overviews"
+    [ "$IMG_VIEW_OVR" ] && echo "$IMG_VIEW_OVR;file;overviews"
+    if [ -f "$VIEW_LIST" ]
+    then
+        echo "$F;file"
+        cat "$VIEW_LIST" | while read F
+        do
+            [ -f "$F" ] && echo "$F;file"
+            [ -d "$F" ] && echo "$F;directory"
+        done
+    fi
 } | $EOXS_MNG eoxs_i2p_load
 
 #-----------------------------------------------------------------------------

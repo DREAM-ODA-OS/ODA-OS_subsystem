@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 #------------------------------------------------------------------------------
 #
-# spot 4/5 raw product ingestion
+# spot 2/4/5 view product ingestion
 #
 # Project: Image Processing Tools
 # Authors: Martin Paces <martin.paces@eox.at>
 #
 #-------------------------------------------------------------------------------
-# Copyright (C) 2013 EOX IT Services GmbH
+# Copyright (C) 2014 EOX IT Services GmbH
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@
 # THE SOFTWARE.
 #-------------------------------------------------------------------------------
 
-info "SPOTSCENE_1A product ..."
+info "SPOTView product ..."
 
 # extract band information
 _nband="`xml_extract.py "$META" '//Raster_Dimensions/NBANDS/text()'`" || exit 1
@@ -60,7 +60,7 @@ IMG_RTYPE="${IMG_DATA%.*}_range_type.json"
 
 # extract metadata
 dimap2rangetype.py "$META" SLOPPY >"$IMG_RTYPE"
-dimap2eop.py "$META" >"$IMG_META"
+dimap2eop.py "$META" DEBUG >"$IMG_META"
 
 [ "$_nband" -eq 1 ] && IMG_VIEW_RTYPE="GrayAlpha"
 [ "$_nband" -gt 1 ] && IMG_VIEW_RTYPE="RGBA"
@@ -75,7 +75,7 @@ then
     if [ "$_nband" -eq 1 ]
     then
         _remove "$_IMG_VIEW"
-        time gdalwarp $_wopt "$IMG_DATA" "$IMG_VIEW" $TOPT -co "PHOTOMETRIC=$_type" || exit 1 
+        time gdalwarp $_wopt "$IMG_DATA" "$IMG_VIEW" $TOPT -co "PHOTOMETRIC=$_type" || exit 1
     else
         _remove "$_tmp0"
         time gdal_translate -b $_red -b $_green -b $_blue "$IMG_DATA" "$_tmp0" $TOPT -co "PHOTOMETRIC=$_type" || exit 1

@@ -102,23 +102,24 @@ then
     info "DIMAP metadata ..."
     if [ "$DIMAP_VERSION" == "1.1" -a "$DIMAP_PROFILE" == "SPOTView" ]
     then #
-        # SPOT 4/5 ortho imagery
-        info "SPOTView product ..."
-        error "NOT IMPLEMENTED!" ; exit 1
+        # SPOT 2/4/5 ortho imagery
+        . "`dirname $0`/products.d/spotview.sh"
     elif [ "$DIMAP_VERSION" == "1.1" -a "$DIMAP_PROFILE" == "SPOTSCENE_1A" ]
     then
         # SPOT 4/5 RAW imagery + Spot4-Take5
         . "`dirname $0`/products.d/spotscene_1a.sh"
     elif [ "$DIMAP_VERSION" == "2.0" -a "$DIMAP_PROFILE" == "S6_ORTHO" ]
     then
-        info "S6_ORTHO product ..."
         # SPOT 6 ortho imagery
-        error "NOT IMPLEMENTED!" ; exit 1
+        RANGE="16 2048"
+        BANDS="B2 B1 B0 B3"
+        . "`dirname $0`/products.d/spot6_ortho.sh"
     elif [ "$DIMAP_VERSION" == "2.0" -a "$DIMAP_PROFILE" == "PHR_ORTHO" ]
     then
-        info "PHR_ORTHO product ..."
+        RANGE="8 1024"
+        BANDS="B2 B1 B0 B3"
         # Pleiades ortho imagery
-        error "NOT IMPLEMENTED!" ; exit 1
+        . "`dirname $0`/products.d/spot6_ortho.sh"
     elif [ "$DIMAP_VERSION" == "2.11.0" -a "$DIMAP_PROFILE" == "BEAM-DATAMODEL-V1" ]
     then
         info "BEAM-DATAMODEL-V1 product ..."
