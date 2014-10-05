@@ -29,15 +29,19 @@ info "Catalogue metadata registration ..."
  
 MANIFEST=$1
 [ -z "$MANIFEST" ] && { error "Missing the required manifest file!" ; exit 1 ; }
+get_field() { sed -ne "s/^$1=\"\(.*\)\"/\1/p" "$MANIFEST" ;}
+get_path() { get_field "$1" | _pipe_expand "$DIR" ;}
 
 # get reference directory
 DIR="`dirname "$MANIFEST"`"
 DIR="`_expand "$DIR"`"
 
-META="`cat "$MANIFEST" | sed -ne 's/^METADATA_EOP20="\(.*\)"/\1/p' | _pipe_expand "$DIR"`"
+META="`get_path METADATA_EOP20`"
+IDENTIFIER="`get_field IDENTIFIER`"
+[ -n "$IDENTIFIER" ] || IDENTIFIER="`basename "$META".xml`"
 
 #make sure the file is readable by the tomcat
-_tmp="`mktemp`.xml"
+_tmp="/tmp/$IDENTIFIER.xml"
 trap "_remove '$_tmp'" EXIT
 cat "$META" > "$_tmp"
 
