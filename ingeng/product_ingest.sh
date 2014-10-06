@@ -166,8 +166,8 @@ fi
 if [ ! -f "$VIEW" ]
 then
     info "Generating browse image ..."
-    _tmp0="`mktemp`.tif"
-    _tmp1="`mktemp`.tif"
+    _tmp0="`mktemp --suffix=.tif`"
+    _tmp1="`mktemp --suffix=.tif`"
     trap "_remove '$_tmp0' '$_tmp1'" EXIT
     info "... band extraction ..."
     _remove "$_tmp0"

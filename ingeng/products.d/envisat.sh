@@ -197,8 +197,8 @@ then
     _type="MINISBLACK"
     if [ ! -f "$IMG_VIEW" ]
     then
-        _tmp0="`mktemp`.tif"
-        _tmp1="`mktemp`.tif"
+        _tmp0="`mktemp --suffix=.tif`"
+        _tmp1="`mktemp --suffix=.tif`"
         trap "_remove '$_tmp0' '$_tmp1'" EXIT
         _remove "$_tmp0"
         # reproject the image 
@@ -229,8 +229,8 @@ then
     _type="RGB"
     if [ ! -f "$IMG_VIEW" ]
     then
-        _tmpG="`mktemp`.gpt"
-        _tmp0="`mktemp`.tif"
+        _tmpG="`mktemp --suffix=.gpt`"
+        _tmp0="`mktemp --suffix=.tif`"
         trap "_remove '$_tmpG' '$_tmp0'" EXIT
         beam_meris_l1_tristim_graph > "$_tmpG"
         gpt.sh "$_tmpG" -c 256M -e -SINPUT="$IMG_DATA" -POUTPUT="$_tmp0" || exit 1

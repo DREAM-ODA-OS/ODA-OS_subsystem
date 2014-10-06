@@ -114,8 +114,8 @@ dimap2eop.py "$META" DEBUG >"$IMG_META"
 if [ ! -f "$IMG_VIEW" ]
 then
     _view_dir="${IMG_DATA%.*}_view"
-    _tmp0="`mktemp`.tif"
-    _tmp1="`mktemp`.tif"
+    _tmp0="`mktemp --suffix=.tif`"
+    _tmp1="`mktemp --suffix=.tif`"
     trap "_remove '$_tmp0' '$_tmp1'" EXIT
     info "Generating preview ..."
     _maxpixsize="10000"

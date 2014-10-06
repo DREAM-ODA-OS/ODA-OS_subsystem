@@ -68,7 +68,7 @@ dimap2eop.py "$META" >"$IMG_META"
 # generate image preview
 if [ ! -f "$IMG_VIEW" ]
 then
-    _tmp0="`mktemp`.tif"
+    _tmp0="`mktemp --suffix=.tif`"
     trap "_remove '$_tmp0'" EXIT
     info "Generating preview ..."
     _wopt="$WOPT -t_srs EPSG:4326 -srcnodata 0 -dstnodata 0 -dstalpha"
