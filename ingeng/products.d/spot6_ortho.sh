@@ -93,7 +93,9 @@ then
     do
         _detach "$IMG_DIR/$F" "$_data_list_dir"
     done > "$DATA_LIST"
+    pushd "$_data_list_dir"
     gdalbuildvrt -overwrite -input_file_list "$DATA_LIST" "$IMG_DATA" || exit 1
+    popd
 else
     IMG_DATA="$IMG_DIR/`xml_extract.py "$META" '//Data_Access/Data_Files/Data_File/DATA_FILE_PATH/@href' `" || exit 1
 fi
