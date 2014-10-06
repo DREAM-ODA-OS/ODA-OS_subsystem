@@ -116,9 +116,9 @@ then
         . "`dirname $0`/products.d/spot6_ortho.sh"
     elif [ "$DIMAP_VERSION" == "2.0" -a "$DIMAP_PROFILE" == "PHR_ORTHO" ]
     then
+        # Pleiades ortho imagery
         RANGE="8 1024"
         BANDS="B2 B1 B0 B3"
-        # Pleiades ortho imagery
         . "`dirname $0`/products.d/spot6_ortho.sh"
     elif [ "$DIMAP_VERSION" == "2.11.0" -a "$DIMAP_PROFILE" == "BEAM-DATAMODEL-V1" ]
     then
