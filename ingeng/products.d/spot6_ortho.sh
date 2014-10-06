@@ -82,20 +82,24 @@ fi
 _tiled="`xml_extract.py "$META" '//Data_Access/DATA_FILE_TILES/text()'`" || exit 1
 _tmp="${META/DIM_/IMG_}"
 DATA_LIST="${_tmp%.*}_data_list.txt"
-VIEW_LIST="${_tmp%.*}_view_data_list.txt"
+VIEW_LIST="${_tmp%.*}_view_list.txt"
 IMG_DIR="`dirname "$META"`"
 IMG_DIR="`_expand "$IMG_DIR"`"
 if [ "$_tiled" == 'true' ]
 then
+    _remove "$DATA_LIST"
+    _tmp0="`mktemp --suffix=.txt`"
+    trap "_remove '$_tmp0'" EXIT
     _data_list_dir="`dirname "$DATA_LIST"`"
     IMG_DATA="${_tmp%.*}.vrt"
     xml_extract.py "$META" '//Data_Access/Data_Files/Data_File/DATA_FILE_PATH/@href' MULTI | while read F
     do
-        _detach "$IMG_DIR/$F" "$_data_list_dir"
-    done > "$DATA_LIST"
-    pushd "$_data_list_dir"
-    gdalbuildvrt -overwrite -input_file_list "$DATA_LIST" "$IMG_DATA" || exit 1
-    popd
+        echo "$IMG_DIR/$F" >> "$_tmp0"
+        _detach "$IMG_DIR/$F" "$_data_list_dir" >> "$DATA_LIST"
+    done
+    gdalbuildvrt -overwrite -input_file_list "$_tmp0" "$IMG_DATA" || exit 1
+    _remove "$_tmp0"
+    trap - EXIT
 else
     IMG_DATA="$IMG_DIR/`xml_extract.py "$META" '//Data_Access/Data_Files/Data_File/DATA_FILE_PATH/@href' `" || exit 1
 fi
