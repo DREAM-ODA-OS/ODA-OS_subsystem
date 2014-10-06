@@ -293,9 +293,11 @@ $EOXS_MNG eoxs_dataset_register -r "$IMG_VIEW_RTYPE" -i "${IDENTIFIER}_view" \
     echo "$IMG_RTYPE;file;range-type"
     if [ -f "$DATA_LIST" ]
     then
-        echo "$F;file"
-        cat "$DATA_LIST" | while read F
+        DATA_LIST_DIR="`dirname "$DATA_LIST"`"
+        echo "$DATA_LIST;file"
+        cat "$DATA_LIST" | while read F0
         do
+            F="`_expand "$F0" "$DATA_LIST_DIR"`"
             [ -f "$F" ] && echo "$F;file"
             [ -d "$F" ] && echo "$F;directory"
         done
@@ -308,9 +310,11 @@ $EOXS_MNG eoxs_dataset_register -r "$IMG_VIEW_RTYPE" -i "${IDENTIFIER}_view" \
     [ "$IMG_VIEW_OVR" ] && echo "$IMG_VIEW_OVR;file;overviews"
     if [ -f "$VIEW_LIST" ]
     then
-        echo "$F;file"
-        cat "$VIEW_LIST" | while read F
+        VIEW_LIST_DIR="`dirname "$VIEW_LIST"`"
+        echo "$VIEW_LIST;file"
+        cat "$VIEW_LIST" | while read F0
         do
+            F="`_expand "$F0" "$VIEW_LIST_DIR"`"
             [ -f "$F" ] && echo "$F;file"
             [ -d "$F" ] && echo "$F;directory"
         done

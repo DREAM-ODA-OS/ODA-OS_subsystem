@@ -87,10 +87,11 @@ IMG_DIR="`dirname "$META"`"
 IMG_DIR="`_expand "$IMG_DIR"`"
 if [ "$_tiled" == 'true' ]
 then
+    _data_list_dir="`dirname "$DATA_LIST"`"
     IMG_DATA="${_tmp%.*}.vrt"
     xml_extract.py "$META" '//Data_Access/Data_Files/Data_File/DATA_FILE_PATH/@href' MULTI | while read F
     do
-        echo $IMG_DIR/$F
+        _detach "$IMG_DIR/$F" "$_data_list_dir"
     done > "$DATA_LIST"
     gdalbuildvrt -overwrite -input_file_list "$DATA_LIST" "$IMG_DATA" || exit 1
 else
@@ -140,7 +141,8 @@ then
     # splitting the image to sub-images
     [ -f "$_view_dir" -o -d "$_view_dir" ] && rm -fvR "$_view_dir"
     mkdir -p "$_view_dir"
-    echo "$_view_dir">> "$VIEW_LIST"
+    _view_list_dir="`dirname "$VIEW_LIST"`"
+    _detach "$_view_dir" "$_view_list_dir" >> "$VIEW_LIST"
     _cnt=0
     info "Warping the extracted image to $_img"
     geom_raster_extent.py "$IMG_DATA" | geom_segmentize.py - 1e4 | geom_to_wgs84.py - \
@@ -153,7 +155,7 @@ then
         _remove "$_tmp1"
         time gdalwarp -te $_te -tr $_resl $_resl $_wopt "$_tmp0" "$_tmp1" $TOPT -co "PHOTOMETRIC=$_type" || exit 1
         time range_stretch.py "$_tmp1" "$_img" $RANGE 0 ADDALPHA `echo $TOPT | sed -e 's/-co//g'` "PHOTOMETRIC=$_type" || exit 1
-        echo "$_img">> "$VIEW_LIST"
+        _detach "$_img" "$_view_list_dir" >> "$VIEW_LIST"
         info "Generating external overviews."
         _levels="`get_gdaladdo_levels.py "$_img" 32 8`"
         _adoopt="$ADOOPT --config PHOTOMETRIC_OVERVIEW $_type -ro"
@@ -163,7 +165,7 @@ then
         then
             time "$GDALADDO" $_adoopt "$_img" $_levels || exit 1
         fi
-        echo "$_img_ovr">> "$VIEW_LIST"
+        _detach "$_img_ovr" "$_view_list_dir" >> "$VIEW_LIST"
         _remove "$_tmp1"
     done && gdalbuildvrt -overwrite "$IMG_VIEW" "$_view_dir"/*.tif || exit 1
     info "Preview generation is finished."
