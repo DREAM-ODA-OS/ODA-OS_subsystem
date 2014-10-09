@@ -29,7 +29,7 @@ info "Catalogue metadata registration ..."
 
 _manifest="`mktemp --suffix=.manifest`"
 _rsp="`mktemp --suffix=.catreg`"
-trap "_remove '$_tmp' '$_rsp' '$_manifest'" EXIT
+trap '_remove "$_tmp" "$_rsp" "$_manifest"' EXIT
 
 if [ "$1" == '-' ]
 then
