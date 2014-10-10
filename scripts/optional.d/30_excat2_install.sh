@@ -13,6 +13,7 @@ XCAT_TMPDIR="/tmp/excat2"
 XCAT_WEBAPPDIR="/usr/share/tomcat/webapps"
 XCAT_NAME="excat2"
 XCAT_URL_PATH="/excat2"
+WMS_URL="http://${HOSTNAME}/eoxs/ows"
 
 [ -z "$CONTRIB" ] && error "Missing the required CONTRIB variable!"
 
@@ -23,7 +24,8 @@ service tomcat stop || :
 
 on_exit()
 {
-    [ ! -d "$XCAT_TMPDIR" ] || rm -fR "$XCAT_TMPDIR"
+    #[ ! -d "$XCAT_TMPDIR" ] || rm -fR "$XCAT_TMPDIR"
+    echo EXIT
 }
 
 trap on_exit EXIT
@@ -57,41 +59,28 @@ mkdir -p "$XCAT_TMPDIR"
 #unpack the archive
 unzip "$XCAT_ZIP" -d "$XCAT_TMPDIR"
 
-if [ -f "$XCAT_TMPDIR/$XCAT_NAME.war" ]
-then
-    info "Deploying the eXcat WAR file..."
-    mv "$XCAT_TMPDIR/$XCAT_NAME.war" "$XCAT_WEBAPPDIR"
-else
-    error "Failed to locate the eXcat uncomressed WAR file! FILE=$XCAT_TMPDIR/$XCAT_NAME.war"
-    exit 1
-fi
-
-service tomcat start
-
 #======================================================================
 # configuration
+# fixing the content of the WAR package before deployment
 
-# TODO: tomcat restart
+pushd "$XCAT_TMPDIR"
+_WAR="$XCAT_TMPDIR/$XCAT_NAME.war"
+_DIR="$_WAR.d"
+mkdir -p "$_DIR"
+unzip "$_WAR" -d "$_DIR"
+cd "$_DIR"
 
-wait_for_file()
-{
-    CNT=0
-    while true
-    do
-        let "CNT+=1"
-        [ ! -f "$1" ] || break
-        [ "$CNT" -le 15 ] || { error "$1 did not appear within the allowed time-out!" ; exit 1 ; }
-        info " ... ($CNT) wating before $1 file appears ..."
-        sleep 1
-    done
-    info " ... $1 exists."
-}
+# fix the capabilities.xml
+info "Fixing WEB-INF/xml/capabilities.xml ..."
+{ ex "WEB-INF/xml/capabilities.xml" || /bin/true ; } <<END
+g/\s\+<ows:Get/s#xlink:href="https\=://\([^/]*\)\(/\=.*\)"#xlink:href="http://$HOSTNAME:80$XCAT_URL_PATH/csw?"#
+g/\s\+<ows:Post/s#xlink:href="https\=://\([^/]*\)\(/\=.*\)"#xlink:href="http://$HOSTNAME:80$XCAT_URL_PATH/csw?"#
+wq
+END
 
 # fix the allow.xml
-ALLOW_XML="$XCAT_WEBAPPDIR/$XCAT_NAME/WEB-INF/conf/allow.xml"
-wait_for_file "$ALLOW_XML"
-info "Fixing $ALLOW_XML"
-cat >"$ALLOW_XML" <<END
+info "Fixing WEB-INF/conf/allow.xml ..."
+cat >"WEB-INF/conf/allow.xml" <<END
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <authorization>
   <harvest>
@@ -105,16 +94,60 @@ cat >"$ALLOW_XML" <<END
 </authorization>
 END
 
-# fix the capabilities.xml
-CAPAB_XML="$XCAT_WEBAPPDIR/$XCAT_NAME/WEB-INF/xml/capabilities.xml"
-wait_for_file "$CAPAB_XML"
-info "Fixing $CAPAB_XML"
-{ ex "$CAPAB_XML" || /bin/true ; } <<END
-g/\s\+<ows:Get/s#xlink:href="https\=://\([^/]*\)\(/\=.*\)"#xlink:href="http://$HOSTNAME:80$XCAT_URL_PATH/csw"#
-g/\s\+<ows:Post/s#xlink:href="https\=://\([^/]*\)\(/\=.*\)"#xlink:href="http://$HOSTNAME:80$XCAT_URL_PATH/csw"#
-wq
+# set the csw-hosts.xml
+info "Fixing WEB-INF/conf/csw-hosts.xml ..."
+cat >"WEB-INF/conf/csw-hosts.xml" <<END
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+Configuration file for local and remote CSW hosts;
+Purpose of this list of hosts is twofold:
+1: defines csw hosts showed in cswclient.
+2: defines csw hosts wich will be harvested and how.
+
+        element host can have the following attributes:
+	id = some unigue identifier for the host (mandatory)
+
+	optional:
+	harvest = "yes|no" (default=no => don't harvest this host)
+	method = "post|get" (default=post => http request method)
+	maxrecords = negative|positive number (negative means all records will be harvested)
+	keepfiles = "true|false" (default=false => don't keep files in harvest directory after storage in database)
+	overwrite = "true|false" (default=false => don't store files already present in database)
+	support-hits = "true|false" (default=true => use resultType=hits to get numberofrecords;
+	                  should be set to false for ESRI because numberOfmatchingRecords are not returned)
+
+	optional element constraint specifies a constraint (in cql_text) when harvesting records
+	with the following optional attribute:
+	language = "FILTER|CQL_TEXT" (default=FILTER => constraint language used)
+-->
+<hosts>
+  <host id="LOCAL" harvest="no">
+    <name>localhost</name>
+    <url>http://localhost:8088/excat2/csw</url>
+  </host>
+</hosts>
 END
 
+# fix the base-paths
+info "Fixing the serviceUrlBasePath definitions ..."
+find WEB-INF/xsl/csw-schemas/eop -name \*.xsl -exec sed -e "/<xsl:variable *name=\"serviceUrlBasePath\"/s#select=\"[^\"]*\"#select=\"'$WMS_URL'\"#" -i {} \;
+
+# repack the archive
+zip "$_WAR" -ur *
+
+popd
+
+#======================================================================
+if [ -f "$XCAT_TMPDIR/$XCAT_NAME.war" ]
+then
+    info "Deploying the eXcat WAR file..."
+    mv "$XCAT_TMPDIR/$XCAT_NAME.war" "$XCAT_WEBAPPDIR"
+else
+    error "Failed to locate the eXcat uncomressed WAR file! FILE=$XCAT_TMPDIR/$XCAT_NAME.war"
+    exit 1
+fi
+
+service tomcat start
 #======================================================================
 # set the reverse proxy
 

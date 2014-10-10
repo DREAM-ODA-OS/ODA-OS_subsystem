@@ -133,6 +133,8 @@ fi
 # eXcat catalogue (if installed)
 
 EXCAT2_CAPAB_XML="/usr/share/tomcat/webapps/excat2/WEB-INF/xml/capabilities.xml"
+EXCAT2_EOP_XSL="/usr/share/tomcat/webapps/excat2/WEB-INF/xsl/csw-schemas/eop"
+WMS_URL="${SCHEME}${HOSTNAME}:${PORT}/eoxs/ows"
 
 if [ -f "$EXCAT2_CAPAB_XML" ]
 then
@@ -142,6 +144,9 @@ g/\s\+<ows:Get/s#xlink:href="https\=://\([^/]*\)\(/\=.*\)"#xlink:href="${SCHEME}
 g/\s\+<ows:Post/s#xlink:href="https\=://\([^/]*\)\(/\=.*\)"#xlink:href="${SCHEME}${HOSTNAME}:${PORT}\2"#
 wq
 END
+
+    find "$EXCAT2_EOP_XSL" -name \*.xsl \
+        -exec sed -e "/<xsl:variable *name=\"serviceUrlBasePath\"/s#select=\"[^\"]*\"#select=\"'$WMS_URL'\"#" -i {} \;
 
   service tomcat restart
 fi
