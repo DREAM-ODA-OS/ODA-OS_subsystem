@@ -2,6 +2,8 @@
 #
 # install NLR eXcat2 CSW catalogue
 #
+# current version: excat2-1.2.7-eop20.zip
+#
 #======================================================================
 
 . `dirname $0`/../lib_logging.sh
