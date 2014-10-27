@@ -76,7 +76,7 @@ then
     #URL="`get_release_url`"
 
     #fixed version download
-    URL="https://github.com/DREAM-ODA-OS/ODAClient/releases/download/0.5.0/ODAClient-0.5.0.tgz"
+    URL="https://github.com/DREAM-ODA-OS/ODAClient/releases/download/0.5.1/ODAClient-0.5.1.tgz"
 
     info "Downloading from: $URL"
 
