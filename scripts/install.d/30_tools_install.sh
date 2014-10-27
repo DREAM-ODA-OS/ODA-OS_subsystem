@@ -62,7 +62,7 @@ then
     #URL="`get_release_url`"
 
     #fixed version download
-    URL="https://github.com/DREAM-ODA-OS/tools/archive/release-0.2.3.tar.gz"
+    URL="https://github.com/DREAM-ODA-OS/tools/archive/release-0.2.4.tar.gz"
 
     info "Downloading from: $URL"
 
