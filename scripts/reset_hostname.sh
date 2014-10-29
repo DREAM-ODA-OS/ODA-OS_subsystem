@@ -48,13 +48,13 @@ then
     echo "ERROR: $EXENAME: Missing the required host name!" >&2
     echo "USAGE: $EXENAME [-s] <hostname>" >&2
     echo "OPTIONS:" >&2
-    echo "    -s  Force HTTPS instead of the default plain HTTP." >&2
+    echo "    -s  Force HTTPS instead of the default plain HTTP URL." >&2
     exit 1
 fi
 
 HOSTNAME="$1"
 
-info "Setting the service to: ${SCHEME}${HOSTNAME}:${PORT}"
+info "Setting the services' base URL to: ${SCHEME}${HOSTNAME}:${PORT}"
 
 [ -z "$ODAOSROOT" ] && error "Missing the required ODAOSROOT variable!"
 [ -z "$ODAOS_IE_HOME" ] && error "Missing the required ODAOS_IE_HOME variable!"
@@ -62,7 +62,7 @@ info "Setting the service to: ${SCHEME}${HOSTNAME}:${PORT}"
 [ -z "$ODAOS_ODAC_HOME" ] && error "Missing the required ODAOS_ODAC_HOME variable!"
 
 #-------------------------------------------------------------------------------
-# ingestion engine
+# Ingestion Engine
 INSTANCE="ingestion"
 INSTROOT="$ODAOS_IE_HOME"
 IE_SETTINGS="${INSTROOT}/${INSTANCE}/settings.py"
@@ -76,7 +76,7 @@ END
 service ingeng restart
 
 #-------------------------------------------------------------------------------
-# EOxServer set the service url
+# EOxServer - set the service url
 
 INSTANCE="eoxs"
 INSTROOT="$ODAOSROOT"
@@ -114,7 +114,7 @@ sudo -u "$ODAOSUSER" rm -f "$CONFIG_JSON~"
 service httpd restart
 
 #-------------------------------------------------------------------------------
-# Data Quality subsytem (if installed)
+# Data Quality subsystem (if installed)
 
 if [ -f '/etc/init.d/tomcat-dq' ]
 then
@@ -130,7 +130,7 @@ END
 fi
 
 #-------------------------------------------------------------------------------
-# eXcat catalogue (if installed)
+# eXcat2 catalogue (if installed)
 
 EXCAT2_CAPAB_XML="/usr/share/tomcat/webapps/excat2/WEB-INF/xml/capabilities.xml"
 EXCAT2_EOP_XSL="/usr/share/tomcat/webapps/excat2/WEB-INF/xsl/csw-schemas/eop"
