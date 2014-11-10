@@ -54,24 +54,25 @@ get_filename()
 #======================================================================
 # trying to locate the ingestion engine tarball
 
+IE_VERSION="0.8.12"
 IE_TARBALL="`find "$CONTRIB" -name 'IngestionEngine*' | grep -e '\.tgz$' -e '\.tar\.gz$' | sort -r | head -n 1`"
 
 if [ -z "$IE_TARBALL" ]
 then
 
     # automatic download of the latest release
-    #URL="`get_release_url`"
+    #IE_URL="`get_release_url`"
 
     #fixed version download
-    URL="https://github.com/DREAM-ODA-OS/IngestionEngine/archive/v0.8.8.tar.gz"
+    IE_URL="https://github.com/DREAM-ODA-OS/IngestionEngine/archive/v$IE_VERSION.tar.gz"
 
-    info "Downloading from: $URL"
+    info "Downloading from: $IE_URL"
 
-    IE_TARBALL="$CONTRIB/`get_filename "$URL"`"
+    IE_TARBALL="$CONTRIB/`get_filename "$IE_URL"`"
 
     info "Saving to : $IE_TARBALL"
 
-    curl -L "$URL" -o "$IE_TARBALL"
+    curl -L "$IE_URL" -o "$IE_TARBALL"
 
     [ -f "$IE_TARBALL" ] || error "Failed to download the Ingestion Engine release!" \
         && info "Ingestion Engine downloaded."
