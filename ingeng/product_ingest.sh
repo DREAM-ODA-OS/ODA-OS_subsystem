@@ -112,16 +112,18 @@ META="`get_path METADATA_EOP20`"
 RANGET="`get_path RANGE_TYPE`"
 IDENTIFIER="`get_field IDENTIFIER`"
 SRS="`get_field SRS`"
+CONTENT_TYPE="`get_field 'Content-Type'`"
 
 [ -n "$META" ] || META="`expr "$DATA" : '\(.*\)\.[a-zA_Z]*'`.xml"
 [ -n "$RANGET" ] || RANGET="`expr "$DATA" : '\(.*\)\.[a-zA_Z]*'`_range_type.json"
 [ -n "$VIEW" ] || VIEW="`expr "$DATA" : '\(.*\)\.[a-zA_Z]*'`_view.tif"
 [ -n "$VIEW_OVR" ] || VIEW_OVR="`expr "$DATA" : '\(.*\)\.[a-zA_Z]*'`_view.tif.ovr"
+[ -n "$CONTENT_TYPE" ] || CONTENT_TYPE="image/tiff"
 
 EOP_VER="2.0"
 EOP="http://www.opengis.net/eop/$EOP_VER"
 OPT="http://www.opengis.net/opt/$EOP_VER"
-SAR="http://www.opengis.net/opt/$EOP_VER"
+SAR="http://www.opengis.net/sar/$EOP_VER"
 
 if [ ! -f "$META" ]
 then
@@ -163,6 +165,34 @@ else # RGB preview
     _type="RGB"
     _bands="-b 1 -b 2 -b 3"
 fi
+
+# add collection name as a prefix of the coverage identifier
+COLLECTION_NOCOLON="`echo "$COLLECTION" | sed -e 's/:/./g'`"
+[ -z "`echo "$IDENTIFIER" | grep "^$COLLECTION_NOCOLON\."`" ] && IDENTIFIER="$COLLECTION_NOCOLON.$IDENTIFIER"
+
+# make sure the EOP metadata XML file contains the right identifier
+_set_eop_identifier "$META" "$IDENTIFIER"
+
+# append EOP2.0 metadata and range-type to the manifest
+update_field IDENTIFIER "$IDENTIFIER"
+[ -n "$DATADIR" ] && set_path DOWNLOAD_DIR "$DATADIR"
+set_path DATA "$DATA"
+set_path VIEW "$VIEW"
+set_path VIEW_OVR "$VIEW_OVR"
+[ -n "$COVDESCR" ] && set_path METADATA "$COVDESCR"
+set_path METADATA_EOP20 "$META"
+update_path RANGE_TYPE "$RANGET"
+[ -n "$SRS" ] && set_field SRS "$SRS"
+# log the content of the manifest file
+cat "$MANIFEST" | info_pipe
+
+# special treatment for the Envisat products
+if [ "$CONTENT_TYPE" == 'application/x-esa-envisat' ]
+then
+    "`dirname $0`/product_add.sh" -data="$DATA" ${CATREG:+-catreg=}$CATREG && exit 0 || exit 1
+fi
+
+# anything else processed hereafter ...
 if [ ! -f "$VIEW" ]
 then
     info "Generating browse image ..."
@@ -202,26 +232,6 @@ then
     _remove "$VIEW_OVR"
     [ -n "$_levels" ] && time "$GDALADDO" $_adoopt "$VIEW" $_levels
 fi
-
-# add collection name as a prefix of the coverage identifier
-COLLECTION_NOCOLON="`echo "$COLLECTION" | sed -e 's/:/./g'`"
-[ -z "`echo "$IDENTIFIER" | grep "^$COLLECTION_NOCOLON\."`" ] && IDENTIFIER="$COLLECTION_NOCOLON.$IDENTIFIER"
-
-# make sure the EOP metadata XML file contains the right identifier
-_set_eop_identifier "$META" "$IDENTIFIER"
-
-# append EOP2.0 metadata and range-type to the manifest
-update_field IDENTIFIER "$IDENTIFIER"
-[ -n "$DATADIR" ] && set_path DOWNLOAD_DIR "$DATADIR"
-set_path DATA "$DATA"
-set_path VIEW "$VIEW"
-set_path VIEW_OVR "$VIEW_OVR"
-[ -n "$COVDESCR" ] && set_path METADATA "$COVDESCR"
-set_path METADATA_EOP20 "$META"
-update_path RANGE_TYPE "$RANGET"
-[ -n "$SRS" ] && set_field SRS "$SRS"
-# log the content of the manifest file
-cat "$MANIFEST" | info_pipe
 
 #-----------------------------------------------------------------------------
 # register dataset

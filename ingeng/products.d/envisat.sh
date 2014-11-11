@@ -172,7 +172,7 @@ END
 IMG_DATA="${DATA}"
 IMG_META="${IMG_DATA%.*}.xml"
 IMG_RTYPE="${IMG_DATA%.*}_range_type.json"
-IMG_VIEW="${IMG_DATA%.*}_RGB_WGS84.tif"
+IMG_VIEW="${IMG_DATA%.*}_view.tif"
 IMG_VIEW_OVR="${IMG_VIEW}.ovr"
 
 _tmp_eop_xml="${IMG_META}_eop.xml"

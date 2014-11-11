@@ -51,7 +51,7 @@ fi
 IMG_DIR="`dirname "$META"`"
 IMG_DIR="`_expand "$IMG_DIR"`"
 IMG_DATA="$IMG_DIR/$_data"
-IMG_VIEW="${IMG_DATA%.*}_RGB_WGS84.tif"
+IMG_VIEW="${IMG_DATA%.*}_view.tif"
 IMG_VIEW_OVR="${IMG_VIEW}.ovr"
 IMG_META="${IMG_DATA%.*}.xml"
 IMG_RTYPE="${IMG_DATA%.*}_range_type.json"

@@ -103,7 +103,7 @@ then
 else
     IMG_DATA="$IMG_DIR/`xml_extract.py "$META" '//Data_Access/Data_Files/Data_File/DATA_FILE_PATH/@href' `" || exit 1
 fi
-IMG_VIEW="${IMG_DATA%.*}_RGB_WGS84.vrt"
+IMG_VIEW="${IMG_DATA%.*}_view.vrt"
 IMG_VIEW_OVR="${IMG_VIEW}.ovr"
 IMG_META="${IMG_DATA%.*}.xml"
 IMG_RTYPE="${IMG_DATA%.*}_range_type.json"
