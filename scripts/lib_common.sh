@@ -35,31 +35,31 @@ export ODAOSVERSION=0.3.0-dev
 export ODAOSHOSTNAME=${ODAOSHOSTNAME:-$HOSTNAME}
 
 # root directory of the ODA-OS subsystem - by default set to '/srv/odaos'
-export ODAOSROOT=${ODAOSROOT:-/srv/odaos}
+export ODAOSROOT=${ODAOSROOT:-/srv/eoxserver}
 
 # directory where the log files shall be places - by default set to '/var/log/odaos'
-export ODAOSLOGDIR=${ODAOSLOGDIR:-/var/log/odaos}
+export ODAOSLOGDIR=${ODAOSLOGDIR:-/var/log/eoxserver}
 
 # directory where the PosgreSQL DB stores the files
-export ODAOS_PGDATA_DIR=${ODAOS_PGDATA_DIR:-/srv/pgdata} 
+#export ODAOS_PGDATA_DIR=${ODAOS_PGDATA_DIR:-/srv/pgdata}
 
 # directory of the long-term data storage - by default set to '/srv/eodata'
-export ODAOSDATADIR=${ODAOSDATADIR:-/srv/eodata}
+#export ODAOSDATADIR=${ODAOSDATADIR:-/srv/eodata}
 
 # directory of the short-term data storage - by default set to '/srv/eodata/tmp'
 # NOTE: the purpose of this directory is not to replace the /tmp but 
 #       rather to be used as a subsytem's temporary workspace
-export ODAOSTMPDIR=${ODAOSTMPDIR:-/srv/eodata/tmp}
+#export ODAOSTMPDIR=${ODAOSTMPDIR:-/srv/eodata/tmp}
 
 # names of the ODA-OS user and group - by default set to 'odaos:apache'
 export ODAOSGROUP=${ODAOSGROUP:-apache}
-export ODAOSUSER=${ODAOSUSER:-odaos}
+export ODAOSUSER=${ODAOSUSER:-eoxserver}
 
 # location of the ngEO downaload manager home directory
-export ODAOS_DM_HOME=${ODAOS_DM_HOME:-$ODAOSROOT/ngeo-dm}
+#export ODAOS_DM_HOME=${ODAOS_DM_HOME:-$ODAOSROOT/ngeo-dm}
 
 # location of the Ingestion Engine home directory
-export ODAOS_IE_HOME=${ODAOS_IE_HOME:-$ODAOSROOT/ingeng}
+#export ODAOS_IE_HOME=${ODAOS_IE_HOME:-$ODAOSROOT/ingeng}
 
 # location of the Ingestion Engine actions scripts home directory
 export ODAOS_IEAS_HOME=${ODAOS_IEAS_HOME:-$ODAOSROOT/ie-scripts}
@@ -68,7 +68,7 @@ export ODAOS_IEAS_HOME=${ODAOS_IEAS_HOME:-$ODAOSROOT/ie-scripts}
 export ODAOS_ODAC_HOME=${ODAOS_ODAC_HOME:-$ODAOSROOT/oda-client}
 
 # location of the DQ subsystem  
-export ODAOS_DQ_HOME=${ODAOS_DQ_HOME:-$ODAOSROOT/data-quality}
+#export ODAOS_DQ_HOME=${ODAOS_DQ_HOME:-$ODAOSROOT/data-quality}
 
 # location of the BEAM installation
 export ODAOS_BEAM_HOME=${ODAOS_BEAM_HOME:-$ODAOSROOT/beam}

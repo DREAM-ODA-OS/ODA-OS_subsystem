@@ -78,8 +78,8 @@ INSTALL_LOG="install.log"
     
     _mkdir "$ODAOSUSER:$ODAOSGROUP" 0755 "$ODAOSROOT" "subsytem's root directory" 
     _mkdir "$ODAOSUSER:$ODAOSGROUP" 0775 "$ODAOSLOGDIR" "subsytem's logging directory" 
-    _mkdir "$ODAOSUSER:$ODAOSGROUP" 0775 "$ODAOSDATADIR" "subsytem's long-term data storage directory"
-    _mkdir "$ODAOSUSER:$ODAOSGROUP" 0775 "$ODAOSTMPDIR" "subsytem's short-term data stoarage directory"
+    #_mkdir "$ODAOSUSER:$ODAOSGROUP" 0775 "$ODAOSDATADIR" "subsytem's long-term data storage directory"
+    #_mkdir "$ODAOSUSER:$ODAOSGROUP" 0775 "$ODAOSTMPDIR" "subsytem's short-term data stoarage directory"
     
     #-------------------------------------------------------------------------------
     # execute specific installation scripts 

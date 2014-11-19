@@ -39,35 +39,35 @@ sudo -u "$ODAOSUSER" rm -f "$CONFIG_JSON~"
 #======================================================================
 # Integration with the Apache web server
 
-info "Setting ODA Client installation behind the Apache reverse proxy ..."
-
-# locate proper configuration file (see also apache configuration)
-{
-    locate_apache_conf 80
-    locate_apache_conf 443
-} | while read CONF
-do
-    { ex "$CONF" || /bin/true ; } <<END
-/ODAC00_BEGIN/,/ODAC00_END/de
-/^[ 	]*<\/VirtualHost>/i
-    # ODAC00_BEGIN - ODA Client - Do not edit or remove this line!
-
-    # DREAM ODA Client
-    Alias $ODAOS_ODAC_URL "$ODAOS_ODAC_HOME"
-    <Directory "$ODAOS_ODAC_HOME">
-            Options -MultiViews +FollowSymLinks
-            AllowOverride None
-            Order Allow,Deny
-            Allow from all
-    </Directory>
-
-    # ODAC00_END - ODA Client - Do not edit or remove this line!
-.
-wq
-END
-done
+##info "Setting ODA Client installation behind the Apache reverse proxy ..."
+##
+### locate proper configuration file (see also apache configuration)
+##{
+##    locate_apache_conf 80
+##    locate_apache_conf 443
+##} | while read CONF
+##do
+##    { ex "$CONF" || /bin/true ; } <<END
+##/ODAC00_BEGIN/,/ODAC00_END/de
+##/^[ 	]*<\/VirtualHost>/i
+##    # ODAC00_BEGIN - ODA Client - Do not edit or remove this line!
+##
+##    # DREAM ODA Client
+##    Alias $ODAOS_ODAC_URL "$ODAOS_ODAC_HOME"
+##    <Directory "$ODAOS_ODAC_HOME">
+##            Options -MultiViews +FollowSymLinks
+##            AllowOverride None
+##            Order Allow,Deny
+##            Allow from all
+##    </Directory>
+##
+##    # ODAC00_END - ODA Client - Do not edit or remove this line!
+##.
+##wq
+##END
+##done
 
 #-------------------------------------------------------------------------------
 # restart apache to force the changes to take effect
 
-service httpd restart
+##service httpd restart
