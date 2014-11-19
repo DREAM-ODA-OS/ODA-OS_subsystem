@@ -147,6 +147,8 @@ cat <<END
         <parameters>
             <crs>EPSG:4326</crs>
             <resampling>Nearest</resampling>
+            <pixelSizeX>0.02197265625</pixelSizeX>
+            <pixelSizeY>0.02197265625</pixelSizeY>
             <noDataValue>0</noDataValue>
             <includeTiePointGrids>false</includeTiePointGrids>
             <addDeltaBands>false</addDeltaBands>
@@ -202,11 +204,12 @@ then
         trap "_remove '$_tmp0' '$_tmp1'" EXIT
         _remove "$_tmp0"
         # reproject the image 
+        RES="-tr 0.00274658203125 0.00274658203125"
         if [ "`gdalinfo "$IMG_DATA" | grep GCP\\\[ | wc -l`" -le 55 ]
         then
-            gdalwarp -t_srs EPSG:4326 -tps2 "$IMG_DATA" "$_tmp0" $TOPT || exit 1
+            gdalwarp $RES -t_srs EPSG:4326 -tps2 "$IMG_DATA" "$_tmp0" $TOPT || exit 1
         else
-            gdalwarp -t_srs EPSG:4326 -tps2_grid 0 0 "$IMG_DATA" "$_tmp0" $TOPT || exit 1
+            gdalwarp $RES -t_srs EPSG:4326 -tps2_grid 0 0 "$IMG_DATA" "$_tmp0" $TOPT || exit 1
         fi
 
         # create range stretched dB view 
