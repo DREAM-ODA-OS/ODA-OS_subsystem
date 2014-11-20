@@ -189,7 +189,7 @@ cat "$MANIFEST" | info_pipe
 # special treatment for the Envisat products
 if [ "$CONTENT_TYPE" == 'application/x-esa-envisat' ]
 then
-    "`dirname $0`/product_add.sh" -data="$DATA" ${CATREG:+-catreg=}$CATREG && exit 0 || exit 1
+    "`dirname $0`/product_add.sh" -add="$COLLECTION" -data="$DATA" ${CATREG:+-catreg=}$CATREG && exit 0 || exit 1
 fi
 
 # anything else processed hereafter ...
