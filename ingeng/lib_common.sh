@@ -3,16 +3,16 @@
 #
 #
 
-export PATH="/srv/odaos/beam/bin:$PATH"
-export PATH="/srv/odaos/tools/metadata:$PATH"
-export PATH="/srv/odaos/tools/imgproc:$PATH"
+export PATH="/srv/eoxserver/beam/bin:$PATH"
+export PATH="/srv/eoxserver/tools/metadata:$PATH"
+export PATH="/srv/eoxserver/tools/imgproc:$PATH"
 export DJANGO_SETTINGS_MODULE="eoxs.settings"
 
-LOG_FILE="/var/log/odaos/ie_actions.log"
+LOG_FILE="/var/log/eoxserver/ie_actions.log"
 
 EXENAME=`basename $0`
 
-EOXS_MNG="/usr/bin/python /srv/odaos/eoxs/manage.py"
+EOXS_MNG="/usr/bin/python /srv/eoxserver/eoxs/manage.py"
 
 _hash()
 {
@@ -100,9 +100,9 @@ TOPT="-co TILED=YES -co COMPRESS=DEFLATE -co PREDICTOR=2 -co INTERLEAVE=PIXEL"
 ADOOPT="--config COMPRESS_OVERVIEW DEFLATE --config PREDICTOR_OVERVIEW 2 --config INTERLEAVE_OVERVIEW PIXEL -r average"
 
 # preferably use gdaladdo provided by the FWTools
-if [ -f "/srv/odaos/fwtools/bin_safe/gdaladdo" ]
+if [ -f "/srv/eoxserver/fwtools/bin_safe/gdaladdo" ]
 then
-    GDALADDO="/srv/odaos/fwtools/bin_safe/gdaladdo"
+    GDALADDO="/srv/eoxserver/fwtools/bin_safe/gdaladdo"
 else
     GDALADDO="`which gdaladdo`"
 fi
