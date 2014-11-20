@@ -167,8 +167,8 @@ else # RGB preview
 fi
 
 # add collection name as a prefix of the coverage identifier
-COLLECTION_NOCOLON="`echo "$COLLECTION" | sed -e 's/:/./g'`"
-[ -z "`echo "$IDENTIFIER" | grep "^$COLLECTION_NOCOLON\."`" ] && IDENTIFIER="$COLLECTION_NOCOLON.$IDENTIFIER"
+#COLLECTION_NOCOLON="`echo "$COLLECTION" | sed -e 's/:/./g'`"
+#[ -z "`echo "$IDENTIFIER" | grep "^$COLLECTION_NOCOLON\."`" ] && IDENTIFIER="$COLLECTION_NOCOLON.$IDENTIFIER"
 
 # make sure the EOP metadata XML file contains the right identifier
 _set_eop_identifier "$META" "$IDENTIFIER"
