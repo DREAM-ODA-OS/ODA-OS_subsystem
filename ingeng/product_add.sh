@@ -228,7 +228,7 @@ COLLECTION="`echo "$COLLECTION" | tr ':' '_'`"
 IDENTIFIER="`echo "$IDENTIFIER" | tr ':' '_'`"
 
 # collection prefix
-[ -z "`echo "$IDENTIFIER" | grep "^$COLLECTION\."`" ] && IDENTIFIER="$COLLECTION.$IDENTIFIER"
+#[ -z "`echo "$IDENTIFIER" | grep "^$COLLECTION\."`" ] && IDENTIFIER="$COLLECTION.$IDENTIFIER"
 
 # fixing the metadata
 _set_eop_identifiers "$IMG_META" "$IDENTIFIER" "$COLLECTION"
