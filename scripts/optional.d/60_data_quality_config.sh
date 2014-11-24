@@ -31,8 +31,8 @@ ODAOS_PORT=80
 DQ_SERVICE="tomcat-dq"
 
 EOXS_ID2PATH_URL="http://127.0.0.1/eoxs/id2path?id="
-IE_ADDPRODUCT_URL="http://127.0.0.1:8000/ingest"
-IE_UPDATEMD_URL="http://127.0.0.1:8000/ingest"
+IE_ADDPRODUCT_URL="http://128.0.0.1:8000/ingest/addProduct/addProduct"
+IE_UPDATEMD_URL="http://128.0.0.1:8000/ingest/uqmd/updateMD"
 
 if [ ! -d "$ODAOS_DQ_HOME" ]
 then
@@ -66,8 +66,11 @@ chmod -v 0755 "$DQ_DATA_DIR"
 
 info "Data Quality subsytem configuration ..."
 
+DQ_KEYSTORE="$ODAOS_DQ_HOME/q2/config/truststore.jks"
+DQ_SERVER_CERT="$ODAOS_DQ_HOME/q2/services.spotimage.fr.pem"
 DQ_INSTALLER="$ODAOS_DQ_HOME/q2/install.sh"
 
+[ ! -f "$DQ_KEYSTORE" ] || rm -fv "$DQ_KEYSTORE"
 [ -f "$DQ_INSTALLER" ] || error "Cannot find the '$DQ_INSTALLER' installer!"
 
 # NOTE: The install script requires the working directory
@@ -78,7 +81,8 @@ DQ_INSTALLER="$ODAOS_DQ_HOME/q2/install.sh"
             -t "$DQ_PROXY_HOST" -u "$DQ_PROXY_PORT" \
             -j "http" -k "$ODAOSHOSTNAME" -l "$ODAOS_PORT" \
             -p "$DQ_SERVICE_HOST" -q "$DQ_SERVICE_PORT" -r "$DQ_WPS_CONTEXT" \
-            -a "$DQ_LOG_DIR" -b "$DQ_DATA_DIR"
+            -a "$DQ_LOG_DIR" -b "$DQ_DATA_DIR" \
+            -z "$DQ_SERVER_CERT" -v "$DQ_USER"
 )
 
 # fix the configuration of the interfaces
@@ -103,6 +107,7 @@ DQ_INIT="/etc/init.d/$DQ_SERVICE"
 #END
 #cp -fv "$DQ_INIT_SRC" "$DQ_INIT"
 
+[ -f "$DQ_INIT" ] && mv -fv "$DQ_INIT" "$DQ_INIT.bak"
 [ -f "$DQ_INIT" ] && rm -fv "$DQ_INIT"
 
 cat >"$DQ_INIT" <<END
