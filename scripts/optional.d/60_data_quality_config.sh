@@ -31,8 +31,8 @@ ODAOS_PORT=80
 DQ_SERVICE="tomcat-dq"
 
 EOXS_ID2PATH_URL="http://127.0.0.1/eoxs/id2path?id="
-IE_ADDPRODUCT_URL="http://128.0.0.1:8000/ingest/addProduct/addProduct"
-IE_UPDATEMD_URL="http://128.0.0.1:8000/ingest/uqmd/updateMD"
+IE_ADDPRODUCT_URL="http://127.0.0.1:8000/ingest/addProduct/addProduct"
+IE_UPDATEMD_URL="http://127.0.0.1:8000/ingest/uqmd/updateMD"
 
 if [ ! -d "$ODAOS_DQ_HOME" ]
 then
