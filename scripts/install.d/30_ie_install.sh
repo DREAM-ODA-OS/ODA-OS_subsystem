@@ -54,7 +54,7 @@ get_filename()
 #======================================================================
 # trying to locate the ingestion engine tarball
 
-IE_VERSION="0.9.1"
+IE_VERSION="0.9.3"
 IE_TARBALL="`find "$CONTRIB" -name 'IngestionEngine*' | grep -e '\.tgz$' -e '\.tar\.gz$' | sort -r | head -n 1`"
 
 if [ -z "$IE_TARBALL" ]
