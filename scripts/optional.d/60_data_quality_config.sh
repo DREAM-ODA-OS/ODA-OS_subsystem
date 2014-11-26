@@ -210,15 +210,16 @@ stop()
 
     while [ \$count -le "\$count_max" ] && ps p "\$pid" >/dev/null 2>&1
     do
-        echo \$"\nwaiting for processes to exit";
+        echo \$"Waiting for the processes to exit ...";
         sleep 1
         let count=\$count+1;
     done
 
     if ps p "\$pid" >/dev/null 2>&1
     then
-        echo \$"\nkilling processes which didn't stop after \$SHUTDOWN_WAIT seconds"
+        echo \$"Killing the processes which didn't stop after \$SHUTDOWN_WAIT seconds!"
         kill -9 \$pid
+        sleep 1
     fi
 
     MSG=\$( status )
