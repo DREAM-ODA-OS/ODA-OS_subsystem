@@ -49,6 +49,8 @@ then
     [ -z "$META" ] && META="`find "$DATA" -name metadata.dim | _one_line_only "$_msg"`"
     [ -z "$META" ] && META="`find "$DATA" -name DIM_\*.XML | _one_line_only "$_msg"`"
     [ -z "$META" ] && META="`find "$DATA" -name \*.dim | _one_line_only "$_msg"`"
+    # special treatment for the improve quality output
+    [ -z "$META" ] && META="`find "$DATA" -name \*.xml | _one_line_only "$_msg"`"
 elif [ -z "$META" -a -f "$DATA" ] # no-metadata - data as a file (image)
 then
     # EOP metadata
@@ -78,6 +80,10 @@ then # XML format
     elif [ "$_xml_root" == '{http://www.opengis.net/eop/2.1}EarthObservation' ]
     then
         METADATA_FORMAT='EOP21'
+        info "Metadata format: $METADATA_FORMAT"
+    elif [ "$_xml_root" == '{http://www.isotc211.org/2005/gmd}MD_Metadata' ]
+    then
+        METADATA_FORMAT='ISO19115'
         info "Metadata format: $METADATA_FORMAT"
     else
         error "Unsupported XML metadata format! META=$META XML_ROOT=$_xml_root"
@@ -150,6 +156,10 @@ then
             ;;
         *) error "Unsupported product type  ${N1_PRODUCT:0:9}!" ; exit 1 ;;
     esac
+elif [ "$METADATA_FORMAT" == "ISO19115" -a -n "$IDENTIFIER" ]
+then
+    info "DQ-improveQuality output ingestion ..."
+    . "`dirname $0`/products.d/improve_quality.sh"
 else
     error "Unsupported metadata format! FORMAT=$METADATA_FORMAT" ; exit 1
 fi

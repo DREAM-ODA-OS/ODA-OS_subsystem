@@ -106,7 +106,7 @@ fi
 
 if [ "$ACTION" == "REPLACE" -a -z "$IDENTIFIER" ] # invalid replace action error
 then
-    error "REPLACE action requires the identifier!" ; exit 1
+    error "REPLACE action requires an identifier!" ; exit 1
 fi
 
 if [ -n "$DIR" ]
@@ -287,7 +287,7 @@ $EOXS_MNG eoxs_dataset_register -r "$IMG_VIEW_RTYPE" -i "${IDENTIFIER}_view" \
     echo "#$IDENTIFIER"
     [ -n "$DATA_SRC" ] && echo "$DATA_SRC;file;source-data"
     [ -n "$IMG_DIR" ] && echo "$IMG_DIR;directory"
-    [ -n "$META" ] && echo "$META;metadata;"
+    [ -n "$META" -a "$META" != "$IMG_META" ] && echo "$META;metadata;$METADATA_FORMAT"
     echo "$IMG_META;metadata;EOP2.0"
     echo "$IMG_DATA;data"
     echo "$IMG_RTYPE;file;range-type"

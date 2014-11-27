@@ -106,3 +106,17 @@ then
 else
     GDALADDO="`which gdaladdo`"
 fi
+
+if [ -f "/srv/odaos/fwtools/bin_safe/gdal_translate" ]
+then
+    GDAL_TRANSLATE="/srv/odaos/fwtools/bin_safe/gdal_translate"
+else
+    GDAL_TRANSLATE="`which gdal_translate`"
+fi
+
+if [ -f "/srv/odaos/fwtools/bin_safe/gdalwarp" ]
+then
+    GDALWARP="/srv/odaos/fwtools/bin_safe/gdalwarp"
+else
+    GDALWARP="`which gdalwarp`"
+fi
