@@ -73,15 +73,15 @@ trap - EXIT
 info "Copying the EOP metadata ..."
 $EOXS_MNG eoxs_i2p_list -f -i "$IDENTIFIER"
 _src_dat="`$EOXS_MNG eoxs_i2p_list -f -i "$IDENTIFIER" | grep '^[^;]*;data' | cut -f 1 -d ';'`"
-_src_eop="${_src_dat%.*}.xml"
+_src_eop="`$EOXS_MNG eoxs_i2p_list -f -i "$IDENTIFIER" | grep '^[^;]*;metadata;EOP2.0' | cut -f 1 -d ';'`"
 _dq_eop="${_dq_tif%.*}_eop20.xml"
-[ -f "$_src_eop" ] || { error "Filed to locate the source EOP metadata!" ; exit 1 ; }
+[ -f "$_src_eop" ] || { error "Failed to locate the source EOP metadata!" ; exit 1 ; }
 cp -v "$_src_eop" "$_dq_eop"
 
 info "Copying the range-type ..."
-_src_rtype="${_src_dat%.*}_range_type.json"
+_src_rtype="`$EOXS_MNG eoxs_i2p_list -f -i "$IDENTIFIER" | grep '^[^;]*;file;range-type' | cut -f 1 -d ';'`"
 _dq_rtype="${_dq_tif%.*}_range_type.json"
-[ -f "$_src_rtype" ] || { error "Filed to locate the source range-type!" ; exit 1 ; }
+[ -f "$_src_rtype" ] || { error "Failed to locate the source range-type!" ; exit 1 ; }
 cp -v "$_src_rtype" "$_dq_rtype"
 
 _nband="`jq '.bands | length' "$_dq_rtype"`"
@@ -136,3 +136,6 @@ then
     _remove "$IMG_VIEW_OVR"
     [ -n "$_levels" ]&& time "$GDALADDO" $_adoopt "$IMG_VIEW" $_levels
 fi
+
+# clean the old records
+#$EOXS_MNG eoxs_i2p_list -f -i "$IDENTIFIER" | grep -v directory | $EOXS_MNG eoxs_i2p_delete
