@@ -57,17 +57,20 @@ _dq_tif="`find "$DATA" -name \*.tif | _one_line_only "$_msg"`"
 _dq_xml="`find "$DATA" -name \*.xml | _one_line_only "$_msg"`"
 #_dq_iso="${_dq_dat=%.*}.iso19115.xml"
 
-[ -n "$_dq_prj" ] || { error "Filed to locate the ESRI projection file!" ; exit 1 ; }
-[ -n "$_dq_tfw" ] || { error "Filed to locate the ESRI world file!" ; exit 1 ; }
+#[ -n "$_dq_prj" ] || { error "Filed to locate the ESRI projection file!" ; exit 1 ; }
+#[ -n "$_dq_tfw" ] || { error "Filed to locate the ESRI world file!" ; exit 1 ; }
 [ -n "$_dq_tif" ] || { error "Filed to locate the TIFF image!" ; exit 1 ; }
 [ -n "$_dq_xml" ] || { error "Filed to locate the XML metadata!" ; exit 1 ; }
 
 # fix the geotiff
-_tmp0="`mktemp --suffix=.tif`"
-trap "_remove '$_tmp0'" EXIT
-info "Fixing the GeoTIFF geocoding ..."
-$GDAL_TRANSLATE -a_srs "`echo "$_dq_prj" | _proj2srs`" "$_dq_tif" "$_tmp0" && mv "$_tmp0" "$_dq_tif"
-trap - EXIT
+if [ -f "$_dq_prj" -a -f "$_dq_tfw" ]
+then
+    _tmp0="`mktemp --suffix=.tif`"
+    trap "_remove '$_tmp0'" EXIT
+    info "Fixing the GeoTIFF geocoding ..."
+    $GDAL_TRANSLATE -a_srs "`echo "$_dq_prj" | _proj2srs`" "$_dq_tif" "$_tmp0" && mv "$_tmp0" "$_dq_tif" && _remove "$_dq_prj" "$_dq_tfw"
+    trap - EXIT
+fi
 
 # get the metadta of the source coverage
 info "Copying the EOP metadata ..."
