@@ -85,6 +85,11 @@ then # XML format
     then
         METADATA_FORMAT='ISO19115'
         info "Metadata format: $METADATA_FORMAT"
+    elif [ "$_xml_root" == '{http://www.opengis.net/wcseo/1.0}RectifiedDataset' -o \
+           "$_xml_root" == '{http://www.opengis.net/wcseo/1.0}ReferenceableDataset' ]
+    then
+        METADATA_FORMAT='EOWCS'
+        info "Metadata format: $METADATA_FORMAT"
     else
         error "Unsupported XML metadata format! META=$META XML_ROOT=$_xml_root"
         exit 1
@@ -160,7 +165,43 @@ elif [ "$METADATA_FORMAT" == "ISO19115" -a -n "$IDENTIFIER" ]
 then
     info "DQ-improveQuality output ingestion ..."
     . "`dirname $0`/products.d/improve_quality.sh"
+elif [ "$METADATA_FORMAT" == "EOWCS" ]
+then
+    info "EO-WCS ingestion ..."
+    # get collection name
+    _EOP20="http://www.opengis.net/eop/2.0"
+    _xq="//{$_EOP20}EarthObservationMetaData/{$_EOP20}parentIdentifier/text()"
+    [ -z "$COLLECTION" ] && COLLECTION="`xml_extract.py "$META" "$_xq"`"
+    [ -z "$COLLECTION" ] && {
+        error "Failed to determine the target collection identifier!"
+        error "Use the -add=<collection-name> or set the 'eop:parentIdentifier'!"
+        exit 1
+    }
+    # get dataset ID
+    _xq="//{$_EOP20}EarthObservationMetaData/{$_EOP20}identifier/text()"
+    [ -z "$IDENTIFIER" ] && IDENTIFIER="`xml_extract.py "$META" "$_xq"`"
+    [ -z "$IDENTIFIER" ] && {
+        error "Failed to determine the target dataset identifier!"
+        error "Use the -id=<identifier> or set the 'eop:identifier'!"
+    }
+    # create manifest file and pass it to the product ingestion
+    MANIFEST="${DATA%.*}.manifest"
+    cat > "$MANIFEST" <<END
+DOWNLOAD_DIR="$DIR"
+DATA="$DATA"
+METADATA="$META"
+SCENARIO_NCN_ID="$COLLECTION"
+IDENTIFIER="$IDENTIFIER"
+END
+    "`dirname $0`/product_ingest.sh" "$MANIFEST" ${CATREG:+-catreg=}$CATREG || exit 1
+    # generate the reponse file
+    if [ -n "$RESPONSE" ]
+    then
+        info "Generating response file $RESPONSE"
+        echo "productId=$IDENTIFIER" > "$RESPONSE"
+        cat "$RESPONSE" | info_pipe
+    fi
+    exit 0
 else
     error "Unsupported metadata format! FORMAT=$METADATA_FORMAT" ; exit 1
 fi
-
