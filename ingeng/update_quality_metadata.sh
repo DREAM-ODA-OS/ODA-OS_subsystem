@@ -7,7 +7,7 @@
 #
 # usage:
 # $0   [ -add | -replace ]  <ProductID>  <metadatafile>
-#    
+#
 #  metadatafile is a full pathname.
 #
 # The script should exit with status 0 if all went well
@@ -18,45 +18,49 @@
 . "`dirname $0`/lib_common.sh"
 
 info "Metadata update started ..."
-info "   ARGUMENTS: $* "
+info "PARAMS: $*"
 
-error "NOT IMPLEMENTED!" ; exit 1 
+# parse the CLI arguments
+DIR="."
 
-#echo "Update MetaData script started on" $(date)
-#echo args: $*
-#
-#echo "---"
-#echo " WARNING: Meta-data update not yet implemented!"
-#echo "---"
-#
-#if [[ $# < 3 ]]
-#then
-#    echo "Not enough args, exiting with status 5."
-#    exit 5
-#fi
-#
-#if [[ $1 == '-add' ]]
-#then
-#    echo "action=add" 
-#elif [[ $1 == '-replace' ]]
-#then
-#    echo "action=replace" 
-#else
-#    echo '***bad action: ' $1
-#    echo "exiting with status 1"
-#    exit 1
-#fi
-#
-#if [[ ! -f $3 ]]
-#then
-#    echo "No file: " $3
-#    echo echo "exiting with status 3"
-#    exit 3
-#fi
-#
-#echo "---"
-#echo " WARNING: Update Quality Metadata not yet implemented!"
-#echo "---"
-#
-#echo "test uqmd finishing with status 0."
-#exit 0
+for _arg in $*
+do
+    _key="`expr "$_arg" : '\([^=]*\)'`"
+    _val="`expr "$_arg" : '[^=]*=\(.*\)'`"
+
+    case "$_key" in
+        '-add' )
+            REPLACE="" ;;
+        '-replace' )
+            REPLACE="REPLACE" ;;
+        *)
+            if [ -z "$IDENTIFIER" ]
+            then
+                IDENTIFIER="$_arg"
+            elif [ -z "$META_DQ" ]
+            then
+                META_DQ="$_arg"
+            fi
+    esac
+done
+
+[ -z "$IDENTIFIER" ] && { error "Missing the required dataset identifier!" ; exit 1 ; }
+[ -z "$META_DQ" ] && { error "Missing the required DQ metadata!" ; exit 1 ; }
+[ ! -f "$META_DQ" ] && { error "The DQ metadata file does not exist! META_DQ=$META_DQ" ; exit 1 ; }
+
+info "REPLACE:  $REPLACE"
+info "IDENTIFIER:  $IDENTIFIER"
+info "META_DQ:  $META_DQ"
+
+info "Getting location of the EOP metadata file ..."
+META_EOP="`$EOXS_MNG eoxs_i2p_list -f -i "$IDENTIFIER" | grep '^[^;]*;metadata;EOP2.0' | cut -f 1 -d ';'`"
+info "META_EOP:  $META_EOP"
+[ -z "$META_EOP" ] && { error "Failed to locate the EOP metadata for dataset '$IDENTIFIER' !" ; exit 1 ; }
+[ ! -f "$META_EOP" ] && { error "The EOP metadata file does not exist! META_EOP=$META_EOP" ; exit 1 ; }
+
+info "Updating the EOP metadata ..."
+_tmp0="`mktemp --suffix=.xml`"
+trap "_remove '$_tmp0'" EXIT
+"`dirname $0`/insert_dq_into_eop.py" "$META_EOP" "$META_DQ" PRETTY $REPLACE > "$_tmp0" && mv "$_tmp0" "$META_EOP" || exit 1
+
+info "Metadata update finished sucessfully."
