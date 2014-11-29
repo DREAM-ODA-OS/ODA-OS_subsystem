@@ -65,6 +65,7 @@ def insert_dq_in_eop(xml_eop, xml_dqm, replace=False):
 
     # insert each DQ_Element
     for dq_elm in xml_dqm_root:
+        print >>sys.stderr, "DQ_Element:  ", dq_elm.tag
         elm = et.Element(OM_RESULT_QUALITY)
         elm.append(deepcopy(dq_elm))
         insert_before(xml_eop_root, (OM_RESULT,), elm)
