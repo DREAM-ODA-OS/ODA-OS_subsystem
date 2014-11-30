@@ -82,6 +82,40 @@ _print()
     { echo "$MSG" >> "$LOG_FILE" ; } 2>/dev/null
 }
 
+_set_eop_identifier() {
+  python <<END
+import sys
+from lxml import etree as et
+xml = et.parse("$1",  et.XMLParser(remove_blank_text=True))
+elm = xml.find("//{http://www.opengis.net/eop/2.0}EarthObservationMetaData/{http://www.opengis.net/eop/2.0}identifier")
+if elm is not None:
+    elm.text = "$2"
+else:
+    sys.exit(1)
+with file("$1", "w") as fid:
+    fid.write(et.tostring(xml, pretty_print=True, xml_declaration=True, encoding="utf-8"))
+END
+}
+
+_set_eop_identifiers() {
+    # modify the eop:identifier and eop:parentIdentifier fields
+  python <<END
+import sys
+from lxml import etree as et
+xml = et.parse("$1",  et.XMLParser(remove_blank_text=True))
+elm = xml.find("//{http://www.opengis.net/eop/2.0}EarthObservationMetaData/{http://www.opengis.net/eop/2.0}identifier")
+if elm is not None:
+    elm.text = "$2"
+else:
+    sys.exit(1)
+elm = xml.find("//{http://www.opengis.net/eop/2.0}EarthObservationMetaData/{http://www.opengis.net/eop/2.0}parentIdentifier")
+if elm is not None:
+    elm.text = "$3"
+with file("$1", "w") as fid:
+    fid.write(et.tostring(xml, pretty_print=True, xml_declaration=True, encoding="utf-8"))
+END
+}
+
 error() { _print "ERROR: $*" ; }
 info()  { _print "INFO: $*" ; }
 warn()  { _print "WARNING: $*" ; }
