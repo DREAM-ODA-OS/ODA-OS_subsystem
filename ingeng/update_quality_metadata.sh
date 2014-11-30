@@ -53,7 +53,7 @@ info "IDENTIFIER:  $IDENTIFIER"
 info "META_DQ:  $META_DQ"
 
 info "Getting location of the EOP metadata file ..."
-META_EOP="`$EOXS_MNG eoxs_i2p_list -f -i "$IDENTIFIER" | grep '^[^;]*;metadata;EOP2.0' | cut -f 1 -d ';'`"
+META_EOP="`$EOXS_MNG eoxs_i2p_list -f -i "$IDENTIFIER" | grep '^[^;]*;metadata;EOP2.0' | head -n 1 | cut -f 1 -d ';'`"
 info "META_EOP:  $META_EOP"
 [ -z "$META_EOP" ] && { error "Failed to locate the EOP metadata for dataset '$IDENTIFIER' !" ; exit 1 ; }
 [ ! -f "$META_EOP" ] && { error "The EOP metadata file does not exist! META_EOP=$META_EOP" ; exit 1 ; }
