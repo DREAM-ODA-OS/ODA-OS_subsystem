@@ -282,9 +282,11 @@ $EOXS_MNG eoxs_dataset_register -r "`jq -r .name "$IMG_RTYPE"`" \
 $EOXS_MNG eoxs_dataset_register -r "$IMG_VIEW_RTYPE" -i "${IDENTIFIER}_view" \
     -d "$IMG_VIEW" -m "$IMG_META" --collection "${COLLECTION}_view" \
     --alias "$COLLECTION"
+
 # id2path file registry
 {
     echo "#$IDENTIFIER"
+    $EOXS_MNG eoxs_i2p_list -f -i "$IDENTIFIER" | grep -v -e directory -e '^#' | sed -ne 's/^\([^;]*\);.*/\1;file/p'
     [ -n "$DATA_SRC" ] && echo "$DATA_SRC;file;source-data"
     [ -n "$IMG_DIR" ] && echo "$IMG_DIR;directory"
     [ -n "$META" -a "$META" != "$IMG_META" ] && echo "$META;metadata;$METADATA_FORMAT"
@@ -303,6 +305,7 @@ $EOXS_MNG eoxs_dataset_register -r "$IMG_VIEW_RTYPE" -i "${IDENTIFIER}_view" \
         done
     fi
     echo "#${IDENTIFIER}_view"
+    $EOXS_MNG eoxs_i2p_list -f -i "${IDENTIFIER}_view" | grep -v -e directory -e '^#' | sed -ne 's/^\([^;]*\);.*/\1;file/p'
     [ -n "$DATA_SRC" ] && echo "$DATA_SRC;file;source-data"
     [ -n "$IMG_DIR" ] && echo "$IMG_DIR;directory"
     echo "$IMG_META;metadata;EOP2.0"
