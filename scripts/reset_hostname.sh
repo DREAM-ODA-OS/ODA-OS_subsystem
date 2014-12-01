@@ -100,13 +100,15 @@ END
 CONFIG_JSON="${ODAOS_ODAC_HOME}/config.json"
 IE_BASE_URL="${SCHEME}${HOSTNAME}/ingest/ManageScenario/"
 LAYERS_URL="${SCHEME}${HOSTNAME}/eoxs/eoxc"
+QTMP_URL="${SCHEME}${HOSTNAME}/q1/pq.html"
 
 # define JQ filters
 _F1=".ingestionEngineT5.baseUrl=\"$IE_BASE_URL\""
 _F2=".mapConfig.dataconfigurl=\"$LAYERS_URL\""
+_F4=".orthoQualityConfig.qtmpUrl=\"$QTMP_URL\""
 
 sudo -u "$ODAOSUSER" cp "$CONFIG_JSON" "$CONFIG_JSON~" && \
-sudo -u "$ODAOSUSER" jq "$_F1|$_F2" >"$CONFIG_JSON" <"$CONFIG_JSON~" && \
+sudo -u "$ODAOSUSER" jq "$_F1|$_F2|$_F4" >"$CONFIG_JSON" <"$CONFIG_JSON~" && \
 sudo -u "$ODAOSUSER" rm -f "$CONFIG_JSON~"
 
 #-------------------------------------------------------------------------------

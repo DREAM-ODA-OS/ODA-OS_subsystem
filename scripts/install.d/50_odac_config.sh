@@ -23,6 +23,7 @@ HOSTNAME="$ODAOSHOSTNAME"
 CONFIG_JSON="${ODAOS_ODAC_HOME}/config.json"
 IE_BASE_URL="http://${HOSTNAME}/ingest/ManageScenario/"
 LAYERS_URL="http://${HOSTNAME}/eoxs/eoxc"
+QTMP_URL="http://${HOSTNAME}/q1/pq.html"
 
 #======================================================================
 # configuration
@@ -31,9 +32,10 @@ LAYERS_URL="http://${HOSTNAME}/eoxs/eoxc"
 _F1=".ingestionEngineT5.baseUrl=\"$IE_BASE_URL\""
 _F2=".mapConfig.dataconfigurl=\"$LAYERS_URL\""
 _F3='del(.mapConfig.products)'
+_F4=".orthoQualityConfig.qtmpUrl=\"$QTMP_URL\""
 
 sudo -u "$ODAOSUSER" cp "$CONFIG_JSON" "$CONFIG_JSON~" && \
-sudo -u "$ODAOSUSER" jq "$_F1|$_F2|$_F3" >"$CONFIG_JSON" <"$CONFIG_JSON~" && \
+sudo -u "$ODAOSUSER" jq "$_F1|$_F2|$_F3|$_F4" >"$CONFIG_JSON" <"$CONFIG_JSON~" && \
 sudo -u "$ODAOSUSER" rm -f "$CONFIG_JSON~"
 
 #======================================================================
