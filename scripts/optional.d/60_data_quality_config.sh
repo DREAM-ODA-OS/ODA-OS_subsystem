@@ -270,6 +270,16 @@ do
 /^[ 	]*<\/VirtualHost>/i
     # DQ00_BEGIN - Data Quality Proxy - Do not edit or remove this line!
 
+    # improvised Q1 client
+    Alias /q1 "/srv/odaos/data-quality/q1"
+    <Directory "/srv/odaos/data-quality/q1">
+            Options -MultiViews +FollowSymLinks
+            AllowOverride None
+            Order Allow,Deny
+            Allow from all
+            Header set Access-Control-Allow-Origin "*"
+    </Directory>
+
     # reverse proxy to the Data Qaulity Proxy
 
     ProxyPass        /constellation http://$DQ_PROXY_HOST:$DQ_PROXY_PORT/constellation
