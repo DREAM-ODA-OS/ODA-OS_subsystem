@@ -52,7 +52,7 @@ trap on_exit EXIT
 # locate a download manager tarball in the DM directory
 
 # fixed source URL
-DQ_URL='ftp://dream-reader@ftp.spacebel.be/Inbox/ASV%20GEO/QSS/0.5/qss-0.5.tgz'
+DQ_URL='ftp://dream-reader@ftp.spacebel.be/Inbox/ASV%20GEO/QSS/0.6/qss-0.6.tgz'
 DQ_TARBALL="$CONTRIB/`basename "$DQ_URL"`"
 
 if [ -f "$DQ_TARBALL" ]
