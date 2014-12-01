@@ -1,0 +1,373 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- Modified for Task-5 test by MN on Nov 10 2014 -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title>MWPS - Data Quality Client</title>
+        <script type="text/javascript">
+          var wpsUrl = "http://dream.eox.at/constellation/WS/wps/dream";
+        </script>
+    </head>
+    <body>
+        <p>
+          <div id="quality-alert" style="width:100%;color=red;"></div>
+          <div id="quality-status" style="width:100%;"></div>
+        </p>
+        <script type="text/javascript" src="lib/jquery/jquery-1.10.2.min.js"></script>
+        <script type="text/javascript" src="lib/mwps/mwps.min.js"></script>
+        <script type="text/javascript">
+
+            window.onload = function() {
+              process_qcall();
+            };
+
+            function getParameterByName(name) {
+              name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+              var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+              results = regex.exec(location.search);
+              return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+            };
+
+            function process_qcall(){
+              var qop   = getParameterByName('qop');
+              var qprod = getParameterByName('prod');
+
+              var qualityHTML = "<p></p>";
+              if (qop == 'i') {
+                var qres = getParameterByName('res');
+                if ("" === qres) { qres = 5; }
+                var qcrs  = getParameterByName('crs');
+                if ("" === qcrs) {  qcrs = 'EPSG:32631'; }
+                console.log("improveQuality("+qres+", '"+qcrs+"', 'bilinear', '"+qprod+"', ...)");
+                qualityHTML = "<p>Processing improveQuality, product:</p>"+qprod+"<p>";
+                improveQuality(qres, qcrs, 'bilinear', qprod, display);
+              } else if (qop == 'a'){
+                console.log("assessQuality("+qprod+")");
+                qualityHTML = "<p>Processing assessQuality, product:</p>"+qprod+"<p>";
+                assessQuality(qprod, display);
+              }
+              this.$('#quality-alert').html(qualityHTML);
+            };
+
+            function display(result) {
+              if (typeof result === "string") {
+                var qualityHTML = "<p>"+result+"</p>";
+                this.$('#quality-alert').html(qualityHTML);
+                alert(result);
+              }
+              else if (typeof result === "object" && result != null) {
+                o0 = result[0];
+                console.log("Quality result: "+o0);
+                if (o0 != null) {
+                  res_href = o0.reference.href;
+                  var qualityHTML = '<p>'+
+                    '<a href="' + res_href + '">Click here for the result.</a>' + 
+                    "</p>";
+                  this.$('#quality-alert').html(qualityHTML);
+                }
+              }
+            };
+ 
+            function updateStatus(sst,ctx) {
+              if (typeof sst === "string") {
+                var stHTML = "<p>"+sst+"</p>";
+                ctx.$('#quality-status').html(stHTML);
+              }
+            };
+
+            /*
+             * Launch an orthorectified process for the Dream project
+             * 
+             * @param {Integer} resolution : Resolution of the output orthorectified image (e.g. 200)
+             * @param {String} crsCode : EPSG code for the output orthorectified image (e.g. EPSG:3857)
+             * @param {String} interpolationMethode : Interpolation method (e.g. 'bilinear')
+             * @param {String} metadataId : Identifier of the source image to orthorectified (e.g. '05MAR06080629-M1BS-000000193961_01_P001')
+             * @param {function} callback : callback function called after a successfull execute process
+             * @returns {Boolean}
+             */
+            function assessQuality(metadataId, callback) {
+                
+                var self = this;
+                //var wpsUrl = "http://sopdk259:8080/constellation/WS/wps/dream";
+                //var proxyUrl = "http://<http_server>/mwps/s/proxy.php?";
+                var proxyUrl = "";
+                var assessQualityProcessId = "urn:ogc:cstl:wps:dream:assessQuality";
+                
+                /*
+                 * Create a wps object
+                 */
+                self.wps = new M.WPS(wpsUrl, proxyUrl);
+                if (M.Util.setUpdateCB && typeof M.Util.setUpdateCB === "function") {
+                  M.Util.setUpdateCB(updateStatus);
+                  M.Util.setCBContext(this);
+                };
+
+                /*
+                 * Register GetCapabilites event
+                 * On load call describeProcess on assessQualityProcessId and orthorectificationProcessId
+                 */
+                self.wps.events.register("getcapabilities", this, function(scope, wps) {
+                    M.Util.message(wps);
+                    wps.describeProcess([assessQualityProcessId]);
+                });
+                
+                /*
+                 * Register DescribeProcess event
+                 */
+                self.wps.events.register("describeprocess", this, function(scope, descriptors) {
+
+                    if ($.isArray(descriptors) && descriptors.length === 1) {
+
+                        /*
+                         * Set Asynchronous Processes Manager
+                         */
+                        if (!M.apm) {
+                            M.apm = new M.WPS.asynchronousProcessManager();
+                        }
+
+                        /*
+                         * Store Process descriptions
+                         */
+                        scope.assessQualityDescriptor = descriptors[0];
+
+                        /*
+                         * Launch assessQuality Process
+                         */
+                        M.Util.message(scope.assessQualityDescriptor);
+
+                        var assessQualityInputs = [
+                            {
+                                identifier: "urn:ogc:cstl:wps:dream:assessQuality:input:metadataId",
+                                type: "LiteralData",
+                                data: metadataId
+                            }
+                        ];
+
+                        // Set inputs
+                        for (var i = 0; i < assessQualityInputs.length; i++) {
+                            scope.assessQualityDescriptor.addInput(assessQualityInputs[i]);
+                        }
+
+                        // Set output
+                        scope.assessQualityDescriptor.addOutput({
+                            type: 'ComplexOutput',
+                            identifier: 'urn:ogc:cstl:wps:dream:assessQuality:output:qualityData',
+                            mimeType: 'text/plain'
+                        });
+
+                        scope.wps.execute(scope.assessQualityDescriptor.identifier, {storeExecute: true});
+
+                    }
+                    else {
+                        M.Util.message("Error reading DescribeProcess");
+                    }
+                });
+                
+                /*
+                 * Register Execute event
+                 */
+                self.wps.events.register("execute", this, function(scope, process) {
+                    
+                    /*
+                     * ProcessAccepted
+                     *  => add a new process to the asynchronous manager
+                     */
+                    if (process.statusLocation && process.status === "ProcessAccepted") {
+                        return M.apm.add(process, {
+                            wpsUrl: process.descriptor.wps.url,
+                            identifier: process.descriptor.identifier
+                        });
+                    }
+                    /*
+                     * Asynchronous case - Bad implementation case
+                     *
+                     * This case occurs when statusLocation attribute is not repeated within the
+                     * process response located at statusLocation
+                     */
+                    else if (process.status === "ProcessStarted") {
+                        return M.apm.update(process);
+                    }
+                    /*
+                     * Process failed - the very easy part :)
+                     */
+                    else if (process.status === "ProcessFailed") {
+                        M.Util.message(process.descriptor.title + " : " + "Process failed" + " - " + process.statusAbstract);
+                        return false;
+                    }
+                    /*
+                     * Success - callback
+                     */
+                    else if (process.status === "ProcessSucceeded") {
+                        console.log(process.result);
+                        callback("Process succeeded.");
+                        return false;
+                    }
+                    
+                    return M.apm.update(process);
+
+                });
+
+                /*
+                 * Retrieve Capabilities
+                 */
+                self.wps.getCapabilities();
+                
+            };
+            
+            /*
+             * Launch an orthorectified process for the Dream project
+             * 
+             * @param {Integer} resolution : Resolution of the output orthorectified image (e.g. 200)
+             * @param {String} crsCode : EPSG code for the output orthorectified image (e.g. EPSG:3857)
+             * @param {String} interpolationMethode : Interpolation method (e.g. 'bilinear')
+             * @param {String} metadataId : Identifier of the source image to orthorectified (e.g. '05MAR06080629-M1BS-000000193961_01_P001')
+             * @param {function} callback : callback function called after a successfull execute process
+             * @returns {Boolean}
+             */
+            function improveQuality(resolution, crsCode, interpolation, metadataId, callback) {
+                
+                var self = this;
+                //var wpsUrl = "http://sopdk259:8080/constellation/WS/wps/dream";
+                //var proxyUrl = "http://<http_server>/mwps/s/proxy.php?";
+                var proxyUrl = "";
+                var orthorectificationProcessId = "urn:ogc:cstl:wps:dream:improveQuality";
+                
+                /*
+                 * Create a wps object
+                 */
+                self.wps = new M.WPS(wpsUrl, proxyUrl);
+                if (M.Util.setUpdateCB && typeof M.Util.setUpdateCB === "function") {
+                  M.Util.setUpdateCB(updateStatus);
+                  M.Util.setCBContext(this);
+                };
+
+                /*
+                 * Register GetCapabilites event
+                 * On load call describeProcess on assessQualityProcessId and orthorectificationProcessId
+                 */
+                self.wps.events.register("getcapabilities", this, function(scope, wps) {
+                    M.Util.message(wps);
+                    wps.describeProcess([orthorectificationProcessId]);
+                });
+                
+                /*
+                 * Register DescribeProcess event
+                 */
+                self.wps.events.register("describeprocess", this, function(scope, descriptors) {
+
+                    if ($.isArray(descriptors) && descriptors.length === 1) {
+
+                        /*
+                         * Set Asynchronous Processes Manager
+                         */
+                        if (!M.apm) {
+                            M.apm = new M.WPS.asynchronousProcessManager();
+                        }
+
+                        /*
+                         * Store Process descriptions
+                         */
+                        scope.improveQualityDescriptor = descriptors[0];
+
+                        /*
+                         * Launch improveQuality Process
+                         */
+                        M.Util.message(scope.improveQualityDescriptor);
+
+                        var improveQualityInputs = [
+                            {
+                                identifier: "urn:ogc:cstl:wps:dream:improveQuality:input:resolution",
+                                type: "LiteralData",
+                                data: resolution
+                            },
+                            {
+                                identifier: "urn:ogc:cstl:wps:dream:improveQuality:input:crsCode",
+                                type: "LiteralData",
+                                data: crsCode
+                            },
+                            {
+                                identifier: "urn:ogc:cstl:wps:dream:improveQuality:input:interpolation",
+                                type: "LiteralData",
+                                data: interpolation
+                            },
+                            {
+                                identifier: "urn:ogc:cstl:wps:dream:improveQuality:input:metadataID",
+                                type: "LiteralData",
+                                data: metadataId
+                            }
+                        ];
+
+                        // Set inputs
+                        for (var i = 0; i < improveQualityInputs.length; i++) {
+                            scope.improveQualityDescriptor.addInput(improveQualityInputs[i]);
+                        }
+
+                        // Set output
+                        scope.improveQualityDescriptor.addOutput({
+                            type: 'ComplexOutput',
+                            identifier: 'urn:ogc:cstl:wps:dream:improveQuality:output:orthoImage',
+                            mimeType: 'text/plain'
+                        });
+
+                        scope.wps.execute(scope.improveQualityDescriptor.identifier, {storeExecute: true});
+
+                    }
+                    else {
+                        M.Util.message("Error reading DescribeProcess");
+                    }
+                });
+                
+                /*
+                 * Register Execute event
+                 */
+                self.wps.events.register("execute", this, function(scope, process) {
+                    
+                    /*
+                     * ProcessAccepted
+                     *  => add a new process to the asynchronous manager
+                     */
+                    if (process.statusLocation && process.status === "ProcessAccepted") {
+                        return M.apm.add(process, {
+                            wpsUrl: process.descriptor.wps.url,
+                            identifier: process.descriptor.identifier
+                        });
+                    }
+                    /*
+                     * Asynchronous case - Bad implementation case
+                     *
+                     * This case occurs when statusLocation attribute is not repeated within the
+                     * process response located at statusLocation
+                     */
+                    else if (process.status === "ProcessStarted") {
+                        return M.apm.update(process);
+                    }
+                    /*
+                     * Process failed - the very easy part :)
+                     */
+                    else if (process.status === "ProcessFailed") {
+                        var msg_str = process.descriptor.title + " : Process failed" + " - " + process.statusAbstract;
+                        callback(msg_str);
+                        M.Util.message(msg_str);
+                        return false;
+                    }
+                    /*
+                     * Success - callback
+                     */
+                    else if (process.status === "ProcessSucceeded") {
+                        console.log(process.result);
+                        callback(process.result);
+                        return false;
+                    }
+                    
+                    return M.apm.update(process);
+
+                });
+
+                /*
+                 * Retrieve Capabilities
+                 */
+                self.wps.getCapabilities();
+            };
+        </script>
+    </body>
+</html>

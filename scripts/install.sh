@@ -44,6 +44,7 @@ INSTALL_LOG="install.log"
     
     export CONTRIB="$(cd "$(dirname "$0")/../contrib"; pwd )"
     export INGENG="$(cd "$(dirname "$0")/../ingeng"; pwd )"
+    export DQCLIENT="$(cd "$(dirname "$0")/../dq-client"; pwd )"
     
     #-------------------------------------------------------------------------------
     # check whether the user and group exists 

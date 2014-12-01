@@ -70,6 +70,9 @@ export ODAOS_ODAC_HOME=${ODAOS_ODAC_HOME:-$ODAOSROOT/oda-client}
 # location of the DQ subsystem  
 export ODAOS_DQ_HOME=${ODAOS_DQ_HOME:-$ODAOSROOT/data-quality}
 
+# location of the DQ Client
+export ODAOS_DQC_HOME=${ODAOS_DQS_HOME:-$ODAOS_DQ_HOME/q1}
+
 # location of the BEAM installation
 export ODAOS_BEAM_HOME=${ODAOS_BEAM_HOME:-$ODAOSROOT/beam}
 
