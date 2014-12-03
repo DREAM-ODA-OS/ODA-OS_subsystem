@@ -24,6 +24,16 @@ sudo -u "$ODAOSUSER" cp -fv "$DQCLIENT/pq.html" "$ODAOS_DQC_HOME/pq.html"
 sudo -u "$ODAOSUSER" cp -fv "$DQCLIENT/mwps/mwps.js" "$ODAOS_DQC_HOME/lib/mwps/mwps.js"
 sudo -u "$ODAOSUSER" cp -fv "$DQCLIENT/mwps/mwps.min.js" "$ODAOS_DQC_HOME/lib/mwps/mwps.min.js"
 
+# reset the right URL in the client
+DQ_URL="http://${HOSTNAME}/constellation/WS/wps/dream"
+if [ -f "$ODAOS_DQC_HOME/pq.html" ]
+then
+    { ex "$ODAOS_DQC_HOME/pq.html" || /bin/true ; } <<END
+%s#\(wpsUrl[ 	]*=[ 	]*"\)[^"']*\(["']\)#\1$DQ_URL\2#
+wq
+END
+fi
+
 #======================================================================
 
 info "Improvised DQ Client installed."

@@ -84,7 +84,7 @@ EOXSCONF="${INSTROOT}/${INSTANCE}/${INSTANCE}/conf/eoxserver.conf"
 EOXSTNGS="${INSTROOT}/${INSTANCE}/${INSTANCE}/settings.py"
 
 sudo -u "$ODAOSUSER" ex "$EOXSCONF" <<END
-/^[	 ]*http_service_url[	 ]*=/s;\(^[	 ]*http_service_url[	 ]*=\).*;\1${SCHEME}${HOSTNAME}/${INSTANCE}/ows?;
+/^[	 ]*http_service_url[	 ]*=/s;\(^[	 ]*http_service_url[	 ]*=\).*;\1${SCHEME}${HOSTNAME}:${PORT}/${INSTANCE}/ows?;
 wq
 END
 
@@ -98,9 +98,9 @@ END
 # ODA Client
 
 CONFIG_JSON="${ODAOS_ODAC_HOME}/config.json"
-IE_BASE_URL="${SCHEME}${HOSTNAME}/ingest/ManageScenario/"
-LAYERS_URL="${SCHEME}${HOSTNAME}/eoxs/eoxc"
-QTMP_URL="${SCHEME}${HOSTNAME}/q1/pq.html"
+IE_BASE_URL="${SCHEME}${HOSTNAME}:${PORT}/ingest/ManageScenario/"
+LAYERS_URL="${SCHEME}${HOSTNAME}:${PORT}/eoxs/eoxc"
+QTMP_URL="${SCHEME}${HOSTNAME}:${PORT}/q1/pq.html"
 
 # define JQ filters
 _F1=".ingestionEngineT5.baseUrl=\"$IE_BASE_URL\""
@@ -129,6 +129,16 @@ wq
 END
 
     service tomcat-dq start
+fi
+
+DQ_URL="${SCHEME}${HOSTNAME}:${PORT}/constellation/WS/wps/dream"
+DQ_C="$ODAOS_DQC_HOME/pq.html"
+if [ -f "$DQ_C" ]
+then
+    { ex "$DQ_C" || /bin/true ; } <<END
+%s#\(wpsUrl[ 	]*=[ 	]*"\)[^"']*\(["']\)#\1$DQ_URL\2#
+wq
+END
 fi
 
 #-------------------------------------------------------------------------------

@@ -5,7 +5,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         <title>MWPS - Data Quality Client</title>
         <script type="text/javascript">
-          var wpsUrl = "http://dream.eox.at/constellation/WS/wps/dream";
+          var wpsUrl = "http://127.0.0.1/constellation/WS/wps/dream";
         </script>
     </head>
     <body>
@@ -88,8 +88,6 @@
             function assessQuality(metadataId, callback) {
                 
                 var self = this;
-                //var wpsUrl = "http://sopdk259:8080/constellation/WS/wps/dream";
-                //var proxyUrl = "http://<http_server>/mwps/s/proxy.php?";
                 var proxyUrl = "";
                 var assessQualityProcessId = "urn:ogc:cstl:wps:dream:assessQuality";
                 
@@ -227,8 +225,6 @@
             function improveQuality(resolution, crsCode, interpolation, metadataId, callback) {
                 
                 var self = this;
-                //var wpsUrl = "http://sopdk259:8080/constellation/WS/wps/dream";
-                //var proxyUrl = "http://<http_server>/mwps/s/proxy.php?";
                 var proxyUrl = "";
                 var orthorectificationProcessId = "urn:ogc:cstl:wps:dream:improveQuality";
                 
