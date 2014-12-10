@@ -33,6 +33,8 @@ DQ_SERVICE="tomcat-dq"
 EOXS_ID2PATH_URL="http://127.0.0.1/eoxs/id2path?id="
 IE_ADDPRODUCT_URL="http://127.0.0.1:8000/ingest/addProduct"
 IE_UPDATEMD_URL="http://127.0.0.1:8000/ingest/uqmd"
+IE_ADDPRODUCT_INTERVAL=20
+IE_ADDPRODUCT_TIMEOUT=1800
 
 if [ ! -d "$ODAOS_DQ_HOME" ]
 then
@@ -86,10 +88,12 @@ DQ_INSTALLER="$ODAOS_DQ_HOME/q2/install.sh"
 )
 
 # fix the configuration of the interfaces
-sudo -u "$DQ_USER" ex "$ODAOS_DQ_HOME/q2/config/_.dream/dream.properties" <<END
+sudo -u "$DQ_USER" ex -V "$ODAOS_DQ_HOME/q2/config/_.dream/dream.properties" <<END
 1,\$s#^\([ 	]*ODA_ID2PATH_URL[ 	]*=\).*\$#\1$EOXS_ID2PATH_URL#
 1,\$s#^\([ 	]*ODA_ADDPRODUCT_URL[ 	]*=\).*\$#\1$IE_ADDPRODUCT_URL#
 1,\$s#^\([ 	]*ODA_UPDATEMD_URL[ 	]*=\).*\$#\1$IE_UPDATEMD_URL#
+1,\$s#^\([ 	]*ODA_ADDPRODUCT_INTERVAL[ 	]*=\).*\$#\1$IE_ADDPRODUCT_INTERVAL#
+1,\$s#^\([ 	]*ODA_ADDPRODUCT_TIMEOUT[ 	]*=\).*\$#\1$IE_ADDPRODUCT_TIMEOUT#
 wq
 END
 
