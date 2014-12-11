@@ -36,15 +36,11 @@ manually.
 
 *SW Component* | *On-line Source* | *Comment*
 --- | --- | --- 
-ngEO-DM | Spacebel FTP [1] | Required. Downloaded automatically when a valid `.netrc` found in the `contrib/` directory.
-DQ subsystem | Spacebel FTP [2] | Optional. Downloaded automatically when a valid `.netrc` found in the `contrib/` directory.
-eXcat catalogue | *n/a* | Optional. Requires manual download and copying of the zip archive to the `contrib` directory. 
-S2-preprocessor | Spacebel FTP [3] | Optional. Downloaded automatically when a valid `.netrc` found in the `contrib/` directory.
-[1] `ftp://ftp.spacebel.be/Inbox/ASU/MAGELLIUM/DM-Releases/`
+ngEO-DM | *n/a* | Required.
+DQ subsystem | *n/a* | Optional.
+eXcat catalogue | *n/a* | Optional.
+S2-preprocessor | *n/a* | Optional.
 
-[2] `ftp://ftp.spacebel.be/Software deliveries/Task13-ASV/QSS/`
-
-[3] `ftp://ftp.spacebel.be/Inbox/EOX/software/gisat`
 #### Step 1 - Get the Installation Scripts
 
 The installer (i.e., content of this repository) can be obtained
@@ -163,7 +159,7 @@ and `service` command [4])
 -  `tomcat6` - Tomcat 6 (Rasdaman Petascope).
 -  `rasdaman` - Rasdaman (raster-DB backend).
 -  `tomcat` - (optional) Tomcat 7 (eXcat catalogue).
--  `tomcat-dq` - (optional) Tomcat 7 (Data Qaulity proxy).
+-  `tomcat-dq` - (optional) Tomcat 7 (Data Quality proxy).
 
 *Additional services may still be added.*
 
