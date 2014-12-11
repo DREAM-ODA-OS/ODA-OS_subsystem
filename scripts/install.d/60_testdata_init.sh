@@ -7,12 +7,15 @@
 
 . `dirname $0`/../lib_logging.sh
 
-TD_DIR="/srv/eodata/testdata"
-DOWNLOAD_SH="$TD_DIR/download_test_data.sh"
 info "Initializing the test data directory $TD_DIR"
 
 [ -z "$ODAOSUSER" ] && error "Missing the required ODAOSUSER variable!"
 [ -z "$ODAOSGROUP" ] && error "Missing the required ODAOSGROUP variable!"
+[ -z "$ODAOSDATADIR" ] && error "Missing the required ODAOSDATADIR variable!"
+
+set -x
+TD_DIR="$ODAOSDATADIR/testdata"
+DOWNLOAD_SH="$TD_DIR/download_test_data.sh"
 
 if [ -f "$TD_DIR" ]
 then
