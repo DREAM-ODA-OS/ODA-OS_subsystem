@@ -59,7 +59,6 @@ download()
         curl -L -D "$_DIR/$_BN.header" "$_URL" -o "$_DIR/$_BN.rpm" && \
         {
             _FN="`cat "$_DIR/$_BN.header" | sed -ne 's/Content-Disposition:.*filename=\(.*[a-zA-Z]\).*/\1/p'`"
-            ls -l "$_DIR" &&
             mv "$_DIR/$_BN.rpm" "$_DIR/$_FN"
         } && rm "$_DIR/$_BN.header"
     } >&2 && echo -n "$_DIR/$_FN"
@@ -76,7 +75,7 @@ then
     #URL="`get_release_url`"
 
     #fixed version download
-    URL="https://github.com/DREAM-ODA-OS/ODAClient/releases/download/0.5.2/ODAClient-0.5.2.tgz"
+    URL="https://github.com/DREAM-ODA-OS/ODAClient/releases/download/0.5.3/ODAClient-0.5.3.tgz"
 
     info "Downloading from: $URL"
 
